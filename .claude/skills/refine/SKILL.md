@@ -15,30 +15,18 @@ The section list comes from `.github/ISSUE_TEMPLATE/work-item.yml` and the
 exit criteria from the Refine stage in `docs/lifecycle.md`. Read both before
 you start; do not work from memory of them.
 
-## 0. Determine the issue number and the session mode
+## 0. Preamble
 
-- The issue number is the **first word** of `$ARGUMENTS` with any leading `#`
-  removed. Ignore everything after it. If that is not a plain number, say so
-  and stop. Never pass `$ARGUMENTS` itself to a command.
-- Decide now whether this session is **interactive** (you can use
-  `AskUserQuestion` or the user can reply) or **non-interactive** (a
-  `claude -p` run, or no way to ask). In a non-interactive session you will
-  stop at the end of step 2 and never write the body or move the stage.
+Read `../_shared/preamble.md`, relative to this skill's base directory, and
+follow it with:
 
-## 1. Read the issue and check its stage
+- expected stage: `stage:refine`;
+- comment headings a non-interactive run may post: `## Refine: proposals`.
 
-```sh
-gh issue view <n> --json title,body,state,labels,comments
-```
+A comment headed `## Refine: proposals` is a previous non-interactive run of
+this skill; start from it.
 
-- The stage is the `stage:*` label in the output. If it is not `stage:refine`,
-  or the issue is closed, say so and stop. Only continue if the user
-  explicitly tells you to.
-- Read every comment: earlier refinement or discussion may already answer
-  questions you would otherwise ask. A comment headed `## Refine: proposals`
-  is a previous non-interactive run; start from it.
-
-## 2. Gap report, before any question
+## 1. Gap report, before any question
 
 Compare the body against the template sections, in template order. For each
 section say one of: **complete**, **weak** (present but not meeting the Refine
@@ -54,20 +42,21 @@ Show the gap report to the user as a short table. Then:
 
 - **Every section complete:** say so and propose moving to Plan. In an
   interactive session, on the user's agreement, skip straight to the
-  `scripts/stage.sh` call in step 6 and leave the body untouched.
-- **Non-interactive session:** post the gap report and your proposed answers
-  to every gap as one comment headed `## Refine: proposals`, then stop. Do
-  not edit the body or move the stage.
+  `scripts/stage.sh` call in step 5 and leave the body untouched.
+- **Non-interactive session:** apply the preamble's duplicate guard for the
+  heading `## Refine: proposals`. If it allows posting, post the gap report
+  and your proposed answers to every gap as one comment under that heading.
+  Either way, stop here. Do not edit the body or move the stage.
 - Otherwise continue.
 
-## 3. Ground yourself in the codebase
+## 2. Ground yourself in the codebase
 
 Before asking anything, look at the parts of the repository the issue touches
 so your questions and proposed answers are concrete. Use `Grep`, `Glob`, and
 `Read`. Note affected files and existing patterns for the Technical
 considerations section. Keep this short; you are refining, not planning.
 
-## 4. Ask about gaps, in batches
+## 3. Ask about gaps, in batches
 
 - At most four questions per batch. Start with the gaps that change the shape
   of the work (goal, scope, acceptance criteria), then the rest.
@@ -84,7 +73,7 @@ considerations section. Keep this short; you are refining, not planning.
   gh issue create --title "[Work item]: <title>" --label stage:refine --body-file <path>
   ```
 
-## 5. Draft, then confirm
+## 4. Draft, then confirm
 
 Write the full refined body using the headings you read from the template, as
 `### <Label>` in template order, with the Scope section's **In scope** and
@@ -96,7 +85,7 @@ any content that sits outside the template sections. Show the complete draft
 and ask for confirmation. **Do not write to the issue until the user
 confirms.** If they ask for changes, revise and show again.
 
-## 6. Write back and move the stage
+## 5. Write back and move the stage
 
 Once confirmed, save the body to a file in your scratchpad and apply it:
 
@@ -110,7 +99,7 @@ items were cut or which criteria were added, so the Plan stage can see it
 without diffing the body. If the body was already complete and left
 untouched, say so in the note.
 
-## 7. Report
+## 6. Report
 
 Tell the user: the issue link, the stage it is now at, the decisions recorded,
 and any new issues created by a split. Suggest `/plan <n>` as the next step if

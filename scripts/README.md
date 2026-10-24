@@ -31,3 +31,30 @@ Behaviour worth knowing:
   the label. Moving a closed issue to a stage reopens it.
 - A `stage:*` label that is not one of the nine stages aborts the script; fix
   the label by hand first.
+
+## risk.sh
+
+Set the risk tier on an issue. Keeps exactly one `risk:*` label on the issue
+and posts a comment for every change. Same argument handling as `stage.sh`.
+
+```sh
+scripts/risk.sh 5                         # print current tier, or "none"
+scripts/risk.sh 5 medium                  # none → medium, comment "Risk: none → medium"
+scripts/risk.sh 5 high "Touches auth."    # same, with a note under the first line
+```
+
+Valid tiers: `low medium high critical`, from `docs/risk-assessment.md`.
+Anything else exits with status 2 and changes nothing. Words after the tier
+are joined into the note, so quoting is optional.
+
+Behaviour worth knowing:
+
+- The comment is posted before the label changes, for the same reason as in
+  `stage.sh`.
+- Setting the tier the issue already has prints `already risk:<tier>` and
+  changes nothing.
+- Every other `risk:*` label is removed, so an issue that somehow carries two
+  risk labels ends with exactly one. The target label is never passed to
+  `--remove-label`: `gh` applies removals last, and removing and adding the
+  same label would leave the issue with none.
+- Closed issues are not reopened; a tier can be recorded on a closed issue.

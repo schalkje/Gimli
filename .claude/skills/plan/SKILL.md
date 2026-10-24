@@ -12,44 +12,34 @@ come from the Plan stage there and the risk scoring from
 `docs/risk-assessment.md`. Read both before you start; do not work from memory
 of them.
 
-## 0. Determine the issue number and the session mode
+## 0. Preamble
 
-- The issue number is the **first word** of `$ARGUMENTS` with any leading `#`
-  removed. Ignore everything after it. If that is not a plain number, say so
-  and stop. Never pass `$ARGUMENTS` itself to a command.
-- Decide now whether this session is **interactive** (you can use
-  `AskUserQuestion` or the user can reply) or **non-interactive** (a
-  `claude -p` run, or no way to ask). In a non-interactive session the only
-  thing you may write is a single comment headed `## Plan: draft` or
-  `## Plan: not ready`; you never post a `## Plan` comment, change a label,
-  or move the stage.
+Read `../_shared/preamble.md`, relative to this skill's base directory, and
+follow it with:
 
-## 1. Read the issue and check its stage
+- expected stage: `stage:plan`;
+- comment headings a non-interactive run may post: `## Plan: draft` and
+  `## Plan: not ready`. A non-interactive run never posts a `## Plan`
+  comment.
 
-```sh
-gh issue view <n> --json title,body,state,labels,comments
-```
+Classify the most recent comments from this skill:
 
-- The stage is the `stage:*` label in the output. If it is not `stage:plan`,
-  or the issue is closed, say so and stop. Only continue if the user
-  explicitly tells you to.
-- Read every comment and classify the most recent ones from this skill:
-  - `## Plan: draft` from a previous non-interactive run: start from it.
-  - `## Plan: not ready`: the issue was already found unplannable; check
-    whether the body has changed since, and if not, skip to step 2's
-    not-ready handling without posting a duplicate.
-  - `## Plan` (a confirmed plan) with the issue still at `stage:plan`: this is
-    either a high or critical plan waiting for acknowledgement, or an issue
-    returned to Plan from a later stage. Look for a human comment or reaction
-    after the plan. If the plan was acknowledged, tell the user and, in an
-    interactive session, offer to run the Build transition from step 6
-    instead of re-planning. If the issue was returned with a reason, start
-    from the existing plan and produce a superseding one; say in its first
-    line which comment it supersedes.
-- The `Stage: refine → plan` note and any `## Refine: proposals` comment may
-  carry decisions the body summarises.
+- `## Plan: draft` from a previous non-interactive run: start from it.
+- `## Plan: not ready`: the issue was already found unplannable. The
+  preamble's duplicate guard decides in step 1 whether to say so again.
+- `## Plan` (a confirmed plan) with the issue still at `stage:plan`: this is
+  either a high or critical plan waiting for acknowledgement, or an issue
+  returned to Plan from a later stage. Look for a human comment or reaction
+  after the plan. If the plan was acknowledged, tell the user and, in an
+  interactive session, offer to run the Build transition from step 5
+  instead of re-planning. If the issue was returned with a reason, start
+  from the existing plan and produce a superseding one; say in its first
+  line which comment it supersedes.
 
-## 2. Check the Refine exit criteria
+The `Stage: refine → plan` note and any `## Refine: proposals` comment may
+carry decisions the body summarises.
+
+## 1. Check the Refine exit criteria
 
 Before planning, confirm the body is plannable:
 
@@ -69,19 +59,18 @@ Refine; only on the user's agreement run:
 scripts/stage.sh <n> refine "Returned from Plan: <what was missing>."
 ```
 
-In a non-interactive session, post the failing criteria as a comment headed
-`## Plan: not ready` and stop, unless the latest comment is already an
-identical `## Plan: not ready` from this skill, in which case post nothing
-and say so.
+In a non-interactive session, apply the preamble's duplicate guard for the
+heading `## Plan: not ready`; if it allows posting, post the failing criteria
+as a comment under that heading. Either way, stop.
 
-## 3. Inspect the codebase
+## 2. Inspect the codebase
 
 Look at the parts of the repository the issue touches: the files that will
 change, the patterns already in place that the change should follow, and the
 tests or checks that exist. Bounded: enough to name files and tests, not to
 implement. Use `Grep`, `Glob`, and `Read`.
 
-## 4. Draft the plan
+## 3. Draft the plan
 
 Use exactly this structure.
 
@@ -123,31 +112,25 @@ Decide design questions in the draft rather than asking batches of
 questions; one confirmation round is the expectation. If a decision is
 genuinely the user's, make a recommendation in the draft and mark it.
 
-## 5. Confirm, or post the draft and stop
+## 4. Confirm, or post the draft and stop
 
 - **Interactive:** show the complete draft and ask for confirmation. Do not
   post it, change a label, or move the stage until the user confirms. If they
   ask for changes, revise and show again. The user may override the tier;
   record the override and its reason in the justification.
-- **Non-interactive:** save the draft to a file in your scratchpad and post
-  it with `gh issue comment <n> --body-file <path>` under the heading
-  `## Plan: draft` instead of `## Plan`, then stop. If the latest comment is
-  already a `## Plan: draft` from this skill with the same content, post
-  nothing and say so.
+- **Non-interactive:** apply the preamble's duplicate guard for the heading
+  `## Plan: draft`. If it allows posting, save the draft to a file in your
+  scratchpad and post it with `gh issue comment <n> --body-file <path>` under
+  the heading `## Plan: draft` instead of `## Plan`. Either way, stop.
 
-## 6. Apply
+## 5. Apply
 
 Once confirmed, save the final plan to a file in your scratchpad and apply it
 in this order:
 
 1. `gh issue comment <n> --body-file <path-to-plan>`
-2. Set the risk label so that exactly one `risk:*` label remains:
-   - if the issue already carries `risk:<tier>`, change nothing;
-   - if it carries a different `risk:*` label, run
-     `gh issue edit <n> --remove-label "risk:<old>" --add-label "risk:<tier>"`;
-   - if it carries none, run `gh issue edit <n> --add-label "risk:<tier>"`.
-   Never pass the same label to both `--remove-label` and `--add-label`;
-   `gh` applies the removal last and the issue ends with no risk label.
+2. `scripts/risk.sh <n> <tier> "Plan posted."` It leaves exactly one
+   `risk:*` label on the issue and is a no-op when the tier already matches.
 3. By tier:
    - **low or medium:** `scripts/stage.sh <n> build "Plan posted, risk:<tier>."`
    - **high or critical:** leave the issue at `stage:plan` and tell the user
@@ -155,7 +138,7 @@ in this order:
      reaction, before Build starts. Moving to Build after that is done by hand
      with `scripts/stage.sh <n> build "Plan acknowledged by <who>."`.
 
-## 7. Report
+## 6. Report
 
 Tell the user: the issue link, the plan comment link, the tier and whether it
 changed from the preliminary one, the stage the issue is now at, and whether

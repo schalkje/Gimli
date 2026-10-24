@@ -36,7 +36,9 @@ label is present at any time. The risk tier is recorded with `risk:<tier>`.
 
 Change the stage with `scripts/stage.sh <issue> <stage> [note]`. It swaps the
 label and posts a `Stage: <old> → <new>` comment so the transition is in the
-audit trail. Do not edit stage labels by hand.
+audit trail. Change the tier with `scripts/risk.sh <issue> <tier> [note]`,
+which does the same with a `Risk: <old> → <new>` comment. Do not edit stage
+or risk labels by hand.
 
 ## Stages
 
