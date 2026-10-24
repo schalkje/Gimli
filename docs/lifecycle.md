@@ -34,6 +34,10 @@ Stage progress is recorded on the issue with labels of the form
 `stage:<name>`, for example `stage:refine` or `stage:build`. Exactly one stage
 label is present at any time. The risk tier is recorded with `risk:<tier>`.
 
+Change the stage with `scripts/stage.sh <issue> <stage> [note]`. It swaps the
+label and posts a `Stage: <old> → <new>` comment so the transition is in the
+audit trail. Do not edit stage labels by hand.
+
 ## Stages
 
 ### 1. Idea
@@ -147,7 +151,7 @@ The change is merged and the issue is closed.
 | | |
 |---|---|
 | Entry | `stage:merge`. |
-| Activity | Squash or merge per repository settings. `risk:low` pull requests may auto-merge. The issue is closed by the merge when the pull request targets `main`; a pull request stacked on another branch does not trigger closing keywords, so close the issue manually with a comment linking the merge. The branch is deleted. |
+| Activity | Squash or merge per repository settings. `risk:low` pull requests may auto-merge. Then run `scripts/stage.sh <issue> close "Merged in #<pr>"`: it removes the stage label and records the transition whether or not GitHub already closed the issue through a closing keyword. The branch is deleted. |
 | Artifact | Merge commit on `main`; closed issue. |
 | Exit | Change is on `main`. Issue is closed. |
 | Label | None; the issue is closed. |
@@ -156,9 +160,9 @@ The change is merged and the issue is closed.
 
 Any stage may send work back to an earlier one. When that happens:
 
-1. Post an issue comment stating which stage is being returned to and why.
-2. Update the `stage:` label.
-3. Continue from that stage's entry criteria.
+1. Run `scripts/stage.sh <issue> <stage> "<reason>"`. It posts the comment and
+   moves the label, and reopens the issue if it was closed.
+2. Continue from that stage's entry criteria.
 
 Common returns: Plan reveals the issue is underspecified (back to Refine);
 Test reveals a design problem (back to Plan); Review requests changes

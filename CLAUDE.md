@@ -16,6 +16,8 @@ lifecycle described in `docs/lifecycle.md`.
   change needs human review or can proceed through AI review.
 - Use the `gh` CLI for all GitHub interaction: reading and updating issues,
   commenting, creating pull requests, applying labels.
+- Move issues between stages with `scripts/stage.sh <issue> <stage> [note]`,
+  never by editing `stage:*` labels directly. See `scripts/README.md`.
 - Record decisions and evidence in GitHub, not only in the conversation. Plans
   go on the issue as a comment; test evidence goes in the pull request body.
 
