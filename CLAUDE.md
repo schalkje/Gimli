@@ -27,6 +27,7 @@ lifecycle described in `docs/lifecycle.md`.
 - `README.md`: product vision and overview.
 - `docs/lifecycle.md`: stage definitions, entry and exit criteria, artifacts.
 - `docs/risk-assessment.md`: risk tiers and the criteria that assign them.
+- `docs/glossary.md`: one-line definitions of lifecycle terms.
 - `.github/ISSUE_TEMPLATE/`: the work item template that starts the cycle.
 - `.github/PULL_REQUEST_TEMPLATE.md`: the pull request template that carries
   evidence and the final risk assessment.
