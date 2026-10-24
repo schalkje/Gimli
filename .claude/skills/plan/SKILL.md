@@ -30,7 +30,10 @@ Classify the most recent comments from this skill:
 - `## Plan` (a confirmed plan) with the issue still at `stage:plan`: this is
   either a high or critical plan waiting for acknowledgement, or an issue
   returned to Plan from a later stage. Look for a human comment or reaction
-  after the plan. If the plan was acknowledged, tell the user and, in an
+  after the plan. Comments headed `Stage:` or `Risk:` are helper output, not
+  acknowledgement, even though they carry a person's login; the `Risk:`
+  comment from step 5 always follows the plan. If the plan was acknowledged,
+  tell the user and, in an
   interactive session, offer to run the Build transition from step 5
   instead of re-planning. If the issue was returned with a reason, start
   from the existing plan and produce a superseding one; say in its first

@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-# Set the risk tier label on a GitHub issue.
+# Set the risk tier label on a GitHub issue or pull request.
 #
 #   risk.sh <issue>                   print the current tier, or "none"
 #   risk.sh <issue> <tier> [note...]  post a comment, then replace the risk label
@@ -43,6 +43,13 @@ fi
 # Current risk labels, without the prefix. Fails if the issue does not exist.
 CURRENT=$(gh issue view "$ISSUE" --json labels \
   --jq '[.labels[].name | select(startswith("risk:")) | sub("^risk:"; "")] | join(" ")')
+
+for t in $CURRENT; do
+  if ! is_tier "$t"; then
+    echo "risk.sh: issue #$ISSUE carries a non-canonical risk label; fix it by hand first. Found: $CURRENT" >&2
+    exit 1
+  fi
+done
 OLD=${CURRENT:-none}
 
 if [ -z "$TARGET" ]; then

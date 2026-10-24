@@ -77,7 +77,7 @@ An implementation plan is produced and recorded on the issue.
 | Activity | Inspect the codebase, identify affected files and components, decide on approach, list steps, identify tests to add or change, confirm or revise the risk tier. |
 | Artifact | A plan posted as an issue comment, headed `## Plan`. A comment headed `## Plan: draft` is an unconfirmed draft from a non-interactive run and `## Plan: not ready` records that the Refine exit criteria were not met; neither is the Plan artifact. |
 | Exit | The plan lists concrete steps, files or areas affected, the tests that will prove each acceptance criterion, and the assessed risk tier with reasoning. For `risk:high` and above, a human has acknowledged the plan with a comment or reaction before Build starts. |
-| Label | `risk:<tier>` applied. `stage:build` for low and medium. High and critical stay at `stage:plan` until a human acknowledges the plan; the Build transition is then made by hand. |
+| Label | `risk:<tier>` applied with `scripts/risk.sh`. `stage:build` for low and medium. High and critical stay at `stage:plan` until a human acknowledges the plan; the Build transition is then made by hand. |
 
 ### 4. Build
 
@@ -123,7 +123,7 @@ The final risk tier is determined and the review path is chosen.
 |---|---|
 | Entry | Pull request is ready for review with `stage:assess`. |
 | Activity | Re-evaluate risk against `risk-assessment.md` using the actual diff, not the plan. Compare with the tier set at Plan. Fill the Risk assessment section of the pull request body with the tier and justification; if the tier changed, explain what changed. |
-| Artifact | `risk:<tier>` label on the pull request and a completed Risk assessment section in the pull request body. |
+| Artifact | `risk:<tier>` label on the pull request, set with `scripts/risk.sh <pr> <tier>`, and a completed Risk assessment section in the pull request body. |
 | Exit | Risk tier is final and the review path is selected. |
 | Label | `stage:review` |
 

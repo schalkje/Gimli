@@ -54,6 +54,9 @@ A non-interactive run is often repeated, by a schedule or a retry, against an
 issue nobody has touched. Before posting a comment under heading `H`:
 
 1. Find the most recent comment on the issue. If it is not headed `H`, post.
+   If it is headed `H` but has been edited since it was posted
+   (`includesCreatedEdit` is true in the `gh issue view` output), someone
+   answered in place: post.
 2. Otherwise find when the issue body was last edited:
 
    ```sh
@@ -71,6 +74,5 @@ issue nobody has touched. Before posting a comment under heading `H`:
 
 The guard is by heading and timestamp, not by content: a regenerated comment
 rarely matches the previous one word for word, so comparing text would not
-stop the duplicate. Any newer human comment, or a body edit, re-arms the skill
-because the most recent comment is then no longer headed `H`, or the body is
-newer than it.
+stop the duplicate. Any newer comment, a body edit, or an edit to the guarded
+comment re-arms the skill. A title or label change alone does not.

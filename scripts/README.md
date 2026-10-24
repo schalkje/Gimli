@@ -34,8 +34,9 @@ Behaviour worth knowing:
 
 ## risk.sh
 
-Set the risk tier on an issue. Keeps exactly one `risk:*` label on the issue
-and posts a comment for every change. Same argument handling as `stage.sh`.
+Set the risk tier on an issue or a pull request; both take the same number
+argument. Keeps exactly one `risk:*` label and posts a comment for every
+change. Same argument handling as `stage.sh`.
 
 ```sh
 scripts/risk.sh 5                         # print current tier, or "none"
@@ -57,4 +58,6 @@ Behaviour worth knowing:
   risk labels ends with exactly one. The target label is never passed to
   `--remove-label`: `gh` applies removals last, and removing and adding the
   same label would leave the issue with none.
+- A `risk:*` label that is not one of the four tiers aborts the script before
+  anything is posted; fix the label by hand first.
 - Closed issues are not reopened; a tier can be recorded on a closed issue.
