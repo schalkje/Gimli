@@ -74,14 +74,14 @@ How well do tests prove the change?
 2. Take the highest tier floor as the base.
 3. Apply the test coverage adjustment.
 4. Record the tier and a one or two sentence justification. During Plan this
-   goes in the plan comment; during Assess it goes in the assessment comment
-   on the pull request.
+   goes in the plan comment; during Assess it goes in the Risk assessment
+   section of the pull request body.
 5. Apply the `risk:<tier>` label.
 
 ## Escalation
 
 - If the final tier at Assess is higher than the tier set at Plan, the
-  assessment comment must explain what changed.
+  Risk assessment section must explain what changed.
 - Anyone, human or agent, may raise the tier at any time with a comment
   explaining why. Lowering a tier set by a human requires that human's
   agreement.

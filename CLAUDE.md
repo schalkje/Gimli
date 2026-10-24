@@ -25,6 +25,8 @@ lifecycle described in `docs/lifecycle.md`.
 - `docs/lifecycle.md`: stage definitions, entry and exit criteria, artifacts.
 - `docs/risk-assessment.md`: risk tiers and the criteria that assign them.
 - `.github/ISSUE_TEMPLATE/`: the work item template that starts the cycle.
+- `.github/PULL_REQUEST_TEMPLATE.md`: the pull request template that carries
+  evidence and the final risk assessment.
 - `.claude/`: skills, agents, and settings that implement the lifecycle
   (added as stages are automated).
 
