@@ -55,26 +55,18 @@ gh issue view <n> --json title,body,state,labels,comments
 A non-interactive run is often repeated, by a schedule or a retry, against an
 issue nobody has touched. Before posting a comment under heading `H`:
 
-1. Find the most recent comment on the issue. If it is not headed `H`, post.
-   If it is headed `H` but has been edited since it was posted
-   (`includesCreatedEdit` is true in the `gh issue view` output), someone
-   answered in place: post.
-2. Otherwise find when the issue body was last edited:
+```sh
+scripts/guard.sh <n> "<H>"
+```
 
-   ```sh
-   gh api graphql -F owner='{owner}' -F repo='{repo}' -F n=<n> \
-     -f query='query($owner:String!,$repo:String!,$n:Int!){repository(owner:$owner,name:$repo){issue(number:$n){createdAt lastEditedAt}}}' \
-     --jq '.data.repository.issue | (.lastEditedAt // .createdAt)'
-   ```
-
-   `lastEditedAt` is null until the body is edited; the fallback is the
-   creation time.
-3. If the body edit time is earlier than that comment's `createdAt`, nothing
-   has changed since the skill last spoke: post nothing and say so in your
-   report, naming the existing comment.
-4. If the body was edited after the comment, post.
+- **Exit 0:** post.
+- **Exit 1:** nothing has changed since the skill last spoke. Post nothing,
+  and quote the script's `skip:` line in your report; it names the existing
+  comment and the timestamps compared.
+- **Any other status:** post nothing and report the error.
 
 The guard is by heading and timestamp, not by content: a regenerated comment
 rarely matches the previous one word for word, so comparing text would not
 stop the duplicate. Any newer comment, a body edit, or an edit to the guarded
-comment re-arms the skill. A title or label change alone does not.
+comment re-arms the skill. A title or label change alone does not. The exact
+rule is in `scripts/README.md`, section `guard.sh`.

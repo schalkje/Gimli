@@ -9,34 +9,14 @@
 
 set -eu
 
+. "$(dirname "$0")/lib.sh"
+
 TIERS="low medium high critical"
 
-usage() {
-  sed -n '2,8p' "$0" | sed 's/^# \{0,1\}//'
-  exit 2
-}
+parse_args "$@"
 
-is_tier() {
-  for t in $TIERS; do
-    [ "$t" = "$1" ] && return 0
-  done
-  return 1
-}
-
-[ $# -ge 1 ] || usage
-ISSUE=$1
-case "$ISSUE" in
-  ''|*[!0-9]*) echo "risk.sh: issue must be a number, got '$ISSUE'" >&2; exit 2 ;;
-esac
-TARGET=${2:-}
-NOTE=""
-if [ $# -ge 3 ]; then
-  shift 2
-  NOTE="$*"
-fi
-
-if [ -n "$TARGET" ] && ! is_tier "$TARGET"; then
-  echo "risk.sh: unknown tier '$TARGET'. Valid: $TIERS" >&2
+if [ -n "$TARGET" ] && ! in_list "$TARGET" "$TIERS"; then
+  echo "$PROG: unknown tier '$TARGET'. Valid: $TIERS" >&2
   exit 2
 fi
 
@@ -44,12 +24,7 @@ fi
 CURRENT=$(gh issue view "$ISSUE" --json labels \
   --jq '[.labels[].name | select(startswith("risk:")) | sub("^risk:"; "")] | join(" ")')
 
-for t in $CURRENT; do
-  if ! is_tier "$t"; then
-    echo "risk.sh: issue #$ISSUE carries a non-canonical risk label; fix it by hand first. Found: $CURRENT" >&2
-    exit 1
-  fi
-done
+check_canonical risk "$ISSUE" "$CURRENT" "$TIERS"
 OLD=${CURRENT:-none}
 
 if [ -z "$TARGET" ]; then
@@ -71,21 +46,10 @@ for t in $CURRENT; do
   REMOVE="${REMOVE:+$REMOVE,}risk:$t"
 done
 
-COMMENT="Risk: $OLD → $TARGET"
-if [ -n "$NOTE" ]; then
-  COMMENT="$COMMENT
-
-$NOTE"
-fi
-
 # Comment first: if a later step fails, the issue is documented but unchanged,
 # which is easier to recover than a changed but undocumented issue.
-gh issue comment "$ISSUE" --body "$COMMENT" >/dev/null
+post_comment "$ISSUE" "Risk: $OLD → $TARGET" "$NOTE"
 
-if [ -n "$REMOVE" ]; then
-  gh issue edit "$ISSUE" --remove-label "$REMOVE" --add-label "risk:$TARGET" >/dev/null
-else
-  gh issue edit "$ISSUE" --add-label "risk:$TARGET" >/dev/null
-fi
+swap_labels "$ISSUE" "$REMOVE" "risk:$TARGET"
 
 echo "#$ISSUE: $OLD → $TARGET"
