@@ -1,0 +1,72 @@
+name: Work item
+description: A change to be taken through the Gimli development lifecycle.
+title: "[Work item]: "
+labels: ["stage:refine"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This issue starts the Gimli development lifecycle (see `docs/lifecycle.md`).
+        Fill in what you know. Gimli will help refine the rest.
+
+  - type: textarea
+    id: goal
+    attributes:
+      label: Goal
+      description: What should be different when this is done, and why does it matter?
+      placeholder: As a ..., I want ..., so that ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope
+      description: What is in scope and what is explicitly out of scope?
+      value: |
+        **In scope**
+        -
+
+        **Out of scope**
+        -
+
+  - type: textarea
+    id: requirements
+    attributes:
+      label: Requirements
+      description: Functional and non-functional requirements. Constraints the solution must respect.
+      placeholder: "-"
+
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: Specific, testable statements. Each one should map to a test or check in the pull request.
+      value: |
+        - [ ]
+        - [ ]
+
+  - type: textarea
+    id: technical
+    attributes:
+      label: Technical considerations
+      description: Known affected areas, dependencies, approach ideas, risks, open questions.
+
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Expected test evidence
+      description: What should the pull request show to prove each acceptance criterion? Test output, screenshots, logs, manual steps.
+
+  - type: dropdown
+    id: risk
+    attributes:
+      label: Preliminary risk tier
+      description: Best guess using `docs/risk-assessment.md`. Confirmed during Plan and Assess.
+      options:
+        - Unknown
+        - Low
+        - Medium
+        - High
+        - Critical
+      default: 0
