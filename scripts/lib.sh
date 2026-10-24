@@ -8,6 +8,9 @@
 
 PROG=$(basename "$0")
 
+# Label names are iterated unquoted below; never expand them as globs.
+set -f
+
 # Print the calling script's header comment, without the shebang, and exit 2.
 usage() {
   awk 'NR == 1 { next } /^#/ { sub(/^# ?/, ""); print; next } { exit }' "$0"

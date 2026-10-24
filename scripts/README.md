@@ -93,9 +93,11 @@ platform `date` parsing is involved.
 | 0 | Post | `post: <reason>` |
 | 1 | Do not post | `skip: <comment url> posted <time>; body last changed <time>, not after it` |
 | 2 | Usage error: not exactly two arguments, a non-numeric issue, or an empty heading. `gh` is not called. | usage or error on stderr |
-| 3 | `gh` failed, for example the issue does not exist | error on stderr |
+| 3 | `gh` failed, for example the issue does not exist, or `lib.sh` is not next to the script | error on stderr |
 
 A failure exits 3, never 0 or 1, so a caller cannot mistake it for a decision.
+The number may be an issue or a pull request. The heading is trimmed of
+trailing whitespace like the comment's first line, and must be one line.
 
 ## lib.sh
 
