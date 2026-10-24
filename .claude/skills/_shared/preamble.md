@@ -27,6 +27,10 @@ headings the skill names for that purpose. A non-interactive run never edits
 the issue body, posts a confirmed artifact, changes a label, or moves the
 stage. When unsure which mode applies, treat the session as non-interactive.
 
+Temporary files, such as a comment body to pass with `--body-file`, go in the
+session's scratchpad directory when one is given, otherwise in the system
+temporary directory. Never write them inside the repository.
+
 ## 3. Stage check
 
 Read the issue:
