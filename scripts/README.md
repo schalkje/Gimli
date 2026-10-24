@@ -61,3 +61,49 @@ Behaviour worth knowing:
 - A `risk:*` label that is not one of the four tiers aborts the script before
   anything is posted; fix the label by hand first.
 - Closed issues are not reopened; a tier can be recorded on a closed issue.
+
+## guard.sh
+
+Decide whether a non-interactive skill run may post a comment under a
+heading, so that a run repeated by a schedule or a retry against an untouched
+issue does not post the same comment again. This is the duplicate guard in
+`.claude/skills/_shared/preamble.md`, section 4.
+
+```sh
+scripts/guard.sh 5 "## Plan: draft"   # exit 0 post, 1 skip; prints one reason line
+```
+
+The rule looks only at the most recent comment on the issue:
+
+1. No comments: post.
+2. Its first line, with trailing whitespace and carriage return removed, is
+   not exactly the heading: post.
+3. It is headed by the heading but was edited after it was posted
+   (`includesCreatedEdit`), meaning someone answered in place: post.
+4. The issue body last changed (`lastEditedAt`, or `createdAt` if the body was
+   never edited) after that comment was posted: post.
+5. Otherwise: skip. Equal timestamps count as not after, so the guard errs
+   towards not posting a duplicate.
+
+Timestamps are compared as ISO 8601 UTC strings inside `gh`'s `--jq`, so no
+platform `date` parsing is involved.
+
+| Exit | Meaning | stdout |
+|---|---|---|
+| 0 | Post | `post: <reason>` |
+| 1 | Do not post | `skip: <comment url> posted <time>; body last changed <time>, not after it` |
+| 2 | Usage error: not exactly two arguments, a non-numeric issue, or an empty heading. `gh` is not called. | usage or error on stderr |
+| 3 | `gh` failed, for example the issue does not exist | error on stderr |
+
+A failure exits 3, never 0 or 1, so a caller cannot mistake it for a decision.
+
+## lib.sh
+
+Not a command. A library of helpers sourced by `stage.sh`, `risk.sh`, and
+`guard.sh` with `. "$(dirname "$0")/lib.sh"`, so it is found next to the
+calling script whatever the working directory. It holds only what at least two
+of them use: usage printing from the caller's header comment, the issue-number
+check, argument and note parsing, the membership and canonical-label checks,
+and single `gh` calls to post a comment or edit labels. Rules that belong to
+one script, such as posting the comment before changing labels or `risk.sh`
+never removing its target label, stay in that script.
