@@ -30,7 +30,8 @@ lifecycle described in `docs/lifecycle.md`.
 - `.github/PULL_REQUEST_TEMPLATE.md`: the pull request template that carries
   evidence and the final risk assessment.
 - `.claude/skills/`: one skill per automated lifecycle stage, invoked as
-  `/<stage> <issue>`. Currently: `/refine`.
+  `/<stage> <issue>`. The table at the end of `docs/lifecycle.md` says which
+  stages have one.
 
 ## Conventions
 
