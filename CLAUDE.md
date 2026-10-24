@@ -33,7 +33,8 @@ lifecycle described in `docs/lifecycle.md`.
 - Branch names: `<type>/<short-description>`, for example `feature/refine-skill`
   or `fix/issue-template-typo`. Reference the issue number in the pull request.
 - Commit messages: imperative mood, one logical change per commit.
-- Pull requests target `main` and use the pull request template once it exists.
+- Pull requests target `main` and use `.github/PULL_REQUEST_TEMPLATE.md`. Fill
+  every section; the template implements the Evidence stage.
 - Documentation is the specification. When behaviour and `docs/` disagree,
   fix one of them in the same change.
 

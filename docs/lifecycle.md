@@ -104,8 +104,8 @@ The pull request is completed with everything a reviewer needs.
 | | |
 |---|---|
 | Entry | `stage:evidence`. |
-| Activity | Fill the pull request body: summary, link to the issue, mapping of each acceptance criterion to the evidence proving it, test output or screenshots, known limitations, deviations from the plan. |
-| Artifact | A complete pull request body. |
+| Activity | Fill every section of the pull request template: summary, linked issue, acceptance criteria and evidence (one row per criterion), test output, known limitations, deviations from plan, risk assessment. |
+| Artifact | A complete pull request body following `.github/PULL_REQUEST_TEMPLATE.md`. |
 | Exit | Each acceptance criterion has a stated evidence item. The pull request is marked ready for review. |
 | Label | `stage:assess` |
 
