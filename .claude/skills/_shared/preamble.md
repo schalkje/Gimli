@@ -1,8 +1,9 @@
 # Shared skill preamble
 
 Every lifecycle stage skill starts by following this file. The skill that
-cites it supplies three things: the **expected stage** label, the **comment
-headings** a non-interactive run may post, and the rest of its own procedure.
+cites it supplies three things: the **expected stage** label, the **writes**
+a non-interactive run may make (for most skills, a list of comment headings),
+and the rest of its own procedure.
 Everything here is about the lifecycle contract (`docs/lifecycle.md`, the
 `stage:*` labels, `scripts/stage.sh`, `scripts/risk.sh`); nothing here is
 specific to one repository.
@@ -22,10 +23,11 @@ Decide now, before reading anything, whether this session is:
 - **non-interactive**: a `claude -p` run, a hook, a scheduled run, or any
   session with no way to ask and wait for an answer.
 
-In a non-interactive session the only writes allowed are comments under the
-headings the skill names for that purpose. A non-interactive run never edits
-the issue body, posts a confirmed artifact, changes a label, or moves the
-stage. When unsure which mode applies, treat the session as non-interactive.
+In a non-interactive session a run makes only the writes its skill declares
+for that mode, and nothing else. Anything the skill does not declare,
+including editing the issue body, posting a confirmed artifact, changing a
+label, moving the stage, or pushing, is forbidden in that mode. When unsure
+which mode applies, treat the session as non-interactive.
 
 Temporary files, such as a comment body to pass with `--body-file`, go in the
 session's scratchpad directory when one is given, otherwise in the system

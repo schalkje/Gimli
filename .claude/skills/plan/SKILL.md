@@ -36,8 +36,9 @@ Classify the most recent comments from this skill:
   tell the user and, in an
   interactive session, offer to run the Build transition from step 5
   instead of re-planning. If the issue was returned with a reason, start
-  from the existing plan and produce a superseding one; say in its first
-  line which comment it supersedes.
+  from the existing plan and produce a superseding one. Keep the heading
+  exactly `## Plan` and say on the line after it which comment it
+  supersedes, so `/build` still recognises the plan.
 
 The `Stage: refine → plan` note and any `## Refine: proposals` comment may
 carry decisions the body summarises.
