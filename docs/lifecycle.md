@@ -73,9 +73,9 @@ An implementation plan is produced and recorded on the issue.
 |---|---|
 | Entry | Issue has `stage:plan`. |
 | Activity | Inspect the codebase, identify affected files and components, decide on approach, list steps, identify tests to add or change, confirm or revise the risk tier. |
-| Artifact | A plan posted as an issue comment, headed `## Plan`. |
+| Artifact | A plan posted as an issue comment, headed `## Plan`. A comment headed `## Plan: draft` is an unconfirmed draft from a non-interactive run and `## Plan: not ready` records that the Refine exit criteria were not met; neither is the Plan artifact. |
 | Exit | The plan lists concrete steps, files or areas affected, the tests that will prove each acceptance criterion, and the assessed risk tier with reasoning. For `risk:high` and above, a human has acknowledged the plan with a comment or reaction before Build starts. |
-| Label | `stage:build`; `risk:<tier>` applied. |
+| Label | `risk:<tier>` applied. `stage:build` for low and medium. High and critical stay at `stage:plan` until a human acknowledges the plan; the Build transition is then made by hand. |
 
 ### 4. Build
 
