@@ -178,7 +178,7 @@ executed by a person working with Claude Code interactively, using
 |---|---|
 | Idea | Issue template `.github/ISSUE_TEMPLATE/work-item.yml` |
 | Refine | `/refine <issue>` skill in `.claude/skills/refine/` |
-| Plan | Manual |
+| Plan | `/plan <issue>` skill in `.claude/skills/plan/` |
 | Build | Manual |
 | Test | Manual |
 | Evidence | Pull request template `.github/PULL_REQUEST_TEMPLATE.md`, filled manually |
