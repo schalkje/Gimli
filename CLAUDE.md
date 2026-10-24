@@ -29,8 +29,8 @@ lifecycle described in `docs/lifecycle.md`.
 - `.github/ISSUE_TEMPLATE/`: the work item template that starts the cycle.
 - `.github/PULL_REQUEST_TEMPLATE.md`: the pull request template that carries
   evidence and the final risk assessment.
-- `.claude/`: skills, agents, and settings that implement the lifecycle
-  (added as stages are automated).
+- `.claude/skills/`: one skill per automated lifecycle stage, invoked as
+  `/<stage> <issue>`. Currently: `/refine`.
 
 ## Conventions
 

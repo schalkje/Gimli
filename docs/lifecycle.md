@@ -170,7 +170,18 @@ Test reveals a design problem (back to Plan); Review requests changes
 
 ## What is not yet automated
 
-This document describes the target process. As of this writing the stages are
-executed by a person working with Claude Code interactively. Skills, agents,
-and GitHub Actions that implement each stage will be added incrementally and
-listed here when they exist.
+This document describes the target process. Stages without a skill below are
+executed by a person working with Claude Code interactively, using
+`scripts/stage.sh` for transitions.
+
+| Stage | Implementation |
+|---|---|
+| Idea | Issue template `.github/ISSUE_TEMPLATE/work-item.yml` |
+| Refine | `/refine <issue>` skill in `.claude/skills/refine/` |
+| Plan | Manual |
+| Build | Manual |
+| Test | Manual |
+| Evidence | Pull request template `.github/PULL_REQUEST_TEMPLATE.md`, filled manually |
+| Assess | Manual |
+| Review | AI review via the `code-review` skill, run manually |
+| Merge | Manual, with `scripts/stage.sh <issue> close` |
