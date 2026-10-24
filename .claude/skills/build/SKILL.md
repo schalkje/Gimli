@@ -82,7 +82,7 @@ non-digit or the end of the line (the search also matches, for example,
 
   ```sh
   git fetch origin
-  git log --branches --remotes --not origin/main --grep="Refs #<n>" --format=%D
+  git log --branches --remotes --not origin/main --grep="Refs #<n>\b" --format=%D
   ```
 
   If it names a branch, check it out (`git pull --ff-only` if it is on
