@@ -104,8 +104,8 @@ The pull request is completed with everything a reviewer needs.
 | | |
 |---|---|
 | Entry | `stage:evidence`. |
-| Activity | Fill the pull request body: summary, link to the issue, mapping of each acceptance criterion to the evidence proving it, test output or screenshots, known limitations, deviations from the plan. |
-| Artifact | A complete pull request body. |
+| Activity | Fill the pull request template: summary, linked issue, acceptance criteria and evidence (one row per criterion, keyed by the criterion's `AC<n>` identifier), test output or screenshots, known limitations, deviations from plan (summarising the deviation comments on the issue). Leave the Risk assessment section for the Assess stage. |
+| Artifact | A complete pull request body following `.github/PULL_REQUEST_TEMPLATE.md`. |
 | Exit | Each acceptance criterion has a stated evidence item. The pull request is marked ready for review. |
 | Label | `stage:assess` |
 
@@ -116,8 +116,8 @@ The final risk tier is determined and the review path is chosen.
 | | |
 |---|---|
 | Entry | Pull request is ready for review with `stage:assess`. |
-| Activity | Re-evaluate risk against `risk-assessment.md` using the actual diff, not the plan. Compare with the tier set at Plan. If the tier increased, note why on the pull request. |
-| Artifact | `risk:<tier>` label on the pull request and a short assessment comment. |
+| Activity | Re-evaluate risk against `risk-assessment.md` using the actual diff, not the plan. Compare with the tier set at Plan. Fill the Risk assessment section of the pull request body with the tier and justification; if the tier changed, explain what changed. |
+| Artifact | `risk:<tier>` label on the pull request and a completed Risk assessment section in the pull request body. |
 | Exit | Risk tier is final and the review path is selected. |
 | Label | `stage:review` |
 
@@ -147,7 +147,7 @@ The change is merged and the issue is closed.
 | | |
 |---|---|
 | Entry | `stage:merge`. |
-| Activity | Squash or merge per repository settings. `risk:low` pull requests may auto-merge. The issue is closed by the merge. The branch is deleted. |
+| Activity | Squash or merge per repository settings. `risk:low` pull requests may auto-merge. The issue is closed by the merge when the pull request targets `main`; a pull request stacked on another branch does not trigger closing keywords, so close the issue manually with a comment linking the merge. The branch is deleted. |
 | Artifact | Merge commit on `main`; closed issue. |
 | Exit | Change is on `main`. Issue is closed. |
 | Label | None; the issue is closed. |

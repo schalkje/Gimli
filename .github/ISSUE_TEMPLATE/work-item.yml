@@ -41,10 +41,10 @@ body:
     id: acceptance
     attributes:
       label: Acceptance criteria
-      description: Specific, testable statements. Each one should map to a test or check in the pull request.
+      description: Specific, testable statements. Keep the AC<n> identifiers; the pull request evidence table is keyed on them.
       value: |
-        - [ ]
-        - [ ]
+        - [ ] AC1:
+        - [ ] AC2:
 
   - type: textarea
     id: technical
