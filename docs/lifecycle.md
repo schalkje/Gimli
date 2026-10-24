@@ -113,7 +113,7 @@ The pull request is completed with everything a reviewer needs.
 | Entry | `stage:evidence`. |
 | Activity | Fill the pull request template: summary, linked issue, acceptance criteria and evidence (one row per criterion, keyed by the criterion's `AC<n>` identifier), test output or screenshots, known limitations, deviations from plan (summarising the deviation comments on the issue). Leave the Risk assessment section for the Assess stage. |
 | Artifact | A complete pull request body following `.github/PULL_REQUEST_TEMPLATE.md`. |
-| Exit | Each acceptance criterion has a stated evidence item. The pull request is marked ready for review. |
+| Exit | Each acceptance criterion has a stated evidence item. The pull request is marked ready for review, which starts the AI review workflow (see Review); it runs while Assess is under way. |
 | Label | `stage:assess` |
 
 ### 7. Assess
@@ -142,10 +142,31 @@ The change is reviewed by the path the risk tier requires.
 | | |
 |---|---|
 | Entry | `stage:review`. |
-| Activity | AI review runs on every pull request. Findings are addressed or explicitly dismissed with a reason. Human review as required by tier. |
+| Activity | AI review runs on every pull request (see below). Findings are addressed or explicitly dismissed with a reason in a `## AI review` comment, posted by whoever does Review. Human review as required by tier. |
 | Artifact | Approvals and resolved review threads on the pull request. |
 | Exit | All required approvals are present. All review threads are resolved. CI is green. |
 | Label | `stage:merge` |
+
+The AI review is `.github/workflows/claude-code-review.yml`. It runs the
+`code-review` plugin on GitHub when a pull request is marked ready and on every
+later push, skips drafts, and posts its findings as inline comments, or one
+summary comment when it finds none, as the Claude GitHub App. The review is
+independent of the authoring session's context but not of its model provider;
+a reviewer from another provider is tracked in #1.
+
+- **Re-running.** The plugin skips a pull request that already has a Claude
+  comment, so a push after the first review starts a run that posts nothing
+  new. For a fresh review, delete the earlier Claude review comment and use
+  *Re-run jobs* on the latest run, or run `/code-review <pr>` locally.
+- **Local fallback.** When Actions is unavailable, run `/code-review <pr>` in
+  Claude Code; it prints its findings, or posts them with `--comment`.
+- **Asking Claude.** A comment containing `@claude` from a user with write
+  access runs `.github/workflows/claude.yml`, which answers questions and can
+  commit a requested fix to the pull request's branch. It never merges,
+  approves, or pushes to `main`, and its commits re-trigger the review.
+- **Workflow changes.** The action only runs a workflow file identical to the
+  copy on `main`, so a pull request that changes either workflow is not
+  reviewed by it; review such a pull request with `/code-review <pr>`.
 
 ### 9. Merge
 
@@ -186,5 +207,5 @@ executed by a person working with Claude Code interactively, using
 | Test | Manual |
 | Evidence | Pull request template `.github/PULL_REQUEST_TEMPLATE.md`, filled manually |
 | Assess | Manual |
-| Review | AI review via the `code-review` skill, run manually |
+| Review | AI review via `.github/workflows/claude-code-review.yml` when the pull request is marked ready; `/code-review <pr>` as local fallback |
 | Merge | Manual, with `scripts/stage.sh <issue> close` |
