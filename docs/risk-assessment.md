@@ -76,7 +76,8 @@ How well do tests prove the change?
 4. Record the tier and a one or two sentence justification. During Plan this
    goes in the plan comment; during Assess it goes in the Risk assessment
    section of the pull request body.
-5. Apply the `risk:<tier>` label.
+5. Apply the label with `scripts/risk.sh <issue-or-pr> <tier> [note]`, which
+   also records the change as a comment. Do not edit `risk:*` labels by hand.
 
 ## Escalation
 
