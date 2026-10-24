@@ -22,7 +22,8 @@ flowchart LR
 - **Human involvement follows risk, not ceremony.** Every change is assessed
   using `risk-assessment.md`. Low-risk changes may proceed autonomously;
   higher-risk changes are presented to a human with everything needed for an
-  effective review.
+  effective review. Today this means `/build` runs unattended, through to the
+  draft pull request, only for `risk:low` issues.
 - **Each stage has explicit exit criteria.** A stage is complete only when its
   exit criteria are met and its artifact exists. Stages are not skipped.
 - **Evidence over assertion.** A claim that something works is backed by test
@@ -86,7 +87,7 @@ The change is implemented on a branch.
 | | |
 |---|---|
 | Entry | Issue has `stage:build`. |
-| Activity | Create a branch named per `CLAUDE.md` conventions. Implement following the plan. Add or update tests. Commit in logical steps. Deviations from the plan are noted as issue comments. |
+| Activity | Create a branch named per `CLAUDE.md` conventions. Implement following the plan. Add or update tests. Commit in logical steps. Deviations from the plan and deferred steps are noted as issue comments headed `## Build: deviation`. `/build` stops for confirmation before anything is pushed; a non-interactive run proceeds unattended only when the issue carries `risk:low`, and refuses otherwise. |
 | Artifact | A branch with commits, and a draft pull request referencing the issue. |
 | Exit | All planned steps are implemented or explicitly deferred with a reason recorded on the issue. The draft pull request exists. |
 | Label | `stage:test` |
@@ -181,7 +182,7 @@ executed by a person working with Claude Code interactively, using
 | Idea | Issue template `.github/ISSUE_TEMPLATE/work-item.yml` |
 | Refine | `/refine <issue>` skill in `.claude/skills/refine/` |
 | Plan | `/plan <issue>` skill in `.claude/skills/plan/` |
-| Build | Manual |
+| Build | `/build <issue>` skill in `.claude/skills/build/` |
 | Test | Manual |
 | Evidence | Pull request template `.github/PULL_REQUEST_TEMPLATE.md`, filled manually |
 | Assess | Manual |
