@@ -97,7 +97,9 @@ the closing keyword.
 Keep a running list of **deviations**: any step implemented differently from
 the plan, with why, and any step **deferred**, with why. A step is never
 dropped silently. Design choices the plan left open are not deviations; make
-them and mention them in the pull request summary.
+them and mention them in the pull request summary. On re-entry, implementing
+a step that an earlier `## Build: deviation` comment deferred is itself a
+deviation to record, so the issue says the deferral was reversed.
 
 ## 4. Gate
 
