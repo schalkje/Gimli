@@ -34,6 +34,10 @@ Stage progress is recorded on the issue with labels of the form
 `stage:<name>`, for example `stage:refine` or `stage:build`. Exactly one stage
 label is present at any time. The risk tier is recorded with `risk:<tier>`.
 
+Change the stage with `scripts/stage.sh <issue> <stage> [note]`. It swaps the
+label and posts a `Stage: <old> → <new>` comment so the transition is in the
+audit trail. Do not edit stage labels by hand.
+
 ## Stages
 
 ### 1. Idea
