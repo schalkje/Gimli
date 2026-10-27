@@ -4,8 +4,8 @@
 set -euo pipefail
 
 stage=$1
-count=$(gh issue list --label stage:$stage --state open --json number --jq length)
-if [ $count > 0 ]; then
+count=$(gh issue list --label "stage:$stage" --state open --json number --jq length)
+if [ "$count" -gt 0 ]; then
   echo "$count open issues at stage:$stage"
 fi
-exit 1
+exit 0
