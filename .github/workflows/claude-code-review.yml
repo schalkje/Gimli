@@ -1,7 +1,8 @@
 # AI review for the Review stage of docs/lifecycle.md.
-# Runs the code-review plugin when a pull request is marked ready, and on
-# every later push. Drafts are skipped: Build opens a draft and the Evidence
-# stage marks it ready.
+# Runs the code-review plugin when a pull request is marked ready. Later
+# pushes start it again, but the plugin skips a pull request it has already
+# commented on (see docs/lifecycle.md, Review). Drafts are skipped: Build opens
+# a draft and the Evidence stage marks it ready.
 #
 # The job's GITHUB_TOKEN is read-only. Claude posts with the Claude GitHub
 # App's own token, so what keeps this review from changing the repository is
@@ -17,6 +18,12 @@ name: Claude Code Review
 on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
+
+# One review per pull request at a time, so overlapping events do not post
+# two full reviews.
+concurrency:
+  group: claude-review-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
 
 jobs:
   review:

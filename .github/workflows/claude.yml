@@ -1,8 +1,10 @@
 # Responds to @claude in issue and pull request comments and reviews, so a
 # reviewer can ask for an explanation or a fix. On a pull request, a requested
 # fix is committed to that pull request's branch; on an issue, the action puts
-# it on a new claude/ branch. Claude never merges, approves, or pushes to
-# main. Its commits re-trigger the AI review like any other push.
+# it on a new claude/ branch. By default the action does not merge, approve,
+# or push to main, but the Claude app's token could: only branch protection on
+# main (#29) enforces it. Commits made here count toward the final-diff rule in
+# docs/lifecycle.md, Review.
 #
 # Only users with write access can trigger it: the action checks the actor,
 # and this workflow does not set allowed_non_write_users.
