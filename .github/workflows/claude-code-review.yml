@@ -1,0 +1,51 @@
+# AI review for the Review stage of docs/lifecycle.md.
+# Runs the code-review plugin when a pull request is marked ready. Later
+# pushes start it again, but the plugin skips a pull request it has already
+# commented on (see docs/lifecycle.md, Review). Drafts are skipped: Build opens
+# a draft and the Evidence stage marks it ready. Pull requests from forks are
+# skipped, because GitHub withholds the secret and OIDC token from them.
+#
+# The job's GITHUB_TOKEN is read-only. Claude posts with the Claude GitHub
+# App's own token, so what keeps this review from changing the repository is
+# the --allowedTools list below: gh commands that read the pull request or post
+# a comment on it, and the inline-comment tool, matching the plugin's
+# allowed-tools frontmatter. Do not add tools that edit files, commit, or push.
+#
+# The action only runs when this file is identical to the copy on the default
+# branch; on a pull request that changes it, the run skips with a warning.
+
+name: Claude Code Review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+jobs:
+  review:
+    if: >-
+      github.event.pull_request.draft == false &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    # One review per pull request at a time. Runs queue rather than cancel, so
+    # a push never cuts a review off after some of its comments are posted.
+    concurrency:
+      group: claude-review-${{ github.event.pull_request.number }}
+      cancel-in-progress: false
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      pull-requests: read
+      issues: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+
+      - uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          plugin_marketplaces: "https://github.com/anthropics/claude-code.git"
+          plugins: "code-review@claude-code-plugins"
+          prompt: "/code-review:code-review --comment ${{ github.repository }}/pull/${{ github.event.pull_request.number }}"
+          claude_args: '--allowedTools "mcp__github_inline_comment__create_inline_comment,Bash(gh pr view:*),Bash(gh pr diff:*),Bash(gh pr list:*),Bash(gh pr comment:*),Bash(gh issue view:*),Bash(gh issue list:*),Bash(gh search:*)"'

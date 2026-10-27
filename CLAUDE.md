@@ -12,8 +12,14 @@ lifecycle described in `docs/lifecycle.md`.
 - Follow the stages in `docs/lifecycle.md` in order: Refine, Plan, Build, Test,
   Evidence, Assess, Review, Merge. Each stage has entry and exit criteria.
   Do not skip a stage or declare one complete without meeting its exit criteria.
-- Assess risk using `docs/risk-assessment.md`. The risk tier decides whether a
-  change needs human review or can proceed through AI review.
+- Assess risk using `docs/risk-assessment.md`. Every change gets an AI review;
+  the risk tier decides what human review it needs on top of that.
+- Mark a pull request ready for review only when the Evidence stage is
+  complete: marking it ready starts the AI review on GitHub
+  (`.github/workflows/claude-code-review.yml`). It reviews a pull request
+  once; if that review skipped, did not finish, or predates later commits,
+  run `/code-review <pr>` on the final diff.
+  `@claude` in a comment asks Claude for an explanation or a fix.
 - Use the `gh` CLI for all GitHub interaction: reading and updating issues,
   commenting, creating pull requests, applying labels.
 - Move issues between stages with `scripts/stage.sh <issue> <stage> [note]`,

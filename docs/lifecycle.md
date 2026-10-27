@@ -8,9 +8,9 @@ this document disagree, one of them is wrong and must be fixed.
 flowchart LR
 	idea[Idea] --> refine[Refine] --> plan[Plan] --> build[Build]
 	build --> test[Test] --> evidence[Evidence] --> assess[Assess]
-	assess -->|Low risk| aiReview[AI review]
-	assess -->|Higher risk| humanReview[Human review]
-	aiReview --> merge[Merge, when ready]
+	assess --> aiReview[AI review]
+	aiReview -->|Low risk| merge[Merge, when ready]
+	aiReview -->|Higher risk| humanReview[Human review]
 	humanReview --> merge
 ```
 
@@ -113,7 +113,7 @@ The pull request is completed with everything a reviewer needs.
 | Entry | `stage:evidence`. |
 | Activity | Fill the pull request template: summary, linked issue, acceptance criteria and evidence (one row per criterion, keyed by the criterion's `AC<n>` identifier), test output or screenshots, known limitations, deviations from plan (summarising the deviation comments on the issue). Leave the Risk assessment section for the Assess stage. |
 | Artifact | A complete pull request body following `.github/PULL_REQUEST_TEMPLATE.md`. |
-| Exit | Each acceptance criterion has a stated evidence item. The pull request is marked ready for review. |
+| Exit | Each acceptance criterion has a stated evidence item. The pull request is marked ready for review, which starts the AI review workflow (see Review); it runs while Assess is under way. |
 | Label | `stage:assess` |
 
 ### 7. Assess
@@ -142,10 +142,49 @@ The change is reviewed by the path the risk tier requires.
 | | |
 |---|---|
 | Entry | `stage:review`. |
-| Activity | AI review runs on every pull request. Findings are addressed or explicitly dismissed with a reason. Human review as required by tier. |
-| Artifact | Approvals and resolved review threads on the pull request. |
-| Exit | All required approvals are present. All review threads are resolved. CI is green. |
+| Activity | AI review runs on every pull request (see below). Findings are addressed or explicitly dismissed with a reason in a `## AI review` comment, posted by whoever does Review. Human review as required by tier. |
+| Artifact | A `## AI review` comment resolving every AI review finding, approvals, and resolved review threads on the pull request. |
+| Exit | An AI review that is present, complete, and current (see below) exists, and its findings are fixed or dismissed in the `## AI review` comment. All required approvals are present. All review threads are resolved. CI is green. |
 | Label | `stage:merge` |
+
+The AI review is `.github/workflows/claude-code-review.yml`. It runs the
+`code-review` plugin on GitHub when a pull request is marked ready, skips
+drafts, and posts its findings as inline comments, or one summary comment when
+it finds none, as the Claude GitHub App. Later pushes start the workflow again,
+but the plugin reviews a pull request only once: it skips any pull request that
+already has a Claude comment. The review is
+independent of the authoring session's context but not of its model provider;
+a reviewer from another provider is tracked in #1.
+
+- **Present, complete, current.** Review needs an AI review that ran, finished,
+  and covers the diff being merged. The workflow's review does not count when
+  it skipped (for example because an `@claude` reply already counts as a Claude
+  comment), when its run was cancelled or failed, or when commits landed after
+  it, including after a return to Build or commits by `@claude`. In any of
+  those cases, run `/code-review <pr>` in Claude Code on the final diff and
+  resolve its findings in the `## AI review` comment as well.
+- **Local review.** `/code-review <pr>` is also the fallback when Actions is
+  unavailable. It does not skip reviewed pull requests; it prints its
+  findings, or posts them with `--comment`. Do not delete the workflow's
+  comments to force a re-run: they are the review threads Review resolves.
+- **Asking Claude.** A comment containing `@claude` from a user with write
+  access runs `.github/workflows/claude.yml`, which answers questions and can
+  commit a requested fix to the pull request's branch. By default the action
+  pushes only to that branch and does not merge or approve, but nothing in the
+  repository enforces this: the Claude app's token can write code and
+  workflows, and only branch protection on `main` (#29) would stop a push
+  there. Its commits are subject to the rule above.
+- **Workflow changes.** The action only runs a workflow file identical to the
+  copy on `main`, so a pull request that changes `claude-code-review.yml` is
+  not reviewed by it; review such a pull request with `/code-review <pr>`.
+- **Forks.** Pull requests from forks are skipped, because GitHub withholds
+  the secret from them; review them with `/code-review <pr>`. For the same
+  reason `claude.yml` fails on reviews and review comments of a fork pull
+  request; ask in a plain pull request comment instead.
+- **Mentions.** Any comment from a user with write access that contains the
+  trigger word `@claude` starts `claude.yml`, including a `## AI review`
+  comment. When writing about the workflow in a comment, refer to it as
+  "the `claude.yml` workflow" rather than writing the mention.
 
 ### 9. Merge
 
@@ -186,5 +225,5 @@ executed by a person working with Claude Code interactively, using
 | Test | Manual |
 | Evidence | Pull request template `.github/PULL_REQUEST_TEMPLATE.md`, filled manually |
 | Assess | Manual |
-| Review | AI review via the `code-review` skill, run manually |
+| Review | AI review via `.github/workflows/claude-code-review.yml` when the pull request is marked ready; `/code-review <pr>` as local fallback |
 | Merge | Manual, with `scripts/stage.sh <issue> close` |
