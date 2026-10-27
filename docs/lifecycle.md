@@ -143,8 +143,8 @@ The change is reviewed by the path the risk tier requires.
 |---|---|
 | Entry | `stage:review`. |
 | Activity | AI review runs on every pull request (see below). Findings are addressed or explicitly dismissed with a reason in a `## AI review` comment, posted by whoever does Review. Human review as required by tier. |
-| Artifact | Approvals and resolved review threads on the pull request. |
-| Exit | All required approvals are present. All review threads are resolved. CI is green. |
+| Artifact | A `## AI review` comment resolving every AI review finding, approvals, and resolved review threads on the pull request. |
+| Exit | An AI review that is present, complete, and current (see below) exists, and its findings are fixed or dismissed in the `## AI review` comment. All required approvals are present. All review threads are resolved. CI is green. |
 | Label | `stage:merge` |
 
 The AI review is `.github/workflows/claude-code-review.yml`. It runs the
@@ -178,7 +178,13 @@ a reviewer from another provider is tracked in #1.
   copy on `main`, so a pull request that changes `claude-code-review.yml` is
   not reviewed by it; review such a pull request with `/code-review <pr>`.
 - **Forks.** Pull requests from forks are skipped, because GitHub withholds
-  the secret from them; review them with `/code-review <pr>`.
+  the secret from them; review them with `/code-review <pr>`. For the same
+  reason `claude.yml` fails on reviews and review comments of a fork pull
+  request; ask in a plain pull request comment instead.
+- **Mentions.** Any comment from a user with write access that contains the
+  trigger word `@claude` starts `claude.yml`, including a `## AI review`
+  comment. When writing about the workflow in a comment, refer to it as
+  "the `claude.yml` workflow" rather than writing the mention.
 
 ### 9. Merge
 
