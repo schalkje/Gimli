@@ -18,9 +18,9 @@ Gimli plans the implementation, delegates work to appropriate coding agents, imp
 flowchart LR
 	idea[Idea] --> refine[Refine] --> plan[Plan] --> build[Build]
 	build --> test[Test] --> evidence[Evidence] --> assess[Assess]
-	assess -->|Low risk| aiReview[AI review]
-	assess -->|Higher risk| humanReview[Human review]
-	aiReview --> merge[Merge, when ready]
+	assess --> aiReview[AI review]
+	aiReview -->|Low risk| merge[Merge, when ready]
+	aiReview -->|Higher risk| humanReview[Human review]
 	humanReview --> merge
 ```
 

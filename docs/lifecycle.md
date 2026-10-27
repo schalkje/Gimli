@@ -8,9 +8,9 @@ this document disagree, one of them is wrong and must be fixed.
 flowchart LR
 	idea[Idea] --> refine[Refine] --> plan[Plan] --> build[Build]
 	build --> test[Test] --> evidence[Evidence] --> assess[Assess]
-	assess -->|Low risk| aiReview[AI review]
-	assess -->|Higher risk| humanReview[Human review]
-	aiReview --> merge[Merge, when ready]
+	assess --> aiReview[AI review]
+	aiReview -->|Low risk| merge[Merge, when ready]
+	aiReview -->|Higher risk| humanReview[Human review]
 	humanReview --> merge
 ```
 
@@ -148,22 +148,29 @@ The change is reviewed by the path the risk tier requires.
 | Label | `stage:merge` |
 
 The AI review is `.github/workflows/claude-code-review.yml`. It runs the
-`code-review` plugin on GitHub when a pull request is marked ready and on every
-later push, skips drafts, and posts its findings as inline comments, or one
-summary comment when it finds none, as the Claude GitHub App. The review is
+`code-review` plugin on GitHub when a pull request is marked ready, skips
+drafts, and posts its findings as inline comments, or one summary comment when
+it finds none, as the Claude GitHub App. Later pushes start the workflow again,
+but the plugin reviews a pull request only once: it skips any pull request that
+already has a Claude comment. The review is
 independent of the authoring session's context but not of its model provider;
 a reviewer from another provider is tracked in #1.
 
-- **Re-running.** The plugin skips a pull request that already has a Claude
-  comment, so a push after the first review starts a run that posts nothing
-  new. For a fresh review, delete the earlier Claude review comment and use
-  *Re-run jobs* on the latest run, or run `/code-review <pr>` locally.
-- **Local fallback.** When Actions is unavailable, run `/code-review <pr>` in
-  Claude Code; it prints its findings, or posts them with `--comment`.
+- **Final diff.** The AI review must cover the diff being merged. If commits
+  landed after the workflow's review, including after a return to Build or
+  commits by `@claude`, run `/code-review <pr>` in Claude Code on the final
+  diff and resolve its findings in the `## AI review` comment as well.
+- **Local review.** `/code-review <pr>` is also the fallback when Actions is
+  unavailable. It does not skip reviewed pull requests; it prints its
+  findings, or posts them with `--comment`. Do not delete the workflow's
+  comments to force a re-run: they are the review threads Review resolves.
 - **Asking Claude.** A comment containing `@claude` from a user with write
   access runs `.github/workflows/claude.yml`, which answers questions and can
-  commit a requested fix to the pull request's branch. It never merges,
-  approves, or pushes to `main`, and its commits re-trigger the review.
+  commit a requested fix to the pull request's branch. By default the action
+  pushes only to that branch and does not merge or approve, but nothing in the
+  repository enforces this: the Claude app's token can write code and
+  workflows, and only branch protection on `main` (#29) would stop a push
+  there. Its commits are subject to the final-diff rule above.
 - **Workflow changes.** The action only runs a workflow file identical to the
   copy on `main`, so a pull request that changes either workflow is not
   reviewed by it; review such a pull request with `/code-review <pr>`.
