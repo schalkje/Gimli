@@ -109,3 +109,5 @@ check, argument and note parsing, the membership and canonical-label checks,
 and single `gh` calls to post a comment or edit labels. Rules that belong to
 one script, such as posting the comment before changing labels or `risk.sh`
 never removing its target label, stay in that script.
+
+<!-- Throwaway line for the #28 post-merge verification; this branch is never merged. -->
