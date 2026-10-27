@@ -17,7 +17,8 @@ lifecycle described in `docs/lifecycle.md`.
 - Mark a pull request ready for review only when the Evidence stage is
   complete: marking it ready starts the AI review on GitHub
   (`.github/workflows/claude-code-review.yml`). It reviews a pull request
-  once; for commits after that, run `/code-review <pr>` on the final diff.
+  once; if that review skipped, did not finish, or predates later commits,
+  run `/code-review <pr>` on the final diff.
   `@claude` in a comment asks Claude for an explanation or a fix.
 - Use the `gh` CLI for all GitHub interaction: reading and updating issues,
   commenting, creating pull requests, applying labels.

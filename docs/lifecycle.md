@@ -156,10 +156,13 @@ already has a Claude comment. The review is
 independent of the authoring session's context but not of its model provider;
 a reviewer from another provider is tracked in #1.
 
-- **Final diff.** The AI review must cover the diff being merged. If commits
-  landed after the workflow's review, including after a return to Build or
-  commits by `@claude`, run `/code-review <pr>` in Claude Code on the final
-  diff and resolve its findings in the `## AI review` comment as well.
+- **Present, complete, current.** Review needs an AI review that ran, finished,
+  and covers the diff being merged. The workflow's review does not count when
+  it skipped (for example because an `@claude` reply already counts as a Claude
+  comment), when its run was cancelled or failed, or when commits landed after
+  it, including after a return to Build or commits by `@claude`. In any of
+  those cases, run `/code-review <pr>` in Claude Code on the final diff and
+  resolve its findings in the `## AI review` comment as well.
 - **Local review.** `/code-review <pr>` is also the fallback when Actions is
   unavailable. It does not skip reviewed pull requests; it prints its
   findings, or posts them with `--comment`. Do not delete the workflow's
@@ -170,10 +173,12 @@ a reviewer from another provider is tracked in #1.
   pushes only to that branch and does not merge or approve, but nothing in the
   repository enforces this: the Claude app's token can write code and
   workflows, and only branch protection on `main` (#29) would stop a push
-  there. Its commits are subject to the final-diff rule above.
+  there. Its commits are subject to the rule above.
 - **Workflow changes.** The action only runs a workflow file identical to the
-  copy on `main`, so a pull request that changes either workflow is not
-  reviewed by it; review such a pull request with `/code-review <pr>`.
+  copy on `main`, so a pull request that changes `claude-code-review.yml` is
+  not reviewed by it; review such a pull request with `/code-review <pr>`.
+- **Forks.** Pull requests from forks are skipped, because GitHub withholds
+  the secret from them; review them with `/code-review <pr>`.
 
 ### 9. Merge
 
