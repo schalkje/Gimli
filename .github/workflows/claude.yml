@@ -6,8 +6,15 @@
 # main (#29) enforces it. Commits made here count toward the review rule in
 # docs/lifecycle.md, Review.
 #
-# Only users with write access can trigger it: the action checks the actor,
-# and this workflow does not set allowed_non_write_users.
+# Two gates decide who can trigger it. The job's if: starts it only when the
+# comment or review author's association is OWNER, MEMBER or COLLABORATOR, so
+# a mention from anyone else on this public repository starts no job and
+# cannot displace a waiting request in the concurrency group. The action then
+# acts only for users with write access (this workflow does not set
+# allowed_non_write_users), which also refuses a read-only collaborator.
+#
+# Claude reads the whole thread, including text written by people who cannot
+# trigger it. Check whose text is in the thread before writing the mention.
 
 name: Claude Code
 
