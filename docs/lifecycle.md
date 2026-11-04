@@ -167,9 +167,13 @@ a reviewer from another provider is tracked in #1.
   unavailable. It does not skip reviewed pull requests; it prints its
   findings, or posts them with `--comment`. Do not delete the workflow's
   comments to force a re-run: they are the review threads Review resolves.
-- **Asking Claude.** A comment containing `@claude` from a user with write
-  access runs `.github/workflows/claude.yml`, which answers questions and can
-  commit a requested fix to the pull request's branch. By default the action
+- **Asking Claude.** A comment containing `@claude` from the owner, a member,
+  or a collaborator starts `.github/workflows/claude.yml`; a mention from
+  anyone else starts no job. The action then acts only for users with write
+  access, so a read-only collaborator is refused. It answers questions and can
+  commit a requested fix to the pull request's branch. Claude reads the whole
+  thread, including text from people who cannot trigger it, so check whose
+  text is in the thread before asking. By default the action
   pushes only to that branch and does not merge or approve, but nothing in the
   repository enforces this: the Claude app's token can write code and
   workflows, and only branch protection on `main` (#29) would stop a push
@@ -181,9 +185,9 @@ a reviewer from another provider is tracked in #1.
   the secret from them; review them with `/code-review <pr>`. For the same
   reason `claude.yml` fails on reviews and review comments of a fork pull
   request; ask in a plain pull request comment instead.
-- **Mentions.** Any comment from a user with write access that contains the
-  trigger word `@claude` starts `claude.yml`, including a `## AI review`
-  comment. When writing about the workflow in a comment, refer to it as
+- **Mentions.** Any comment from the owner, a member, or a collaborator that
+  contains the trigger word `@claude` starts `claude.yml`, including a
+  `## AI review` comment. When writing about the workflow in a comment, refer to it as
   "the `claude.yml` workflow" rather than writing the mention.
 
 ### 9. Merge
