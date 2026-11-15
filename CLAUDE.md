@@ -25,6 +25,16 @@ lifecycle described in `docs/lifecycle.md`.
 - Move issues between stages with `scripts/stage.sh <issue> <stage> [note]`,
   and set the risk tier with `scripts/risk.sh <issue> <tier> [note]`, never by
   editing `stage:*` or `risk:*` labels directly. See `scripts/README.md`.
+- `main` accepts changes only through a squash-merged pull request: the
+  ruleset `protect-main` enforces it, with no bypass for anyone. See
+  `docs/repository-settings.md`. Everything else in Review, including human
+  approval, is a process rule GitHub does not check.
+- Merge a `risk:medium` or higher pull request only on the owner's explicit
+  instruction in that session, and record it in a pull request comment first:
+  `Human approval: <owner> instructed the merge on <date>.`
+- Do not change, disable or delete the ruleset or the repository's merge
+  settings unless the owner asks in that session. The admin credentials Claude
+  runs with could; that is why this rule exists.
 - Record decisions and evidence in GitHub, not only in the conversation. Plans
   go on the issue as a comment; test evidence goes in the pull request body.
 
