@@ -99,11 +99,42 @@ A failure exits 3, never 0 or 1, so a caller cannot mistake it for a decision.
 The number may be an issue or a pull request. The heading is trimmed of
 trailing whitespace like the comment's first line, and must be one line.
 
+## protect-main.sh
+
+Apply the repository settings and the `protect-main` ruleset that make `main`
+accept changes only through a squash-merged pull request. What they enforce,
+the exact calls, and how to undo them are in `docs/repository-settings.md`.
+
+```sh
+scripts/protect-main.sh                   # the repository of the current directory
+scripts/protect-main.sh schalkje/Gimli    # a named repository
+```
+
+Behaviour worth knowing:
+
+- It changes live repository settings, not files. Run it only when the owner
+  asks; `CLAUDE.md` says Claude does not change the ruleset otherwise.
+- The merge settings are patched first, then the ruleset is created or
+  updated. A failure part way can leave the settings changed and the ruleset
+  not; running the script again completes it.
+- The ruleset is found by name among the repository's own rulesets. None:
+  `POST` creates it. One: `PUT` replaces it in place, so a second run leaves
+  one ruleset with the same id. More than one: exit 1 before touching the
+  ruleset, naming the ids.
+- It prints the resulting merge settings and ruleset, so its output is
+  evidence of what was applied.
+
+| Exit | Meaning |
+|---|---|
+| 0 | Settings and ruleset applied and printed |
+| 1 | More than one ruleset named `protect-main`, with the ids on stderr; delete the extras by hand. Or a `gh` call failed, with its error on stderr |
+| 2 | Usage error: more than one argument, or not `<owner>/<repo>`. `gh` is not called |
+
 ## lib.sh
 
-Not a command. A library of helpers sourced by `stage.sh`, `risk.sh`, and
-`guard.sh` with `. "$(dirname "$0")/lib.sh"`, so it is found next to the
-calling script whatever the working directory. It holds only what at least two
+Not a command. A library of helpers sourced by `stage.sh`, `risk.sh`,
+`guard.sh`, and `protect-main.sh` with `. "$(dirname "$0")/lib.sh"`, so it is
+found next to the calling script whatever the working directory. It holds only what at least two
 of them use: usage printing from the caller's header comment, the issue-number
 check, argument and note parsing, the membership and canonical-label checks,
 and single `gh` calls to post a comment or edit labels. Rules that belong to
