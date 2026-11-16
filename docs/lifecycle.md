@@ -136,16 +136,39 @@ The change is reviewed by the path the risk tier requires.
 |---|---|
 | `risk:low` | AI review. A human may review but is not required. |
 | `risk:medium` | AI review plus at least one human approval. |
-| `risk:high` | AI review plus human approval from a code owner. The reviewer confirms evidence against acceptance criteria. |
-| `risk:critical` | As high, plus a second human approval. |
+| `risk:high` | AI review plus human approval from the owner. The reviewer confirms evidence against acceptance criteria. |
+| `risk:critical` | As high, plus a second human approval. With one maintainer this cannot be met today. |
 
 | | |
 |---|---|
 | Entry | `stage:review`. |
 | Activity | AI review runs on every pull request (see below). Findings are addressed or explicitly dismissed with a reason in a `## AI review` comment, posted by whoever does Review. Human review as required by tier. |
-| Artifact | A `## AI review` comment resolving every AI review finding, approvals, and resolved review threads on the pull request. |
-| Exit | An AI review that is present, complete, and current (see below) exists, and its findings are fixed or dismissed in the `## AI review` comment. All required approvals are present. All review threads are resolved. CI is green. |
+| Artifact | A `## AI review` comment resolving every AI review finding, the `Human approval:` comment where the tier requires one, and resolved review threads on the pull request. |
+| Exit | An AI review that is present, complete, and current (see below) exists, and its findings are fixed or dismissed in the `## AI review` comment. Every required human approval is recorded in a `Human approval:` comment (see below). All review threads are resolved. CI is green. |
 | Label | `stage:merge` |
+
+**Human approval.** For `risk:medium` and higher, human approval is the
+owner's instruction to merge. It is not a GitHub review approval: GitHub never
+counts the author's own approval, and the owner authors every pull request.
+Whoever merges records the instruction in a pull request comment before
+merging:
+
+```text
+Human approval: <owner> instructed the merge on <date>.
+```
+
+Claude merges such a pull request only on the owner's explicit instruction in
+that session.
+
+**What GitHub enforces.** The ruleset `protect-main` (see
+`repository-settings.md`) makes changes reach `main` only through a pull
+request, blocks force pushes and deletion of `main`, allows only squash merge,
+and has no bypass for anyone, including the owner and the Claude GitHub App.
+Everything else in the Review exit criteria, including the AI review, human
+approval, resolved threads and green CI, is a process rule: GitHub does not
+check it, and Claude runs with the owner's admin credentials, which could
+change or remove the ruleset itself. Claude does not change the ruleset or the
+merge settings unless the owner asks in that session.
 
 The AI review is `.github/workflows/claude-code-review.yml`. It runs the
 `code-review` plugin on GitHub when a pull request is marked ready, skips
@@ -174,10 +197,10 @@ a reviewer from another provider is tracked in #1.
   commit a requested fix to the pull request's branch. Claude reads the whole
   thread, including text from people who cannot trigger it, so check whose
   text is in the thread before asking. By default the action
-  pushes only to that branch and does not merge or approve, but nothing in the
-  repository enforces this: the Claude app's token can write code and
-  workflows, and only branch protection on `main` (#29) would stop a push
-  there. Its commits are subject to the rule above.
+  pushes only to that branch and does not merge or approve. The ruleset on
+  `main` stops its token from pushing there, but nothing stops it from pushing
+  to the pull request's branch or merging: the Claude app's token can write
+  code and workflows. Its commits are subject to the rule above.
 - **Workflow changes.** The action only runs a workflow file identical to the
   copy on `main`, so a pull request that changes `claude-code-review.yml` is
   not reviewed by it; review such a pull request with `/code-review <pr>`.
@@ -197,8 +220,8 @@ The change is merged and the issue is closed.
 | | |
 |---|---|
 | Entry | `stage:merge`. |
-| Activity | Squash or merge per repository settings. `risk:low` pull requests may auto-merge. Then run `scripts/stage.sh <issue> close "Merged in #<pr>"`: it removes the stage label and records the transition whether or not GitHub already closed the issue through a closing keyword. The branch is deleted. |
-| Artifact | Merge commit on `main`; closed issue. |
+| Activity | For `risk:medium` and higher, post the `Human approval:` comment first if Review has not. Squash merge, the only method the repository allows. `risk:low` pull requests may auto-merge. Then run `scripts/stage.sh <issue> close "Merged in #<pr>"`: it removes the stage label and records the transition whether or not GitHub already closed the issue through a closing keyword. The head branch is deleted automatically. |
+| Artifact | Squash commit on `main`; closed issue. |
 | Exit | Change is on `main`. Issue is closed. |
 | Label | None; the issue is closed. |
 
