@@ -175,7 +175,10 @@ The AI review is `.github/workflows/claude-code-review.yml`. It runs the
 drafts, and posts its findings as inline comments, or one summary comment when
 it finds none, as the Claude GitHub App. Later pushes start the workflow again,
 but the plugin reviews a pull request only once: it skips any pull request that
-already has a Claude comment. The review is
+already has a Claude comment. The plugin is a copy vendored in
+`vendor/claude-plugins/` and the workflow's actions are pinned to commit SHAs,
+so neither changes without a pull request here; see
+`workflow-dependencies.md`. The review is
 independent of the authoring session's context but not of its model provider;
 a reviewer from another provider is tracked in #1.
 
@@ -204,6 +207,9 @@ a reviewer from another provider is tracked in #1.
 - **Workflow changes.** The action only runs a workflow file identical to the
   copy on `main`, so a pull request that changes `claude-code-review.yml` is
   not reviewed by it; review such a pull request with `/code-review <pr>`.
+  The workflow loads the plugin from `main`, so a pull request that changes
+  the vendored plugin is reviewed by the previous copy; the new one takes
+  effect after the merge.
 - **Forks.** Pull requests from forks are skipped, because GitHub withholds
   the secret from them; review them with `/code-review <pr>`. For the same
   reason `claude.yml` fails on reviews and review comments of a fork pull
