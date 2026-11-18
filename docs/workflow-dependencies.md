@@ -19,8 +19,8 @@ The review workflow installs the plugin as `code-review@gimli` from this
 repository's marketplace, `.claude-plugin/marketplace.json`. The action is
 given the marketplace as this repository's Git URL, built from the workflow
 context as `${{ github.server_url }}/${{ github.repository }}.git` so that it
-follows a rename or a copy of the repository, and clones its default branch, so the plugin that reviews a pull request is
-always the one on `main`. A local path (`./`), which the action also accepts,
+follows a rename or a copy of the repository, and clones its default branch,
+so the plugin that reviews a pull request is always the one on `main`. A local path (`./`), which the action also accepts,
 would read the plugin from the pull request's own checkout and let a pull
 request change its own review.
 
@@ -66,23 +66,17 @@ source from `anthropics/claude-plugins-official` at `ref: main`.
    ```
 
 2. Replace `vendor/claude-plugins/code-review/` with the upstream directory at
-   that commit. Fetch every file in the upstream tree raw, so the bytes are
-   unchanged:
+   that commit, on the pull request's branch. Fetch the commit and read its
+   subtree straight into the index and working tree, so the bytes, file modes,
+   symlinks, and removed files all match upstream:
 
    ```sh
-   gh api "repos/anthropics/claude-plugins-official/git/trees/<sha>?recursive=1" \
-     --jq '.tree[] | select(.type == "blob" and (.path | startswith("plugins/code-review/"))) | .path'
+   git fetch --depth 1 https://github.com/anthropics/claude-plugins-official.git <sha>
+   git rm -r -q vendor/claude-plugins/code-review
+   git read-tree --prefix=vendor/claude-plugins/code-review/ -u FETCH_HEAD:plugins/code-review
    ```
 
-   Then, for each path, with `<rel>` the path minus `plugins/code-review/`:
-
-   ```sh
-   mkdir -p "$(dirname vendor/claude-plugins/code-review/<rel>)"
-   gh api -H "Accept: application/vnd.github.raw" \
-     "repos/anthropics/claude-plugins-official/contents/<path>?ref=<sha>" > vendor/claude-plugins/code-review/<rel>
-   ```
-
-   Delete files that upstream removed. Do not edit the copy.
+   Do not edit the copy.
 3. Check it is identical (below), then update the commit, tree, version and
    date in `vendor/claude-plugins/README.md`.
 4. Compare the `allowed-tools` frontmatter of
@@ -96,9 +90,9 @@ source from `anthropics/claude-plugins-official` at `ref: main`.
 
 ## Check the copy is identical
 
-Equal Git tree hashes mean byte-identical files, on any platform.
-`.gitattributes` marks `vendor/**` as `-text`, so Git never rewrites the
-vendored files' line endings.
+Equal Git tree hashes mean identical files, modes, and symlinks, on any
+platform. `.gitattributes` marks `vendor/claude-plugins/code-review/**` as
+`-text`, so Git never rewrites the vendored files' line endings.
 
 ```sh
 git rev-parse HEAD:vendor/claude-plugins/code-review
@@ -106,7 +100,7 @@ gh api "repos/anthropics/claude-plugins-official/contents/plugins?ref=<sha>" \
   --jq '.[] | select(.name == "code-review") | .sha'
 ```
 
-Before committing, `git add vendor && git write-tree --prefix=vendor/claude-plugins/code-review/`
+Before committing, `git write-tree --prefix=vendor/claude-plugins/code-review/`
 gives the same hash for the staged copy.
 
 `claude plugin validate .` checks the marketplace and the plugin manifest.

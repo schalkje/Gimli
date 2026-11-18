@@ -51,7 +51,10 @@ lifecycle described in `docs/lifecycle.md`.
   stages have one.
 - `.claude-plugin/marketplace.json` and `vendor/claude-plugins/`: the
   `code-review` plugin the AI review workflow runs, vendored verbatim from
-  upstream. Do not edit it by hand; see `docs/workflow-dependencies.md`.
+  upstream into `vendor/claude-plugins/code-review/`. Never edit that copy by
+  hand; re-vendor it and update the provenance in
+  `vendor/claude-plugins/README.md` as `docs/workflow-dependencies.md`
+  describes.
 
 ## Conventions
 
