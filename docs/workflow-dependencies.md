@@ -17,8 +17,9 @@ pull request through the lifecycle (`lifecycle.md`).
 
 The review workflow installs the plugin as `code-review@gimli` from this
 repository's marketplace, `.claude-plugin/marketplace.json`. The action is
-given the marketplace as a Git URL, `https://github.com/schalkje/Gimli.git`,
-and clones its default branch, so the plugin that reviews a pull request is
+given the marketplace as this repository's Git URL, built from the workflow
+context as `${{ github.server_url }}/${{ github.repository }}.git` so that it
+follows a rename or a copy of the repository, and clones its default branch, so the plugin that reviews a pull request is
 always the one on `main`. A local path (`./`), which the action also accepts,
 would read the plugin from the pull request's own checkout and let a pull
 request change its own review.
@@ -30,12 +31,17 @@ source from `anthropics/claude-plugins-official` at `ref: main`.
 ## Update an action pin
 
 1. Resolve the tag to a commit SHA, and find the exact version that commit
-   carries:
+   carries. `--paginate` matters: `claude-code-action` has more than 100 tags.
 
    ```sh
    gh api repos/actions/checkout/commits/v6 --jq .sha
-   gh api "repos/actions/checkout/tags?per_page=100" --jq '.[] | select(.commit.sha == "<sha>") | .name'
+   gh api --paginate "repos/actions/checkout/tags?per_page=100" --jq '.[] | select(.commit.sha == "<sha>") | .name'
    ```
+
+   If no exact version tag points at that commit, pin the newest release
+   instead: `gh api repos/<owner>/<repo>/releases/latest --jq .tag_name`, then
+   `gh api repos/<owner>/<repo>/commits/<tag> --jq .sha`. The trailing comment
+   always names a tag that points at the pinned SHA.
 
    Use `anthropics/claude-code-action` and `v1` for the other action. For a
    new major version, read its release notes first; that is a change in what
@@ -66,8 +72,14 @@ source from `anthropics/claude-plugins-official` at `ref: main`.
    ```sh
    gh api "repos/anthropics/claude-plugins-official/git/trees/<sha>?recursive=1" \
      --jq '.tree[] | select(.type == "blob" and (.path | startswith("plugins/code-review/"))) | .path'
+   ```
+
+   Then, for each path, with `<rel>` the path minus `plugins/code-review/`:
+
+   ```sh
+   mkdir -p "$(dirname vendor/claude-plugins/code-review/<rel>)"
    gh api -H "Accept: application/vnd.github.raw" \
-     "repos/anthropics/claude-plugins-official/contents/<path>?ref=<sha>" > vendor/claude-plugins/code-review/<path minus plugins/code-review/>
+     "repos/anthropics/claude-plugins-official/contents/<path>?ref=<sha>" > vendor/claude-plugins/code-review/<rel>
    ```
 
    Delete files that upstream removed. Do not edit the copy.
