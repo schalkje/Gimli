@@ -15,18 +15,44 @@ pull request through the lifecycle (`lifecycle.md`).
 | `anthropics/claude-code-action` | `claude-code-review.yml`, `claude.yml` | Commit SHA, version in a trailing comment |
 | `code-review` plugin | `vendor/claude-plugins/code-review/` | A verbatim copy of an upstream commit, recorded in `vendor/claude-plugins/README.md` |
 
-The review workflow installs the plugin as `code-review@gimli` from this
-repository's marketplace, `.claude-plugin/marketplace.json`. The action is
-given the marketplace as this repository's Git URL, built from the workflow
-context as `${{ github.server_url }}/${{ github.repository }}.git` so that it
-follows a rename or a copy of the repository, and clones its default branch,
-so the plugin that reviews a pull request is always the one on `main`. A local path (`./`), which the action also accepts,
-would read the plugin from the pull request's own checkout and let a pull
-request change its own review.
-
 The upstream plugin is not pinned by pinning a marketplace: the upstream
 marketplace in `anthropics/claude-code` lists `code-review` as a `git-subdir`
 source from `anthropics/claude-plugins-official` at `ref: main`.
+
+## What the review loads
+
+A pull request cannot change the plugin or the project configuration that
+reviews it. Both come from the default branch:
+
+- **The plugin.** The review workflow installs `code-review@gimli` from this
+  repository's marketplace, `.claude-plugin/marketplace.json`. The action is
+  given the marketplace as this repository's Git URL, built from the workflow
+  context as `${{ github.server_url }}/${{ github.repository }}.git` so that
+  it follows a rename or a copy of the repository, and clones its default
+  branch. A local path (`./`), which the action also accepts, would read the
+  plugin from the checkout.
+- **The project configuration.** The workflow checks out the default branch,
+  not the pull request, so the `CLAUDE.md` files, `.claude/` settings, hooks
+  and skills, and `.mcp.json` that Claude Code loads are the ones on `main`.
+  The review reads the change itself only through `gh pr diff` and
+  `gh pr view`. This relies on the action not checking out the pull request
+  in agent mode, which it uses for a `pull_request` event with a `prompt`: at
+  the pinned version, only tag mode calls `setupBranch`
+  (`src/github/operations/branch.ts`). Re-check this whenever the action pin
+  moves.
+
+The limits:
+
+- A reviewer agent that opens a file on disk sees the `main` version, not the
+  pull request's. Only the diff reflects the change.
+- `CLAUDE.md` compliance is judged against the rules on `main`, so a pull
+  request that changes `CLAUDE.md` is reviewed against the old rules.
+- Whatever is on `main` reviews every open pull request. The `protect-main`
+  ruleset admits changes to `main` only through a pull request, but admin
+  credentials, including those Claude runs with, could change or remove the
+  ruleset (`lifecycle.md`, Review).
+- This covers the review workflow only. `claude.yml` acts for people with
+  write access and works in the pull request's own checkout.
 
 ## Update an action pin
 
@@ -103,13 +129,20 @@ gh api "repos/anthropics/claude-plugins-official/contents/plugins?ref=<sha>" \
 Before committing, `git write-tree --prefix=vendor/claude-plugins/code-review/`
 gives the same hash for the staged copy.
 
+Vendoring another plugin needs its own `vendor/claude-plugins/<name>/** -text`
+line in `.gitattributes` before its files are added; otherwise Git may
+normalise their line endings and the tree hash will not match upstream.
+
 `claude plugin validate .` checks the marketplace and the plugin manifest.
 
 ## Changes to these files
 
-A pull request that changes `claude-code-review.yml` is not reviewed by that
-workflow, and one that changes `claude.yml` gets no mention-triggered replies,
-because the action only runs a workflow file identical to the copy on `main`
-(see `lifecycle.md`, Review). A pull request that changes the vendored plugin
-is reviewed by the old copy. Review the first two with `/code-review <pr>`,
-and in all three cases check the first run after the merge.
+The action only runs a workflow file identical to the copy on `main` (see
+`lifecycle.md`, Review). A pull request that changes `claude-code-review.yml`
+is therefore not reviewed by that workflow; review it with
+`/code-review <pr>`. One that changes `claude.yml` still gets replies to
+mentions in plain pull request comments, because GitHub runs `issue_comment`
+workflows from `main`, but not to mentions in reviews or review comments,
+which run the pull request's copy and are skipped. A pull request that
+changes the vendored plugin is reviewed by the old copy. In every case,
+check the first run after the merge.

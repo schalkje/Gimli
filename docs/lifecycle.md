@@ -177,8 +177,12 @@ it finds none, as the Claude GitHub App. Later pushes start the workflow again,
 but the plugin reviews a pull request only once: it skips any pull request that
 already has a Claude comment. The plugin is a copy vendored in
 `vendor/claude-plugins/` and the workflow's actions are pinned to commit SHAs,
-so neither changes without a pull request here; see
-`workflow-dependencies.md`. The review is
+so an upstream change reaches the review only through a pull request here.
+The plugin and the project configuration Claude Code loads (`CLAUDE.md`,
+`.claude/`, `.mcp.json`) both come from `main`, not from the pull request
+under review, so a pull request that changes the `CLAUDE.md` rules is reviewed
+against the old ones; see `workflow-dependencies.md`, What the review loads,
+for this and its limits. The review is
 independent of the authoring session's context but not of its model provider;
 a reviewer from another provider is tracked in #1.
 
