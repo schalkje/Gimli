@@ -16,9 +16,17 @@
 # repository's marketplace (.claude-plugin/marketplace.json). The marketplace
 # is given as a Git URL, which the action clones from the default branch, so a
 # pull request cannot change the plugin that reviews it; a local path would
-# read it from the pull request's own checkout. The actions are pinned to
-# commit SHAs. How to update the pins and the plugin:
-# docs/workflow-dependencies.md.
+# read it from the pull request's own checkout.
+#
+# The checkout is the default branch too, so the CLAUDE.md files, .claude/
+# settings, hooks and skills, and .mcp.json that Claude Code loads are the
+# ones on main, not the pull request's. The review reads the change only
+# through gh pr diff and gh pr view. This holds because the action does not
+# check out the pull request in agent mode, which a pull_request event with a
+# prompt selects; re-check that when moving the action pin.
+#
+# The actions are pinned to commit SHAs. What the review loads, and how to
+# update the pins and the plugin: docs/workflow-dependencies.md.
 #
 # The action only runs when this file is identical to the copy on the default
 # branch; on a pull request that changes it, the run skips with a warning.
@@ -47,8 +55,10 @@ jobs:
       issues: read
       id-token: write
     steps:
+      # The default branch, not the pull request: see the header comment.
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
         with:
+          ref: ${{ github.event.repository.default_branch }}
           fetch-depth: 1
 
       - uses: anthropics/claude-code-action@cc98b3ae241b0fcfb6a42a2690751afffecb4452 # v1.0.278
