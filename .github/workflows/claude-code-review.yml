@@ -18,9 +18,11 @@
 # pull request cannot change the plugin that reviews it; a local path would
 # read it from the pull request's own checkout.
 #
-# --setting-sources user keeps the session from loading the pull request's
-# CLAUDE.md, .claude/ settings, hooks and skills, and .mcp.json. The plugin's
-# agents still read the pull request's files, CLAUDE.md included, as data.
+# The step after checkout removes the pull request's project settings, which
+# the action's plugin install would otherwise read, and --setting-sources user
+# keeps the session from loading its CLAUDE.md, .claude/ and .mcp.json. The
+# plugin's agents still read the pull request's files, CLAUDE.md included, as
+# data.
 #
 # The actions are pinned to commit SHAs. What the review loads, and how to
 # update the pins and the plugin: docs/workflow-dependencies.md.
@@ -55,6 +57,9 @@ jobs:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
         with:
           fetch-depth: 1
+
+      - name: Remove the pull request's project settings
+        run: rm -f .claude/settings.json .claude/settings.local.json .mcp.json
 
       - uses: anthropics/claude-code-action@cc98b3ae241b0fcfb6a42a2690751afffecb4452 # v1.0.278
         with:

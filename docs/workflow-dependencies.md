@@ -32,6 +32,14 @@ configuration into the review session.
   rename or a copy of the repository, and clones its default branch. A local
   path (`./`), which the action also accepts, would read the plugin from the
   pull request's checkout.
+- **Nothing reads the pull request's project settings.** Before the action
+  runs, a workflow step deletes `.claude/settings.json`,
+  `.claude/settings.local.json` and `.mcp.json` from the checkout. The action
+  installs the plugin with `claude plugin marketplace add` and
+  `claude plugin install` in the checkout, before the review session starts
+  and without `--setting-sources`, so without this step a pull request could,
+  for example, declare its own `gimli` marketplace in `extraKnownMarketplaces`
+  and influence which plugin is installed.
 - **The session loads no project configuration.** The workflow passes
   `--setting-sources user` in `claude_args`, so Claude Code loads none of the
   pull request's `CLAUDE.md` files as instructions, none of its `.claude/`
@@ -52,13 +60,16 @@ The limits:
 
 - A pull request that edits `CLAUDE.md` is checked for compliance against its
   own version of the rules.
+- The plugin's agents cannot read a pull request's changed settings files
+  from disk, because the workflow deletes them; the diff still shows them.
 - Whatever is on `main` reviews every open pull request. The `protect-main`
   ruleset admits changes to `main` only through a pull request, but admin
   credentials, including those Claude runs with, could change or remove the
   ruleset (`lifecycle.md`, Review).
 - This covers the review workflow only. `claude.yml` acts for people with
   write access and loads the pull request's configuration.
-- Check the `--setting-sources` handling again whenever the action pin moves.
+- Whenever the action pin moves, check again that `--setting-sources` reaches
+  the session and which project files the plugin install reads.
 
 ## Update an action pin
 
@@ -71,8 +82,11 @@ The limits:
    ```
 
    If no exact version tag points at that commit, pin the newest release
-   instead: `gh api repos/<owner>/<repo>/releases/latest --jq .tag_name`, then
-   `gh api repos/<owner>/<repo>/commits/<tag> --jq .sha`. The trailing comment
+   within the same major version instead. List the releases with
+   `gh api --paginate "repos/<owner>/<repo>/releases?per_page=100" --jq '.[].tag_name'`,
+   take the newest `v1.*` (or `v6.*`) tag, and resolve it with
+   `gh api repos/<owner>/<repo>/commits/<tag> --jq .sha`. Do not use
+   `releases/latest`, which can be a new major version. The trailing comment
    always names a tag that points at the pinned SHA.
 
    Use `anthropics/claude-code-action` and `v1` for the other action. For a
@@ -98,14 +112,22 @@ The limits:
    ```
 
 2. Replace `vendor/claude-plugins/code-review/` with the upstream directory at
-   that commit, on the pull request's branch. Fetch the commit and read its
-   subtree straight into the index and working tree, so the bytes, file modes,
-   symlinks, and removed files all match upstream:
+   that commit, on the pull request's branch. Fetch the commit into a
+   temporary repository, so this clone gets no foreign objects and no
+   `.git/shallow`, empty the directory, including untracked files, and extract
+   the subtree with `git archive`, which keeps file modes and symlinks.
+   `core.autocrlf=false` stops `git archive` from converting line endings on
+   Windows:
 
    ```sh
-   git fetch --depth 1 https://github.com/anthropics/claude-plugins-official.git <sha>
-   git rm -r -q vendor/claude-plugins/code-review
-   git read-tree --prefix=vendor/claude-plugins/code-review/ -u FETCH_HEAD:plugins/code-review
+   tmp=$(mktemp -d)
+   git -C "$tmp" init -q
+   git -C "$tmp" fetch -q --depth 1 https://github.com/anthropics/claude-plugins-official.git <sha>
+   rm -rf vendor/claude-plugins/code-review
+   mkdir -p vendor/claude-plugins/code-review
+   git -C "$tmp" -c core.autocrlf=false archive FETCH_HEAD:plugins/code-review | tar -x -C vendor/claude-plugins/code-review
+   rm -rf "$tmp"
+   git add -A vendor/claude-plugins/code-review
    ```
 
    Do not edit the copy.
