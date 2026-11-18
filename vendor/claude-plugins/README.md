@@ -6,9 +6,9 @@ repository. They are served by the marketplace in
 `.claude-plugin/marketplace.json`. Do not edit them by hand: re-vendor them as
 described in `docs/workflow-dependencies.md`.
 
-`.gitattributes` marks `vendor/claude-plugins/code-review/**` as `-text`, so
-Git stores the files exactly as upstream does and the tree hash below can be
-checked on any platform.
+`.gitattributes` marks `vendor/claude-plugins/*/**` as `-text`, so Git
+stores every vendored plugin exactly as upstream does and the tree hash below
+can be checked on any platform. This README is outside that pattern.
 
 ## code-review
 

@@ -21,38 +21,44 @@ source from `anthropics/claude-plugins-official` at `ref: main`.
 
 ## What the review loads
 
-A pull request cannot change the plugin or the project configuration that
-reviews it. Both come from the default branch:
+A pull request cannot change the plugin that reviews it, or load its own
+configuration into the review session.
 
-- **The plugin.** The review workflow installs `code-review@gimli` from this
-  repository's marketplace, `.claude-plugin/marketplace.json`. The action is
-  given the marketplace as this repository's Git URL, built from the workflow
-  context as `${{ github.server_url }}/${{ github.repository }}.git` so that
-  it follows a rename or a copy of the repository, and clones its default
-  branch. A local path (`./`), which the action also accepts, would read the
-  plugin from the checkout.
-- **The project configuration.** The workflow checks out the default branch,
-  not the pull request, so the `CLAUDE.md` files, `.claude/` settings, hooks
-  and skills, and `.mcp.json` that Claude Code loads are the ones on `main`.
-  The review reads the change itself only through `gh pr diff` and
-  `gh pr view`. This relies on the action not checking out the pull request
-  in agent mode, which it uses for a `pull_request` event with a `prompt`: at
-  the pinned version, only tag mode calls `setupBranch`
-  (`src/github/operations/branch.ts`). Re-check this whenever the action pin
-  moves.
+- **The plugin comes from `main`.** The review workflow installs
+  `code-review@gimli` from this repository's marketplace,
+  `.claude-plugin/marketplace.json`. The action is given the marketplace as
+  this repository's Git URL, built from the workflow context as
+  `${{ github.server_url }}/${{ github.repository }}.git` so that it follows a
+  rename or a copy of the repository, and clones its default branch. A local
+  path (`./`), which the action also accepts, would read the plugin from the
+  pull request's checkout.
+- **The session loads no project configuration.** The workflow passes
+  `--setting-sources user` in `claude_args`, so Claude Code loads none of the
+  pull request's `CLAUDE.md` files as instructions, none of its `.claude/`
+  settings, hooks or skills, and none of its `.mcp.json` servers. The action
+  passes the option to the SDK and documents it for this purpose
+  (`base-action/src/parse-sdk-options.ts` at the pinned version). The plugin
+  is installed at user scope, and the action passes its own MCP servers with
+  `--mcp-config`, so neither depends on project settings. A local canary
+  test (a `CLAUDE.md` rule, a `SessionStart` hook and a `.mcp.json` server)
+  showed a default run obeying all three and a `--setting-sources user` run
+  obeying none.
+- **The plugin's agents read the pull request's checkout.** The job checks
+  out the pull request, so the plugin's validators confirm findings against
+  the changed code. Its `CLAUDE.md` compliance check reads `CLAUDE.md` files
+  from that checkout as data.
 
 The limits:
 
-- A reviewer agent that opens a file on disk sees the `main` version, not the
-  pull request's. Only the diff reflects the change.
-- `CLAUDE.md` compliance is judged against the rules on `main`, so a pull
-  request that changes `CLAUDE.md` is reviewed against the old rules.
+- A pull request that edits `CLAUDE.md` is checked for compliance against its
+  own version of the rules.
 - Whatever is on `main` reviews every open pull request. The `protect-main`
   ruleset admits changes to `main` only through a pull request, but admin
   credentials, including those Claude runs with, could change or remove the
   ruleset (`lifecycle.md`, Review).
 - This covers the review workflow only. `claude.yml` acts for people with
-  write access and works in the pull request's own checkout.
+  write access and loads the pull request's configuration.
+- Check the `--setting-sources` handling again whenever the action pin moves.
 
 ## Update an action pin
 
@@ -117,8 +123,8 @@ The limits:
 ## Check the copy is identical
 
 Equal Git tree hashes mean identical files, modes, and symlinks, on any
-platform. `.gitattributes` marks `vendor/claude-plugins/code-review/**` as
-`-text`, so Git never rewrites the vendored files' line endings.
+platform. `.gitattributes` marks `vendor/claude-plugins/*/**` as `-text`, so
+Git never rewrites a vendored plugin's line endings.
 
 ```sh
 git rev-parse HEAD:vendor/claude-plugins/code-review
@@ -128,10 +134,6 @@ gh api "repos/anthropics/claude-plugins-official/contents/plugins?ref=<sha>" \
 
 Before committing, `git write-tree --prefix=vendor/claude-plugins/code-review/`
 gives the same hash for the staged copy.
-
-Vendoring another plugin needs its own `vendor/claude-plugins/<name>/** -text`
-line in `.gitattributes` before its files are added; otherwise Git may
-normalise their line endings and the tree hash will not match upstream.
 
 `claude plugin validate .` checks the marketplace and the plugin manifest.
 

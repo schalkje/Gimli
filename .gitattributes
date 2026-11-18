@@ -1,2 +1,2 @@
 *.sh text eol=lf
-vendor/claude-plugins/code-review/** -text
+vendor/claude-plugins/*/** -text
