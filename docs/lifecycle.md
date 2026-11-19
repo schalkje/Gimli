@@ -179,9 +179,9 @@ already has a Claude comment. The plugin is a copy vendored in
 `vendor/claude-plugins/` and the workflow's actions are pinned to commit SHAs,
 so an upstream change reaches the review only through a pull request here.
 What the review loads from `main` and from the pull request under review, and
-the limits, are in `workflow-dependencies.md`, What the review loads. The review is
-independent of the authoring session's context but not of its model provider;
-a reviewer from another provider is tracked in #1.
+the limits, are in `workflow-dependencies.md`, section "What the review
+loads". The review is independent of the authoring session's context but not
+of its model provider; a reviewer from another provider is tracked in #1.
 
 - **Present, complete, current.** Review needs an AI review that ran, finished,
   and covers the diff being merged. The workflow's review does not count when

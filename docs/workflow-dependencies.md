@@ -22,7 +22,9 @@ source from `anthropics/claude-plugins-official` at `ref: main`.
 ## What the review loads
 
 A pull request cannot change the plugin that reviews it, or load its own
-configuration into the review session.
+settings, hooks, skills or MCP servers into the review session. It can still
+put text in front of the reviewer through the files the plugin reads, see the
+limits below.
 
 - **The plugin comes from `main`.** The review workflow installs
   `code-review@gimli` from this repository's marketplace,
@@ -59,7 +61,11 @@ configuration into the review session.
 The limits:
 
 - A pull request that edits `CLAUDE.md` is checked for compliance against its
-  own version of the rules.
+  own version of the rules. The compliance agents read that text, so a pull
+  request can use a `CLAUDE.md`, including a nested one, to try to steer the
+  review's judgement, for example by declaring its changes pre-approved. It
+  cannot run anything or change the review's tools. Treat a pull request
+  that changes `CLAUDE.md` and gets a clean review with that in mind.
 - The plugin's agents cannot read a pull request's changed settings files
   from disk, because the workflow deletes them; the diff still shows them.
 - Whatever is on `main` reviews every open pull request. The `protect-main`
@@ -115,9 +121,8 @@ The limits:
    that commit, on the pull request's branch. Fetch the commit into a
    temporary repository, so this clone gets no foreign objects and no
    `.git/shallow`, empty the directory, including untracked files, and extract
-   the subtree with `git archive`, which keeps file modes and symlinks.
-   `core.autocrlf=false` stops `git archive` from converting line endings on
-   Windows:
+   the subtree with `git archive`. `core.autocrlf=false` stops `git archive`
+   from converting line endings on Windows:
 
    ```sh
    tmp=$(mktemp -d)
@@ -130,7 +135,15 @@ The limits:
    git add -A vendor/claude-plugins/code-review
    ```
 
-   Do not edit the copy.
+   Do not edit the copy. `git archive` and `tar` are not verbatim in every
+   case: upstream `export-ignore` or `export-subst` attributes, symlinks
+   (which Git Bash's `tar` may copy), and executable files on a clone with
+   `core.filemode=false` can all come out different. The check below catches
+   any of these. If it fails, re-vendor in a throwaway clone of this
+   repository instead: `git fetch --depth 1 <upstream> <sha>`, then
+   `git rm -r -q vendor/claude-plugins/code-review` and
+   `git read-tree --prefix=vendor/claude-plugins/code-review/ -u FETCH_HEAD:plugins/code-review`,
+   which copies the tree exactly; commit there and push the branch.
 3. Check it is identical (below), then update the commit, tree, version and
    date in `vendor/claude-plugins/README.md`.
 4. Compare the `allowed-tools` frontmatter of
