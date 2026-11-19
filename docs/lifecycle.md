@@ -178,7 +178,7 @@ but the plugin reviews a pull request only once: it skips any pull request that
 already has a Claude comment. The plugin is a copy vendored in
 `vendor/claude-plugins/` and the workflow's actions are pinned to commit SHAs,
 so an upstream change reaches the review only through a pull request here,
-except the Claude Code installer the action downloads.
+except what the pinned action downloads at run time.
 What the review loads from `main` and from the pull request under review, and
 the limits, are in `workflow-dependencies.md`, section "What the review
 loads". The review is independent of the authoring session's context but not

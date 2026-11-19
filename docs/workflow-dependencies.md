@@ -3,9 +3,9 @@
 The Claude workflows in `.github/workflows/` run code from outside this
 repository: two GitHub Actions and the `code-review` plugin. Each is pinned, so
 an upstream change cannot alter how pull requests are reviewed, or what the
-review is allowed to do, without a reviewed pull request here, with one
-exception: the Claude Code installer the action downloads (see the limits
-under What the review loads). The cost is that
+review is allowed to do, without a reviewed pull request here, except what
+the pinned action downloads at run time (see the limits under What the
+review loads). The cost is that
 fixes upstream are not picked up automatically; every update is a deliberate
 pull request through the lifecycle (`lifecycle.md`).
 
@@ -35,12 +35,15 @@ in front of the reviewer through files the plugin reads; see the limits.
   rename or a copy of the repository, and clones its default branch. A local
   path (`./`), which the action also accepts, would read the plugin from the
   pull request's checkout.
-- **The action restores the root configuration from `main`.** On every
-  pull request event, before it installs plugins or starts Claude Code, the
-  action copies the pull request's `.claude`, `.mcp.json`, `.claude.json`,
-  `.gitmodules`, `.ripgreprc`, `CLAUDE.md`, `CLAUDE.local.md`, `AGENTS.md`
-  and `.husky` into `.claude-pr/`, deletes them, and restores `main`'s
-  versions (`restoreConfigFromBase` in
+- **The action restores the root configuration from the base branch.** On
+  every pull request event, before it installs plugins or starts Claude Code,
+  the action copies the pull request's `.claude`, `.mcp.json`,
+  `.claude.json`, `.gitmodules`, `.ripgreprc`, `CLAUDE.md`,
+  `CLAUDE.local.md`, `AGENTS.md` and `.husky` into `.claude-pr/`, deletes
+  them, and restores the versions on the pull request's base branch
+  (`pull_request.base.ref`), which is `main` for every pull request the
+  lifecycle opens. A stacked pull request gets its base branch's versions
+  instead (`restoreConfigFromBase` in
   `src/github/operations/restore-config.ts`, called from
   `src/entrypoints/run.ts`, at the pinned `cc98b3a`). The plugin install
   therefore never sees the pull request's settings, and the reviewers can
@@ -58,9 +61,10 @@ in front of the reviewer through files the plugin reads; see the limits.
   server; a `--setting-sources user` run did none of these.
 - **The plugin's agents read the pull request's checkout.** The job checks
   out the pull request, so the plugin's validators confirm findings against
-  the changed code. The compliance check reads the root `CLAUDE.md` as `main`
-  has it, which are the rules in force, and nested `CLAUDE.md` files as the
-  pull request has them, as data.
+  the changed code. The compliance check reads the root `CLAUDE.md` as the
+  base branch has it, so a pull request that changes the root rules is
+  checked against the old ones, and nested `CLAUDE.md` files as the pull
+  request has them, as data.
 
 The limits:
 
@@ -69,11 +73,12 @@ The limits:
   the review's judgement, for example by declaring its changes pre-approved.
   It cannot run anything or change the review's tools. Treat a clean review
   of a pull request that changes a `CLAUDE.md` with that in mind.
-- The action installs Claude Code at run time with
-  `curl -fsSL https://claude.ai/install.sh | bash -s -- <version>`. The
-  version is fixed by the pinned action, but the script and the binary it
-  downloads are not checked against a hash, so that is the one upstream
-  input this repository does not pin.
+- The pinned action downloads its runtime when it runs: Claude Code with
+  `curl -fsSL https://claude.ai/install.sh | bash -s -- <version>`, Bun 1.4.4
+  through a SHA-pinned `oven-sh/setup-bun`, and its npm dependencies with
+  `bun install --production`. The versions are fixed by the pinned action,
+  but none of these downloads is checked against a hash by this repository,
+  so they can change without a pull request here.
 - Whatever is on `main` reviews every open pull request. The `protect-main`
   ruleset admits changes to `main` only through a pull request, but admin
   credentials, including those Claude runs with, could change or remove the
@@ -82,8 +87,10 @@ The limits:
   `--setting-sources user`, so it loads `main`'s project configuration and
   any nested `CLAUDE.md` it reads. It acts only for people with write access.
 - Whenever the action pin moves, check again that `restoreConfigFromBase`
-  still runs before the plugin install and which paths it covers, and that
-  `--setting-sources` still reaches the session.
+  still runs before the plugin install, which paths and which base branch it
+  uses, that `--setting-sources` still reaches the session, and that
+  `claude plugin install` still installs at user scope, which
+  `--setting-sources user` needs to load the plugin.
 
 ## Update an action pin
 

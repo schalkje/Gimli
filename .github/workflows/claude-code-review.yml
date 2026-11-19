@@ -19,7 +19,7 @@
 # read it from the pull request's own checkout.
 #
 # On a pull request the action itself replaces the root .claude/, .mcp.json,
-# CLAUDE.md and similar files with main's, keeping the pull request's copies
+# CLAUDE.md and similar files with the base branch's, keeping the PR's copies
 # in .claude-pr/ for the reviewers to read. --setting-sources user also keeps
 # the session from loading any project configuration, including nested
 # CLAUDE.md files, which that restore does not cover.
