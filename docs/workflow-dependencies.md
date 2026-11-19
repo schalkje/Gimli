@@ -3,7 +3,9 @@
 The Claude workflows in `.github/workflows/` run code from outside this
 repository: two GitHub Actions and the `code-review` plugin. Each is pinned, so
 an upstream change cannot alter how pull requests are reviewed, or what the
-review is allowed to do, without a reviewed pull request here. The cost is that
+review is allowed to do, without a reviewed pull request here, with one
+exception: the Claude Code installer the action downloads (see the limits
+under What the review loads). The cost is that
 fixes upstream are not picked up automatically; every update is a deliberate
 pull request through the lifecycle (`lifecycle.md`).
 
@@ -22,9 +24,8 @@ source from `anthropics/claude-plugins-official` at `ref: main`.
 ## What the review loads
 
 A pull request cannot change the plugin that reviews it, or load its own
-settings, hooks, skills or MCP servers into the review session. It can still
-put text in front of the reviewer through the files the plugin reads, see the
-limits below.
+settings, hooks, skills or MCP servers into the review. It can still put text
+in front of the reviewer through files the plugin reads; see the limits.
 
 - **The plugin comes from `main`.** The review workflow installs
   `code-review@gimli` from this repository's marketplace,
@@ -34,48 +35,55 @@ limits below.
   rename or a copy of the repository, and clones its default branch. A local
   path (`./`), which the action also accepts, would read the plugin from the
   pull request's checkout.
-- **Nothing reads the pull request's project settings.** Before the action
-  runs, a workflow step deletes `.claude/settings.json`,
-  `.claude/settings.local.json` and `.mcp.json` from the checkout. The action
-  installs the plugin with `claude plugin marketplace add` and
-  `claude plugin install` in the checkout, before the review session starts
-  and without `--setting-sources`, so without this step a pull request could,
-  for example, declare its own `gimli` marketplace in `extraKnownMarketplaces`
-  and influence which plugin is installed.
+- **The action restores the root configuration from `main`.** On every
+  pull request event, before it installs plugins or starts Claude Code, the
+  action copies the pull request's `.claude`, `.mcp.json`, `.claude.json`,
+  `.gitmodules`, `.ripgreprc`, `CLAUDE.md`, `CLAUDE.local.md`, `AGENTS.md`
+  and `.husky` into `.claude-pr/`, deletes them, and restores `main`'s
+  versions (`restoreConfigFromBase` in
+  `src/github/operations/restore-config.ts`, called from
+  `src/entrypoints/run.ts`, at the pinned `cc98b3a`). The plugin install
+  therefore never sees the pull request's settings, and the reviewers can
+  still read the pull request's versions in `.claude-pr/`.
 - **The session loads no project configuration.** The workflow passes
-  `--setting-sources user` in `claude_args`, so Claude Code loads none of the
-  pull request's `CLAUDE.md` files as instructions, none of its `.claude/`
-  settings, hooks or skills, and none of its `.mcp.json` servers. The action
-  passes the option to the SDK and documents it for this purpose
-  (`base-action/src/parse-sdk-options.ts` at the pinned version). The plugin
-  is installed at user scope, and the action passes its own MCP servers with
-  `--mcp-config`, so neither depends on project settings. A local canary
-  test (a `CLAUDE.md` rule, a `SessionStart` hook and a `.mcp.json` server)
-  showed a default run obeying all three and a `--setting-sources user` run
-  obeying none.
+  `--setting-sources user` in `claude_args`, so Claude Code loads neither
+  `main`'s restored project configuration nor any nested `CLAUDE.md` or
+  `.claude/` directory, which the restore does not cover because it handles
+  root paths only. The action passes the option to the SDK and documents it
+  "to avoid in-repo configs" (`base-action/src/parse-sdk-options.ts`). The
+  plugin is installed at user scope, and the action passes its own MCP
+  servers with `--mcp-config`, so neither depends on project settings. Local
+  canary tests: a default run obeyed a root `CLAUDE.md` rule, a nested
+  `CLAUDE.md` rule and a `SessionStart` hook, and loaded a `.mcp.json`
+  server; a `--setting-sources user` run did none of these.
 - **The plugin's agents read the pull request's checkout.** The job checks
   out the pull request, so the plugin's validators confirm findings against
-  the changed code. Its `CLAUDE.md` compliance check reads `CLAUDE.md` files
-  from that checkout as data.
+  the changed code. The compliance check reads the root `CLAUDE.md` as `main`
+  has it, which are the rules in force, and nested `CLAUDE.md` files as the
+  pull request has them, as data.
 
 The limits:
 
-- A pull request that edits `CLAUDE.md` is checked for compliance against its
-  own version of the rules. The compliance agents read that text, so a pull
-  request can use a `CLAUDE.md`, including a nested one, to try to steer the
-  review's judgement, for example by declaring its changes pre-approved. It
-  cannot run anything or change the review's tools. Treat a pull request
-  that changes `CLAUDE.md` and gets a clean review with that in mind.
-- The plugin's agents cannot read a pull request's changed settings files
-  from disk, because the workflow deletes them; the diff still shows them.
+- A pull request can add or edit a nested `CLAUDE.md`, or put text in
+  `.claude-pr/`, and the compliance agents read it, so it can try to steer
+  the review's judgement, for example by declaring its changes pre-approved.
+  It cannot run anything or change the review's tools. Treat a clean review
+  of a pull request that changes a `CLAUDE.md` with that in mind.
+- The action installs Claude Code at run time with
+  `curl -fsSL https://claude.ai/install.sh | bash -s -- <version>`. The
+  version is fixed by the pinned action, but the script and the binary it
+  downloads are not checked against a hash, so that is the one upstream
+  input this repository does not pin.
 - Whatever is on `main` reviews every open pull request. The `protect-main`
   ruleset admits changes to `main` only through a pull request, but admin
   credentials, including those Claude runs with, could change or remove the
   ruleset (`lifecycle.md`, Review).
-- This covers the review workflow only. `claude.yml` acts for people with
-  write access and loads the pull request's configuration.
-- Whenever the action pin moves, check again that `--setting-sources` reaches
-  the session and which project files the plugin install reads.
+- `claude.yml` gets the same root restore on pull request events, but not
+  `--setting-sources user`, so it loads `main`'s project configuration and
+  any nested `CLAUDE.md` it reads. It acts only for people with write access.
+- Whenever the action pin moves, check again that `restoreConfigFromBase`
+  still runs before the plugin install and which paths it covers, and that
+  `--setting-sources` still reaches the session.
 
 ## Update an action pin
 
