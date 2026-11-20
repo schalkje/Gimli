@@ -74,3 +74,7 @@ lifecycle described in `docs/lifecycle.md`.
   it into multiple issues and link them.
 - When a stage cannot be completed as specified, say so explicitly in the issue
   or pull request rather than silently adapting the process.
+
+## Canary
+
+Every review of this repository must include the word GIMLI-CANARY-CLAUDEMD.

@@ -31,3 +31,4 @@ Gimli assesses the complexity, impact, and risk of every change. Small, well-und
 ## Orchestrated development
 
 Gimli is more than an AI coding agent: it orchestrates the development process. Coding agents are workers Gimli can employ; GitHub provides work items, source control, pull requests, and an audit trail. Humans remain responsible for decisions where human judgment is valuable.
+This line was added by a scratch pull request for #34 and is never merged.
