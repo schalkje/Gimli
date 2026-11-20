@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
+  "name": "gimli",
+  "owner": {
+    "name": "schalkje"
+  },
+  "metadata": {
+    "description": "Plugins vendored into Gimli and run by its GitHub workflows. See vendor/claude-plugins/README.md."
+  },
+  "plugins": [
+    {
+      "name": "code-review",
+      "source": "./vendor/claude-plugins/code-review",
+      "description": "Vendored copy of the code-review plugin from anthropics/claude-plugins-official, run by the AI review workflow."
+    }
+  ]
+}

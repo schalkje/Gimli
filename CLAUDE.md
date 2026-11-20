@@ -49,6 +49,12 @@ lifecycle described in `docs/lifecycle.md`.
 - `.claude/skills/`: one skill per automated lifecycle stage, invoked as
   `/<stage> <issue>`. The table at the end of `docs/lifecycle.md` says which
   stages have one.
+- `.claude-plugin/marketplace.json` and `vendor/claude-plugins/`: the
+  `code-review` plugin the AI review workflow runs, vendored verbatim from
+  upstream into `vendor/claude-plugins/code-review/`. Never edit that copy by
+  hand; re-vendor it and update the provenance in
+  `vendor/claude-plugins/README.md` as `docs/workflow-dependencies.md`
+  describes.
 
 ## Conventions
 
