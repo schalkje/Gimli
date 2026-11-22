@@ -23,4 +23,6 @@ can be checked on any platform. This README is outside that pattern.
 | Licence | Apache License 2.0, in `code-review/LICENSE` |
 
 The workflow's `--allowedTools` list mirrors the `allowed-tools` frontmatter
-of `code-review/commands/code-review.md`.
+of `code-review/commands/code-review.md`. Its `--disallowedTools` list is
+deliberately stricter: see What the review may post in
+`docs/workflow-dependencies.md`.

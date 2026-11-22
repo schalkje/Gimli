@@ -92,7 +92,59 @@ The limits:
   still runs before the plugin install, which paths and which base branch it
   uses, that `--setting-sources` still reaches the session, and that
   `claude plugin install` still installs at user scope, which
-  `--setting-sources user` needs to load the plugin.
+  `--setting-sources user` needs to load the plugin, and that the token
+  exchange in `src/github/token.ts` still sends no repository list (see What
+  the review may post).
+
+## What the review may post
+
+The review writes to GitHub in two ways: inline comments through
+`mcp__github_inline_comment__create_inline_comment`, which the action binds
+to the pull request under review, and a summary comment through
+`gh pr comment`. The workflow's tool rules control the second.
+
+`--allowedTools` in `claude_args` lists the same tools as the `allowed-tools`
+frontmatter of `vendor/claude-plugins/code-review/commands/code-review.md`.
+That list does not narrow anything: a command's `allowed-tools` grants its
+tools while the command runs, so `Bash(gh pr comment:*)` is allowed whatever
+the workflow lists. Deny rules take precedence over that grant, so the
+workflow is stricter than the vendored frontmatter through `--disallowedTools`:
+
+| Rule | Denies |
+|---|---|
+| `Bash(gh pr comment *--edit-last*)` | Editing the last comment, with the flag anywhere in the command, also as `--edit-last=true` |
+| `Bash(gh pr comment *--delete-last*)` | Deleting the last comment, likewise |
+| `Bash(xargs:*)` | `echo --edit-last \| xargs gh pr comment 42`, which puts the flag where no rule sees it |
+| `Bash(command:*)` | `command -p gh …`, the same through `command` |
+
+Claude Code checks each part of a compound command (`cd x && …`, `…; …`,
+`… | …`) and strips wrappers such as `timeout`, `nice`, `nohup`, `stdbuf`,
+`time`, `exec` and `builtin command` before matching, so the two
+`gh pr comment` rules cover those forms. It also resolves quotes, escapes,
+command substitution and variables before matching, so `--edit-l''ast`,
+`--edit-las\t`, `"--edit-last"`, `$(printf -- '--edit-%s' last)` and
+`f=--edit-last; … $f` are denied as well. A command that matches no allow rule,
+such as an absolute path to `gh`, an `env`, `PATH=` or `GH_REPO=` prefix, or
+`bash -c`, is denied because the run cannot ask for permission. A comment
+whose body contains the text `--edit-last` or `--delete-last` is denied too;
+the review then has to word it differently. Local tests of every form above,
+with Claude Code 2.1.330 and a fake `gh`, are recorded in the pull request
+that added these rules (issue #37).
+
+The limit: permission rules match command text and cannot say "only this pull
+request", so the review can post a new comment on any pull request its token
+can write to. Issues are out of reach only because `gh pr comment` resolves
+pull requests alone and `gh issue comment` is not allowed. The action gets that token by exchanging the job's
+OIDC token at Anthropic's endpoint, sending only the permissions and no
+repository list (`exchangeForAppToken` in `src/github/token.ts` at the
+pinned `cc98b3a`), and exports it as `GH_TOKEN` to the session. Which
+repositories it covers is decided by that endpoint. It covers at most the
+repositories the Claude GitHub App installation can access, set under the
+account's Settings, Applications, Installed GitHub Apps. On 2026-11-22 that
+installation had access to all repositories of the account, so a review's
+token may be able to comment anywhere in the account, not only in this
+repository. Limiting the installation to selected repositories narrows that;
+it is a setting outside this repository and is not changed here.
 
 ## Update an action pin
 
@@ -167,7 +219,11 @@ The limits:
    `vendor/claude-plugins/code-review/commands/code-review.md` with the review
    workflow's `--allowedTools`. If upstream changed the list, decide whether to
    follow it; a widened list is a change in what the review may do and is
-   assessed as such.
+   assessed as such. The frontmatter grants its tools whatever
+   `--allowedTools` says, so check every tool it adds that can write against
+   the deny rules in What the review may post, and add a rule for any form
+   that should not be allowed. Keep `--disallowedTools` as it is: it is
+   deliberately stricter than the frontmatter.
 5. Open a pull request. It is reviewed with `/code-review <pr>`: the workflow
    still runs the plugin from `main`, so the new copy takes effect on the next
    pull request after the merge.
