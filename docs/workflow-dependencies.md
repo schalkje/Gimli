@@ -190,7 +190,7 @@ gives the same hash for the staged copy.
 ## Changes to these files
 
 The action only runs a workflow file identical to the copy on `main` (see
-`lifecycle.md`, Review). A pull request that changes `claude-code-review.yml`
+[`ai-review.md`](ai-review.md), Workflow changes). A pull request that changes `claude-code-review.yml`
 is therefore not reviewed by that workflow; review it with
 `/code-review <pr>`. One that changes `claude.yml` still gets replies to
 mentions in plain pull request comments, because GitHub runs `issue_comment`
