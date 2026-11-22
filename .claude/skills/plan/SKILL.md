@@ -87,6 +87,10 @@ Numbered, concrete, in build order. Say where to branch from.
 ### Files affected
 One bullet per file or area, marked (new) where applicable.
 
+**Documentation:** the documents this change updates under the
+documentation rule in docs/lifecycle.md, each with what changes, or
+`None, because <reason>`.
+
 ### Tests
 | Criterion | Proof |
 Exactly one row per AC<n> in the issue body, in order; never group
@@ -111,6 +115,13 @@ Tier rules:
   whether they agree and record the answer; in a non-interactive session
   keep the preliminary tier in the draft and flag the proposed lower tier.
 - If your tier is **higher**, use yours and explain what raised it.
+
+Documentation entry: read the "Documentation rule" section of
+`docs/lifecycle.md` and name each document it covers whose described
+behaviour this change alters, including a new document's entry in the
+README documentation map. `/build` treats each named document as a step.
+Write `None, because <reason>` only when no covered document describes what
+the change alters; a bare `None` does not meet the Plan exit criteria.
 
 Decide design questions in the draft rather than asking batches of
 questions; one confirmation round is the expectation. If a decision is
