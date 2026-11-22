@@ -12,8 +12,9 @@ evidence can point at its scenarios, and the reasons behind it are in the
 ## Format
 
 Each capability has a folder with one file, `docs/specs/<capability>/spec.md`,
-where `<capability>` is a few lowercase words joined with hyphens. Start from
-[`template.md`](template.md).
+where `<capability>` is a few lowercase words joined with hyphens. Start by
+copying [`_template/spec.md`](_template/spec.md) to the new folder; its links
+are already right for that location.
 
 - A header names the capability's **prefix**, the files that implement it,
   and the ADRs behind it.
@@ -41,9 +42,11 @@ IDs are stable once a spec is on `main`, because tests and evidence will
 refer to them:
 
 - A changed scenario keeps its ID if it still describes the same behaviour.
-- A removed scenario or requirement gives up its ID: the ID is listed under
-  **Retired scenario IDs** and is never used again.
-- New requirements and scenarios take the next unused number.
+- A removed scenario gives up its ID, and a removed requirement gives up its
+  number and the IDs of all its scenarios. Each is listed under **Retired
+  scenario IDs**, a requirement as `<CAP>-<req>`, and is never used again.
+- New requirements and scenarios take the next number never used on `main`,
+  retired numbers included.
 
 ## Index
 
