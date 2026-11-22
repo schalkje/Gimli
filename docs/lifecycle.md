@@ -237,7 +237,7 @@ The change is merged and the issue is closed.
 | | |
 |---|---|
 | Entry | `stage:merge`. |
-| Activity | For `risk:medium` and higher, post the `Human approval:` comment first if Review has not. If the pull request adds an ADR whose number `main` has taken since, renumber it as [`adr/README.md`](adr/README.md#numbering) says, which means a return to Build. Squash merge, the only method the repository allows. `risk:low` pull requests may auto-merge. Then run `scripts/stage.sh <issue> close "Merged in #<pr>"`: it removes the stage label and records the transition whether or not GitHub already closed the issue through a closing keyword. The head branch is deleted automatically. |
+| Activity | For `risk:medium` and higher, post the `Human approval:` comment first if Review has not. If the pull request adds an ADR whose number `main` has taken since, renumber it as [`adr/README.md`](adr/README.md#numbering) says, which means a return to Build. Squash merge, the only method the repository allows. `risk:low` pull requests may auto-merge, except one that adds an ADR: its number is checked against `main` at merge, so it is merged by hand. Then run `scripts/stage.sh <issue> close "Merged in #<pr>"`: it removes the stage label and records the transition whether or not GitHub already closed the issue through a closing keyword. The head branch is deleted automatically. |
 | Artifact | Squash commit on `main`; closed issue. |
 | Exit | Change is on `main`. Issue is closed. |
 | Label | None; the issue is closed. |
