@@ -38,8 +38,9 @@ first, and make the detail available one step down for whoever needs it.
 - Every document is short and links to the next layer down; the
   [documentation model](../documentation-model.md) defines the layers.
 - A document does not repeat what a lower layer owns; it links to it.
-- `README.md` is the top layer and lists only the entry document of each
-  layer, not every document below it.
+- `README.md` is the top layer. Its documentation map lists the entry point
+  of each layer and the documents people start from, not every document
+  below them.
 
 **Agents and skills.**
 - An agent receives a context packet with its task, the relevant spec

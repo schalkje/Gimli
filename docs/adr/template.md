@@ -2,7 +2,7 @@
 
 Part of the [architecture decision records](README.md).
 
-- **Status:** Proposed
+- **Status:** Accepted
 - **Date:** YYYY-MM-DD
 - **Issue:** #<issue>
 
