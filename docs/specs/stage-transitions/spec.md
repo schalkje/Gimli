@@ -93,7 +93,7 @@ leave the issue with exactly that one stage label.
 
 The case where one of several stage labels is the target is not specified
 yet: `stage.sh` would remove and add the same label in one edit, which
-`scripts/README.md` notes leaves no label at all.
+`scripts/README.md` notes leaves no label at all. Fixing it is #49.
 
 ### Requirement STAGE-4: Comment before label
 
