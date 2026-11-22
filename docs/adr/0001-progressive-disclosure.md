@@ -40,7 +40,8 @@ first, and make the detail available one step down for whoever needs it.
 - A document does not repeat what a lower layer owns; it links to it.
 - `README.md` is the top layer. Its documentation map lists the entry point
   of each layer and the documents people start from, not every document
-  below them.
+  below them; the exact rule is
+  [where a new document goes](../documentation-model.md#where-a-new-document-goes).
 
 **Agents and skills.**
 - An agent receives a context packet with its task, the relevant spec

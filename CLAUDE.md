@@ -40,9 +40,9 @@ lifecycle described in `docs/lifecycle.md`.
 
 ## Repository layout
 
-- `README.md`: product vision, overview, and the documentation map. A new
-  document goes in its layer's index; only entry points and documents people
-  start from go in the map (`docs/documentation-model.md`).
+- `README.md`: product vision, overview, and the documentation map. Where a
+  new document goes and whether the map lists it is set in
+  `docs/documentation-model.md`, section "Where a new document goes".
 - `docs/documentation-model.md`: the documentation layers and how they link.
 - `docs/specs/`: capability specs, requirements with scenarios whose IDs
   (`<CAP>-<req>.<n>`) are never reused; format in `docs/specs/README.md`.

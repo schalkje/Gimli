@@ -21,7 +21,7 @@ README.md                          what Gimli is, and the map
 
 | Layer | Holds | Entry point | Format |
 |---|---|---|---|
-| Specs | Requirements as SHALL statements, each with scenarios that have stable IDs | [`specs/README.md`](specs/README.md) | [`specs/template.md`](specs/template.md) |
+| Specs | Requirements as SHALL statements, each with scenarios that have stable IDs | [`specs/README.md`](specs/README.md) | [`specs/_template/spec.md`](specs/_template/spec.md) |
 | Architecture | Gimli's parts, how they interact, and the principles changes are reviewed against | [`architecture/README.md`](architecture/README.md) | Free form, short: one overview, with a document per part added when the overview would grow too long |
 | Decisions | One decision each: context, decision, options, consequences | [`adr/README.md`](adr/README.md) | [`adr/template.md`](adr/template.md) |
 
@@ -38,14 +38,17 @@ README.md                          what Gimli is, and the map
 
 ## Where a new document goes
 
-| You are writing down | Put it in |
-|---|---|
-| What Gimli does, in a way that can be tested | a capability spec in `docs/specs/` |
-| How a part of Gimli works, or a principle code is reviewed against | `docs/architecture/` |
-| A decision and why it was made | a new ADR in `docs/adr/` |
-| A process document that is not a capability spec yet, such as a new stage procedure | directly in `docs/`, placed in a layer in the [architecture overview](architecture/README.md#where-the-documents-in-docs-fit) and listed in the README map's Process group |
+This section is the rule. `lifecycle.md`, `CLAUDE.md` and the stage skills
+link here instead of restating it.
 
-A new document is added to its layer's index; a document directly in `docs/`
-is added to the placement table in the architecture overview instead. It goes in the
-[documentation map](../README.md#documentation) only when it is the entry
-point of a layer or a document people start from.
+| You are writing down | Put it in | List it in | README map |
+|---|---|---|---|
+| What Gimli does, in a way that can be tested | `docs/specs/<capability>/spec.md` | the index in [`specs/README.md`](specs/README.md#index) | No |
+| How a part of Gimli works, or a principle code is reviewed against | `docs/architecture/` | the [architecture overview](architecture/README.md) | No |
+| A decision and why it was made | `docs/adr/NNNN-<slug>.md` | the index in [`adr/README.md`](adr/README.md#index) | No |
+| A process document that is not a capability spec yet, such as a new stage procedure | directly in `docs/` | the [placement table](architecture/README.md#where-the-documents-in-docs-fit) in the architecture overview | Yes, in the group it belongs to |
+| A document outside `docs/` that describes a file beside it, such as a skill, a template or a folder's README | next to what it describes | nothing else | Yes, in the group it belongs to |
+| The entry point of a new layer | its layer folder | this page | Yes |
+
+The README map lists only the last three kinds; everything else is reached
+through the index it is listed in.
