@@ -134,7 +134,11 @@ repository list (`exchangeForAppToken` in `src/github/token.ts` at the
 pinned `cc98b3a`), and exports it as `GH_TOKEN` to the session. Which
 repositories it covers is decided by that endpoint. It covers at most the
 repositories the Claude GitHub App installation can access, set under the
-account's Settings, Applications, Installed GitHub Apps.
+account's Settings, Applications, Installed GitHub Apps. On 2026-11-22 that
+installation had access to all repositories of the account, so a review's
+token may be able to comment anywhere in the account, not only in this
+repository. Limiting the installation to selected repositories narrows that;
+it is a setting outside this repository and is not changed here.
 
 ## Update an action pin
 
