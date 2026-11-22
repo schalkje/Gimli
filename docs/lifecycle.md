@@ -30,6 +30,10 @@ flowchart LR
   exit criteria are met and its artifact exists. Stages are not skipped.
 - **Evidence over assertion.** A claim that something works is backed by test
   output, screenshots, or logs attached to the pull request.
+- **Documentation is part of the change.** A change updates the documentation
+  that describes what it changes, in the same pull request. The
+  [documentation rule](#documentation-rule) says what that covers and where it
+  is checked.
 
 ## Stage status
 
@@ -42,6 +46,35 @@ label and posts a `Stage: <old> → <new>` comment so the transition is in the
 audit trail. Change the tier with `scripts/risk.sh <issue> <tier> [note]`,
 which does the same with a `Risk: <old> → <new>` comment. Do not edit stage
 or risk labels by hand.
+
+## Documentation rule
+
+Documentation is the specification, so a change that alters what a document
+describes updates that document in the same pull request. Documentation means
+everything that describes behaviour:
+
+- every document under `docs/`;
+- `README.md`: its stage, status and documentation map tables, and the
+  colours of its lifecycle diagram, which show who carries out each stage;
+- `scripts/README.md`, when a script's behaviour changes;
+- the skill files under `.claude/skills/`, when a stage's procedure changes;
+- the issue and pull request templates under `.github/`;
+- the Repository layout section of `CLAUDE.md`.
+
+A new document is added to the documentation map in `README.md`.
+
+The rule is applied at three stages:
+
+- **Plan** names the documents the change updates, or says
+  `None, because <reason>`.
+- **Evidence** lists the documents updated in the pull request's
+  Documentation section, or says `None, because <reason>`. An empty section,
+  or a bare `None`, does not meet the Evidence exit criteria.
+- **Review** checks the Documentation section against the diff: every
+  behaviour the diff changes is reflected in a listed document.
+
+The skills, the pull request template and `CLAUDE.md` refer to this section
+rather than repeating the list.
 
 ## Stages
 
