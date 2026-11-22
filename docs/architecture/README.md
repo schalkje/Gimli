@@ -64,6 +64,7 @@ they are. This table places each one in a layer; a new one is added here.
 
 | Document | Layer | Notes |
 |---|---|---|
+| [`documentation-model.md`](../documentation-model.md) | None: it describes the layers | The top of the documentation below `README.md`, and the rule for where a new document goes. |
 | [`lifecycle.md`](../lifecycle.md) | Specs | The functional specification of the lifecycle, not yet in capability format. A candidate for conversion. |
 | [`risk-assessment.md`](../risk-assessment.md) | Specs | The functional specification of risk tiers, not yet in capability format. A candidate for conversion. |
 | [`ai-review.md`](../ai-review.md) | Architecture | How the AI review workflow and its fallback behave. |
