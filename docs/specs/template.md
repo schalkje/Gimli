@@ -1,6 +1,6 @@
 # Capability name
 
-Part of the [Gimli specs](README.md).
+Part of the [Gimli specs](/docs/specs/README.md).
 
 - **Prefix:** `CAP`
 - **Implemented by:** the files that implement this capability.

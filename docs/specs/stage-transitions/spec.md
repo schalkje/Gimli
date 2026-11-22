@@ -21,7 +21,7 @@ The valid stages are `refine`, `plan`, `build`, `test`, `evidence`,
 ### Requirement STAGE-1: Report the current stage
 
 Given only an issue number, the system SHALL print the issue's current stage
-and change nothing.
+and change nothing, unless STAGE-8 applies.
 
 #### Scenario STAGE-1.1: Issue with a stage
 
