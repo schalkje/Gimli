@@ -40,9 +40,19 @@ lifecycle described in `docs/lifecycle.md`.
 
 ## Repository layout
 
-- `README.md`: product vision and overview.
+- `README.md`: product vision, overview, and the map of all documentation.
+  Add a new document to its Documentation section.
 - `docs/lifecycle.md`: stage definitions, entry and exit criteria, artifacts.
 - `docs/risk-assessment.md`: risk tiers and the criteria that assign them.
+- `docs/ai-review.md`: how the AI review workflow, the local `/code-review`
+  fallback and `claude.yml` behave.
+- `docs/workflow-dependencies.md`: what the workflows pin and load, and how to
+  update a pin or re-vendor the plugin.
+- `docs/repository-settings.md`: the `protect-main` ruleset and merge settings.
+- `scripts/`: the stage, risk and guard helpers and the ruleset setup,
+  documented in `scripts/README.md`.
+- `.github/workflows/`: the AI review (`claude-code-review.yml`) and the
+  mention workflow (`claude.yml`).
 - `.github/ISSUE_TEMPLATE/`: the work item template that starts the cycle.
 - `.github/PULL_REQUEST_TEMPLATE.md`: the pull request template that carries
   evidence and the final risk assessment.

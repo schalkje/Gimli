@@ -1,5 +1,7 @@
 # Scripts
 
+Part of the [Gimli documentation](../README.md#documentation).
+
 Small, deterministic helpers for running the lifecycle in `docs/lifecycle.md`.
 They use the `gh` CLI and POSIX shell only, so they run from Claude Code's
 Bash tool on Windows (Git Bash), macOS, and Linux.
