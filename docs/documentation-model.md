@@ -38,8 +38,8 @@ README.md                          what Gimli is, and the map
 
 ## Where a new document goes
 
-This section is the rule. `lifecycle.md`, `CLAUDE.md` and the stage skills
-link here instead of restating it.
+This section is the rule. `lifecycle.md`, `CLAUDE.md` and the Plan and Build
+skills link here instead of restating it.
 
 | You are writing down | Put it in | List it in | README map |
 |---|---|---|---|

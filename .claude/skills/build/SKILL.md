@@ -113,6 +113,8 @@ document it names, as the documentation rule in `docs/lifecycle.md`
 describes. A named document left unchanged is a deferred step and goes in
 the deviation list below with the reason. A document the change turns out to
 alter that the plan did not name is updated too, and recorded as a deviation.
+A new document gets the index and README map entries that "Where a new
+document goes" in `docs/documentation-model.md` gives it.
 
 A new ADR the plan names is written as `docs/adr/README.md` says: its
 status, its number (the next one not used on `main`), and its entry in the
