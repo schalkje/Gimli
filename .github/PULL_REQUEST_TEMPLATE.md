@@ -26,6 +26,14 @@ Closes #
 |---|---|
 | AC1 | |
 
+## Documentation
+
+<!-- The documents this change updates, one bullet each with what changed,
+     starting from the plan's Documentation entry. What counts is the
+     documentation rule in docs/lifecycle.md. If nothing needs updating, write
+     "None, because <reason>": unlike the other sections, a bare "None" does
+     not meet the Evidence exit criteria. -->
+
 ## Test output
 
 <!-- Paste the relevant test run output or link to the CI run. Attach screenshots
