@@ -119,7 +119,9 @@ Tier rules:
 Documentation entry: read the "Documentation rule" section of
 `docs/lifecycle.md` and name each document it covers whose described
 behaviour this change alters, including a new document's entry in the
-README documentation map. `/build` treats each named document as a step.
+index of its layer, and in the README documentation map when the rule says
+so. When the change makes a decision that `docs/adr/README.md` says needs an
+ADR, name the new ADR here too. `/build` treats each named document as a step.
 Write `None, because <reason>` only when no covered document describes what
 the change alters; a bare `None` does not meet the Plan exit criteria.
 
