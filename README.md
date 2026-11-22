@@ -28,7 +28,34 @@ flowchart LR
 	aiReview -->|Low risk| merge[Merge, when ready]
 	aiReview -->|Higher risk| humanReview[Human review]
 	humanReview --> merge
+
+	classDef human fill:#fde68a,stroke:#b45309,color:#1f2937
+	classDef skill fill:#bfdbfe,stroke:#1d4ed8,color:#1f2937
+	classDef workflow fill:#bbf7d0,stroke:#15803d,color:#1f2937
+	classDef manual fill:#e5e7eb,stroke:#4b5563,color:#1f2937,stroke-dasharray:4 3
+	class idea,humanReview human
+	class refine,plan,build skill
+	class aiReview workflow
+	class test,evidence,assess,merge manual
+
+	click idea "https://github.com/schalkje/Gimli/blob/main/docs/lifecycle.md#1-idea" "Idea stage" _blank
+	click refine "https://github.com/schalkje/Gimli/blob/main/docs/lifecycle.md#2-refine" "Refine stage" _blank
+	click plan "https://github.com/schalkje/Gimli/blob/main/docs/lifecycle.md#3-plan" "Plan stage" _blank
+	click build "https://github.com/schalkje/Gimli/blob/main/docs/lifecycle.md#4-build" "Build stage" _blank
+	click test "https://github.com/schalkje/Gimli/blob/main/docs/lifecycle.md#5-test" "Test stage" _blank
+	click evidence "https://github.com/schalkje/Gimli/blob/main/docs/lifecycle.md#6-evidence" "Evidence stage" _blank
+	click assess "https://github.com/schalkje/Gimli/blob/main/docs/lifecycle.md#7-assess" "Assess stage" _blank
+	click aiReview "https://github.com/schalkje/Gimli/blob/main/docs/ai-review.md" "AI review" _blank
+	click humanReview "https://github.com/schalkje/Gimli/blob/main/docs/lifecycle.md#8-review" "Review stage" _blank
+	click merge "https://github.com/schalkje/Gimli/blob/main/docs/lifecycle.md#9-merge" "Merge stage" _blank
 ```
+
+The colours show who carries out each stage today:
+🟨 a human decides ·
+🟦 a Claude Code skill does the work and asks a human to confirm ·
+🟩 a GitHub workflow runs it automatically ·
+⬜ done by hand today, to be automated (dashed).
+Click a stage to open its definition.
 
 Each stage has entry and exit criteria and leaves an artifact on GitHub. The specification is [`docs/lifecycle.md`](docs/lifecycle.md):
 
@@ -65,17 +92,19 @@ The exact review paths and what counts as human approval are in the [Review stag
 
 The lifecycle above is the target. Today the stages are carried out like this (from [what is not yet automated](docs/lifecycle.md#what-is-not-yet-automated)):
 
-| Stage | Today |
-|---|---|
-| Idea | Issue template [`.github/ISSUE_TEMPLATE/work-item.yml`](.github/ISSUE_TEMPLATE/work-item.yml) |
-| Refine | `/refine <issue>` skill |
-| Plan | `/plan <issue>` skill |
-| Build | `/build <issue>` skill; runs unattended only for `risk:low` issues |
-| Test | Manual |
-| Evidence | Pull request template [`.github/PULL_REQUEST_TEMPLATE.md`](.github/PULL_REQUEST_TEMPLATE.md), filled manually |
-| Assess | Manual |
-| Review | AI review by a GitHub workflow when the pull request is marked ready; `/code-review <pr>` as local fallback |
-| Merge | Manual, closing the issue with `scripts/stage.sh <issue> close` |
+| | Stage | Today |
+|---|---|---|
+| 🟨 | Idea | Issue template [`.github/ISSUE_TEMPLATE/work-item.yml`](.github/ISSUE_TEMPLATE/work-item.yml) |
+| 🟦 | Refine | `/refine <issue>` skill |
+| 🟦 | Plan | `/plan <issue>` skill |
+| 🟦 | Build | `/build <issue>` skill; runs unattended only for `risk:low` issues |
+| ⬜ | Test | Manual |
+| ⬜ | Evidence | Pull request template [`.github/PULL_REQUEST_TEMPLATE.md`](.github/PULL_REQUEST_TEMPLATE.md), filled manually |
+| ⬜ | Assess | Manual |
+| 🟩 🟨 | Review | AI review by a GitHub workflow when the pull request is marked ready; `/code-review <pr>` as local fallback. Human review as the risk tier requires |
+| ⬜ | Merge | Manual, closing the issue with `scripts/stage.sh <issue> close` |
+
+The symbols match the diagram colours above.
 
 `main` accepts changes only through a squash-merged pull request, enforced by a GitHub ruleset ([`docs/repository-settings.md`](docs/repository-settings.md)). The other Review rules, including human approval, are process rules that GitHub does not check.
 
