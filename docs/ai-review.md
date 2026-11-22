@@ -17,7 +17,8 @@ The AI review is `.github/workflows/claude-code-review.yml`. It runs the
 drafts, and posts its findings as inline comments, or one summary comment when
 it finds none, as the Claude GitHub App. Later pushes start the workflow again,
 but the plugin reviews a pull request only once: it skips any pull request that
-already has a Claude comment. The plugin is a copy vendored in
+already has a Claude comment, and may post nothing on one it judges trivial
+(see below). The plugin is a copy vendored in
 `vendor/claude-plugins/` and the workflow's actions are pinned to commit SHAs,
 so an upstream change reaches the review only through a pull request here,
 except what the pinned action downloads at run time.
@@ -32,6 +33,24 @@ of its model provider; a reviewer from another provider is tracked in #1.
   unavailable. It does not skip reviewed pull requests; it prints its
   findings, or posts them with `--comment`. Do not delete the workflow's
   comments to force a re-run: they are the review threads Review resolves.
+- **Trivial pull requests.** The plugin may finish without posting anything
+  on a pull request it judges trivial. In the #28 verification, the
+  ready-for-review run on a one-line HTML comment change ended after 2 turns
+  with no comment
+  ([run 40578896724](https://github.com/schalkje/Gimli/actions/runs/40578896724)).
+  When the plugin reviews and finds nothing it posts a "No issues found"
+  summary, so no Claude comment after the head commit means the review
+  skipped: run `/code-review <pr>`.
+- **Held runs after `claude.yml` commits.** A commit pushed by the
+  `claude.yml` workflow starts a review run that GitHub holds as
+  `action_required`, with actor `github-actions[bot]`, under the repository's
+  `first_time_contributors` approval policy. This was observed once, in the
+  #28 verification, and not tested beyond it:
+  [run 40579775116](https://github.com/schalkje/Gimli/actions/runs/40579775116)
+  was held with no jobs until its pull request was closed, and now shows as
+  failed for that reason. Do not approve such a run: the pull
+  request already has a Claude comment, the reply to the mention, so the
+  plugin would skip it. Run `/code-review <pr>` instead.
 - **Asking Claude.** A comment containing `@claude` from the owner, a member,
   or a collaborator starts `.github/workflows/claude.yml`; a mention from
   anyone else starts no job. The action then acts only for users with write

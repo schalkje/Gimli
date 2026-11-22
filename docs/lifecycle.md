@@ -208,15 +208,19 @@ merge settings unless the owner asks in that session.
 **The AI review.** `.github/workflows/claude-code-review.yml` runs the
 `code-review` plugin on GitHub when a pull request is marked ready and posts
 its findings as the Claude GitHub App. It reviews a pull request only once: it
-skips any pull request that already has a Claude comment. `/code-review <pr>`
-in Claude Code is the local review. How the workflow behaves, when it skips,
+skips any pull request that already has a Claude comment, or one it judges
+trivial. `/code-review <pr>` in Claude Code is the local review. How the workflow behaves, when it skips,
 and how to ask Claude on a pull request with a mention are in
 [`ai-review.md`](ai-review.md).
 
 **Present, complete, current.** Review needs an AI review that ran, finished,
-and covers the diff being merged. The workflow's review does not count when
-it skipped (for example because an `@claude` reply already counts as a Claude
-comment), when its run was cancelled or failed, or when commits landed after
+and covers the diff being merged. The workflow's review counts only when a
+Claude comment, inline or summary, was posted on the pull request after its
+head commit. It does not count when it skipped (for example because an
+`@claude` reply already counts as a Claude comment), when its run finished
+without posting anything because the plugin judged the change trivial, when
+its run is held as `action_required` after a commit by the `claude.yml`
+workflow, when its run was cancelled or failed, or when commits landed after
 it, including after a return to Build or commits by `@claude`. In any of
 those cases, run `/code-review <pr>` in Claude Code on the final diff and
 resolve its findings in the `## AI review` comment as well.
