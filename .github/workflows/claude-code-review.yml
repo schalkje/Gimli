@@ -15,7 +15,7 @@
 # restricts nothing. --disallowedTools takes precedence: it stops gh pr comment
 # from editing or deleting earlier comments, and denies xargs and command,
 # which could carry those flags past the rules. The review can still comment
-# on any pull request or issue its token reaches. Do not add tools that edit
+# on any pull request its token reaches. Do not add tools that edit
 # files, commit, or push. Details: docs/workflow-dependencies.md, What the
 # review may post.
 #

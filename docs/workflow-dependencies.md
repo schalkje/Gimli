@@ -118,7 +118,10 @@ workflow is stricter than the vendored frontmatter through `--disallowedTools`:
 Claude Code checks each part of a compound command (`cd x && …`, `…; …`,
 `… | …`) and strips wrappers such as `timeout`, `nice`, `nohup`, `stdbuf`,
 `time`, `exec` and `builtin command` before matching, so the two
-`gh pr comment` rules cover those forms. A command that matches no allow rule,
+`gh pr comment` rules cover those forms. It also resolves quotes, escapes,
+command substitution and variables before matching, so `--edit-l''ast`,
+`--edit-las\t`, `"--edit-last"`, `$(printf -- '--edit-%s' last)` and
+`f=--edit-last; … $f` are denied as well. A command that matches no allow rule,
 such as an absolute path to `gh`, an `env`, `PATH=` or `GH_REPO=` prefix, or
 `bash -c`, is denied because the run cannot ask for permission. A comment
 whose body contains the text `--edit-last` or `--delete-last` is denied too;
@@ -127,8 +130,9 @@ with Claude Code 2.1.330 and a fake `gh`, are recorded in the pull request
 that added these rules (issue #37).
 
 The limit: permission rules match command text and cannot say "only this pull
-request", so the review can post a new comment on any pull request or issue
-its token can write to. The action gets that token by exchanging the job's
+request", so the review can post a new comment on any pull request its token
+can write to. Issues are out of reach only because `gh pr comment` resolves
+pull requests alone and `gh issue comment` is not allowed. The action gets that token by exchanging the job's
 OIDC token at Anthropic's endpoint, sending only the permissions and no
 repository list (`exchangeForAppToken` in `src/github/token.ts` at the
 pinned `cc98b3a`), and exports it as `GH_TOKEN` to the session. Which
