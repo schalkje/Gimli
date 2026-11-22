@@ -38,16 +38,16 @@ flowchart LR
 	class aiReview workflow
 	class test,evidence,assess,merge manual
 
-	click idea "https://github.com/schalkje/Gimli/blob/main/docs/lifecycle.md#1-idea" "Idea stage" _blank
-	click refine "https://github.com/schalkje/Gimli/blob/main/docs/lifecycle.md#2-refine" "Refine stage" _blank
-	click plan "https://github.com/schalkje/Gimli/blob/main/docs/lifecycle.md#3-plan" "Plan stage" _blank
-	click build "https://github.com/schalkje/Gimli/blob/main/docs/lifecycle.md#4-build" "Build stage" _blank
-	click test "https://github.com/schalkje/Gimli/blob/main/docs/lifecycle.md#5-test" "Test stage" _blank
-	click evidence "https://github.com/schalkje/Gimli/blob/main/docs/lifecycle.md#6-evidence" "Evidence stage" _blank
-	click assess "https://github.com/schalkje/Gimli/blob/main/docs/lifecycle.md#7-assess" "Assess stage" _blank
-	click aiReview "https://github.com/schalkje/Gimli/blob/main/docs/ai-review.md" "AI review" _blank
-	click humanReview "https://github.com/schalkje/Gimli/blob/main/docs/lifecycle.md#8-review" "Review stage" _blank
-	click merge "https://github.com/schalkje/Gimli/blob/main/docs/lifecycle.md#9-merge" "Merge stage" _blank
+	click idea "docs/lifecycle.md#1-idea" "Idea stage" _blank
+	click refine "docs/lifecycle.md#2-refine" "Refine stage" _blank
+	click plan "docs/lifecycle.md#3-plan" "Plan stage" _blank
+	click build "docs/lifecycle.md#4-build" "Build stage" _blank
+	click test "docs/lifecycle.md#5-test" "Test stage" _blank
+	click evidence "docs/lifecycle.md#6-evidence" "Evidence stage" _blank
+	click assess "docs/lifecycle.md#7-assess" "Assess stage" _blank
+	click aiReview "docs/ai-review.md" "AI review" _blank
+	click humanReview "docs/lifecycle.md#8-review" "Review stage" _blank
+	click merge "docs/lifecycle.md#9-merge" "Merge stage" _blank
 ```
 
 The colours show who carries out each stage today:
