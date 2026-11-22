@@ -150,7 +150,7 @@ stage label, and leave the issue closed.
 #### Scenario STAGE-6.1: Close an open issue
 
 - **GIVEN** an open issue at `stage:merge`
-- **WHEN** `scripts/stage.sh <issue> close Merged in #6.` runs
+- **WHEN** `scripts/stage.sh <issue> close "Merged in #6."` runs
 - **THEN** a comment `Stage: merge → close` with the note is posted
 - **AND** the `stage:merge` label is removed and the issue is closed
 
