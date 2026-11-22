@@ -36,6 +36,10 @@ and change nothing.
 - **WHEN** `scripts/stage.sh <issue>` runs
 - **THEN** it prints `none`
 
+The output for an issue carrying several stage labels is not specified yet:
+`stage.sh` prints all of them, for example `plan build`, which is not a stage.
+It is part of #49.
+
 ### Requirement STAGE-2: Reject invalid arguments
 
 The system SHALL exit with status 2 and change nothing when its arguments are
@@ -92,18 +96,32 @@ leave the issue with exactly that one stage label.
 - **THEN** every old stage label is removed and only the target label remains
 
 The case where one of several stage labels is the target is not specified
-yet: `stage.sh` would remove and add the same label in one edit, which
-`scripts/README.md` notes leaves no label at all. Fixing it is #49.
+yet: `stage.sh` would remove and add the same label in one edit, and `gh`
+then leaves no label at all, as the
+[`risk.sh` section of `scripts/README.md`](../../../scripts/README.md#risksh)
+explains. Fixing it is #49.
 
 ### Requirement STAGE-4: Comment before label
 
-The system SHALL post the transition comment before it changes any label, so
-that a failure part way leaves the issue documented but unmoved.
+The system SHALL post the transition comment before it changes any label or
+the issue's open or closed state, so that a failure part way always leaves the
+transition documented.
 
-#### Scenario STAGE-4.1: Label change fails
+#### Scenario STAGE-4.1: Label change fails on a move
 
-- **WHEN** posting the comment succeeds and the label change fails
+- **GIVEN** an open issue
+- **WHEN** it is moved to a stage, posting the comment succeeds, and the label
+  change fails
 - **THEN** the comment is on the issue and the old stage label is unchanged
+
+#### Scenario STAGE-4.2: Later step fails on close or reopen
+
+- **WHEN** a close or a reopen fails after the comment is posted
+- **THEN** the comment is on the issue, but the issue may be partly changed:
+  on `close`, the stage label is removed before the issue is closed; on a
+  reopen, the issue is reopened before the labels change
+- **AND** the script stops with a non-zero status, so the partial state is
+  visible to whoever ran it
 
 ### Requirement STAGE-5: No-op at the same stage
 
@@ -116,6 +134,13 @@ stage.
 - **WHEN** `scripts/stage.sh <issue> build` runs
 - **THEN** it prints `#<issue>: already at build`
 - **AND** posts no comment and changes no label
+
+#### Scenario STAGE-5.2: Closed issue already at the target stage
+
+- **GIVEN** a closed issue that still carries `stage:build`
+- **WHEN** `scripts/stage.sh <issue> build` runs
+- **THEN** it prints `#<issue>: already at build`
+- **AND** posts no comment, and the issue stays closed
 
 ### Requirement STAGE-6: Close
 
@@ -139,11 +164,12 @@ stage label, and leave the issue closed.
 
 ### Requirement STAGE-7: Reopen a closed issue
 
-Moving a closed issue to a stage SHALL reopen it.
+Moving a closed issue to a stage other than its current one SHALL reopen it.
+At its current stage, STAGE-5.2 applies instead.
 
 #### Scenario STAGE-7.1: Return a closed issue to Build
 
-- **GIVEN** a closed issue
+- **GIVEN** a closed issue that does not carry `stage:build`
 - **WHEN** `scripts/stage.sh <issue> build "Regression found."` runs
 - **THEN** the comment is posted, the issue is reopened, and it carries
   `stage:build`
@@ -156,7 +182,8 @@ carries a `stage:*` label that is not one of the valid stages.
 #### Scenario STAGE-8.1: Unknown stage label on the issue
 
 - **GIVEN** an issue carrying `stage:done`
-- **WHEN** `scripts/stage.sh <issue>` runs, with or without a target
+- **WHEN** `scripts/stage.sh <issue>` runs with no target or with a valid
+  target (an invalid target fails first, under STAGE-2.3)
 - **THEN** it reports the non-canonical label, says to fix it by hand, and
   exits with status 1
 - **AND** posts no comment and changes no label

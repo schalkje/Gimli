@@ -50,7 +50,7 @@ Changes are reviewed against these. Each links to where it is defined.
 - **Scripts are small, deterministic, and use only `gh` and POSIX shell,** so
   they run on Windows, macOS and Linux ([`scripts/README.md`](../../scripts/README.md)).
 - **Record before acting.** A script posts its comment before it changes a
-  label, so a failure leaves the issue documented but unmoved
+  label or an issue's state, so a failure part way leaves the change documented
   ([STAGE-4](../specs/stage-transitions/spec.md#requirement-stage-4-comment-before-label)).
 - **Pinned and vendored dependencies.** Workflow actions are pinned and the
   review plugin is vendored, never edited by hand
