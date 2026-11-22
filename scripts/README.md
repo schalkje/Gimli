@@ -31,7 +31,7 @@ Behaviour worth knowing:
   changes nothing.
 - `close` on an issue GitHub already closed still posts the comment and removes
   the label. Moving a closed issue to a stage reopens it.
-- A `stage:*` label that is not one of the nine stages aborts the script; fix
+- A `stage:*` label that is not one of the eight stages aborts the script; fix
   the label by hand first.
 
 ## risk.sh

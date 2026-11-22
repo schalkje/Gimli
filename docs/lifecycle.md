@@ -53,7 +53,10 @@ Documentation is the specification, so a change that alters what a document
 describes updates that document in the same pull request. Documentation means
 everything that describes behaviour:
 
-- every document under `docs/`;
+- every document under `docs/`, including the three layers of the
+  [documentation model](documentation-model.md): the capability specs in
+  `docs/specs/`, the architecture in `docs/architecture/`, and the
+  architecture decision records in `docs/adr/`;
 - `README.md`: its stage, status and documentation map tables, and the
   colours of its lifecycle diagram, which show who carries out each stage;
 - `scripts/README.md`, when a script's behaviour changes;
@@ -61,7 +64,9 @@ everything that describes behaviour:
 - the issue and pull request templates under `.github/`;
 - the Repository layout section of `CLAUDE.md`.
 
-A new document is added to the documentation map in `README.md`.
+Where a new document goes, which index lists it, and whether the documentation
+map in `README.md` lists it are set in
+[where a new document goes](documentation-model.md#where-a-new-document-goes).
 
 The rule is applied at three stages:
 
@@ -110,9 +115,9 @@ An implementation plan is produced and recorded on the issue.
 | | |
 |---|---|
 | Entry | Issue has `stage:plan`. |
-| Activity | Inspect the codebase, identify affected files and components, decide on approach, list steps, identify tests to add or change, identify the documentation to update under the [documentation rule](#documentation-rule), confirm or revise the risk tier. |
+| Activity | Inspect the codebase, identify affected files and components, decide on approach, list steps, identify tests to add or change, identify the documentation to update under the [documentation rule](#documentation-rule), decide whether the change needs an architecture decision record under [`adr/README.md`](adr/README.md#when-to-write-an-adr), confirm or revise the risk tier. |
 | Artifact | A plan posted as an issue comment, headed `## Plan`. A comment headed `## Plan: draft` is an unconfirmed draft from a non-interactive run and `## Plan: not ready` records that the Refine exit criteria were not met; neither is the Plan artifact. |
-| Exit | The plan lists concrete steps, files or areas affected, the documents the change updates under the documentation rule or `None, because <reason>`, the tests that will prove each acceptance criterion, and the assessed risk tier with reasoning. For `risk:high` and above, a human has acknowledged the plan with a comment or reaction before Build starts. |
+| Exit | The plan lists concrete steps, files or areas affected, the documents the change updates under the documentation rule or `None, because <reason>`, including a new architecture decision record when [`adr/README.md`](adr/README.md#when-to-write-an-adr) calls for one, the tests that will prove each acceptance criterion, and the assessed risk tier with reasoning. For `risk:high` and above, a human has acknowledged the plan with a comment or reaction before Build starts. |
 | Label | `risk:<tier>` applied with `scripts/risk.sh`. `stage:build` for low and medium. High and critical stay at `stage:plan` until a human acknowledges the plan; the Build transition is then made by hand. |
 
 ### 4. Build
@@ -232,7 +237,7 @@ The change is merged and the issue is closed.
 | | |
 |---|---|
 | Entry | `stage:merge`. |
-| Activity | For `risk:medium` and higher, post the `Human approval:` comment first if Review has not. Squash merge, the only method the repository allows. `risk:low` pull requests may auto-merge. Then run `scripts/stage.sh <issue> close "Merged in #<pr>"`: it removes the stage label and records the transition whether or not GitHub already closed the issue through a closing keyword. The head branch is deleted automatically. |
+| Activity | For `risk:medium` and higher, post the `Human approval:` comment first if Review has not. If the pull request adds an ADR whose number `main` has taken since, renumber it as [`adr/README.md`](adr/README.md#numbering) says, which means a return to Build. Squash merge, the only method the repository allows. `risk:low` pull requests may auto-merge, except one that adds an ADR: its number is checked against `main` at merge, so it is merged by hand. Then run `scripts/stage.sh <issue> close "Merged in #<pr>"`: it removes the stage label and records the transition whether or not GitHub already closed the issue through a closing keyword. The head branch is deleted automatically. |
 | Artifact | Squash commit on `main`; closed issue. |
 | Exit | Change is on `main`. Issue is closed. |
 | Label | None; the issue is closed. |

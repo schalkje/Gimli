@@ -40,8 +40,16 @@ lifecycle described in `docs/lifecycle.md`.
 
 ## Repository layout
 
-- `README.md`: product vision, overview, and the map of all documentation.
-  Add a new document to its Documentation section.
+- `README.md`: product vision, overview, and the documentation map. Where a
+  new document goes and whether the map lists it is set in
+  `docs/documentation-model.md`, section "Where a new document goes".
+- `docs/documentation-model.md`: the documentation layers and how they link.
+- `docs/specs/`: capability specs, requirements with scenarios whose IDs
+  (`<CAP>-<req>.<n>`) are never reused; format in `docs/specs/README.md`.
+- `docs/architecture/`: Gimli's parts and the principles changes are
+  reviewed against.
+- `docs/adr/`: architecture decision records; when to write one is in
+  `docs/adr/README.md`.
 - `docs/lifecycle.md`: stage definitions, entry and exit criteria, artifacts.
 - `docs/risk-assessment.md`: risk tiers and the criteria that assign them.
 - `docs/ai-review.md`: how the AI review workflow, the local `/code-review`

@@ -6,7 +6,7 @@
 
 Gimli is an agentic software development system that takes work from idea to proven implementation, with human involvement based on risk rather than fixed process gates.
 
-This README is the starting point. Each section gives the short version and links to the document that holds the detail; the [documentation map](#documentation) lists them all.
+This README is the starting point. Each section gives the short version and links to the document that holds the detail; the [documentation map](#documentation) lists the documents to start from, and each layer's index lists the rest.
 
 ## How it works
 
@@ -128,6 +128,18 @@ scripts/risk.sh <issue-or-pr> <tier> [note]   # low, medium, high, critical
 
 ## Documentation
 
+### Specification and architecture
+
+The documentation is layered: start here and follow the links down. The
+[documentation model](docs/documentation-model.md) explains the layers.
+
+| Document | What it covers |
+|---|---|
+| [`docs/documentation-model.md`](docs/documentation-model.md) | The layers of Gimli's documentation, how they link, and where a new document goes. |
+| [`docs/specs/README.md`](docs/specs/README.md) | What Gimli does: the capability spec format, scenario IDs, and the index of specs. |
+| [`docs/architecture/README.md`](docs/architecture/README.md) | How Gimli is built: its parts, the principles changes are reviewed against, and where the process documents fit. |
+| [`docs/adr/README.md`](docs/adr/README.md) | Why Gimli is built this way: when to write an architecture decision record, the format, and the index of decisions. |
+
 ### Process
 
 | Document | What it covers |
@@ -168,6 +180,9 @@ scripts/risk.sh <issue-or-pr> <tier> [note]   # low, medium, high, critical
 ├── README.md                     this overview
 ├── CLAUDE.md                     instructions for Claude Code
 ├── docs/                         the specification (see Documentation)
+│   ├── specs/                    capability specs: what Gimli does
+│   ├── architecture/             how Gimli is built
+│   └── adr/                      architecture decision records: why
 ├── scripts/                      stage, risk and guard helpers, ruleset setup
 ├── .claude/skills/               one skill per automated lifecycle stage
 ├── .github/ISSUE_TEMPLATE/       the work item template that starts the cycle
