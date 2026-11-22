@@ -44,9 +44,11 @@ of its model provider; a reviewer from another provider is tracked in #1.
 - **Held runs after `claude.yml` commits.** A commit pushed by the
   `claude.yml` workflow starts a review run that GitHub holds as
   `action_required`, with actor `github-actions[bot]`, under the repository's
-  `first_time_contributors` approval policy
-  ([run 40579775116](https://github.com/schalkje/Gimli/actions/runs/40579775116);
-  observed once, not tested beyond it). Do not approve it: such a pull
+  `first_time_contributors` approval policy. This was observed once, in the
+  #28 verification, and not tested beyond it:
+  [run 40579775116](https://github.com/schalkje/Gimli/actions/runs/40579775116)
+  was held with no jobs until its pull request was closed, and now shows as
+  failed for that reason. Do not approve such a run: the pull
   request already has a Claude comment, the reply to the mention, so the
   plugin would skip it. Run `/code-review <pr>` instead.
 - **Asking Claude.** A comment containing `@claude` from the owner, a member,
