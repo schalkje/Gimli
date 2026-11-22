@@ -76,7 +76,8 @@ lifecycle described in `docs/lifecycle.md`.
   section is filled by the Evidence and Assess stages, which the template
   implements.
 - Documentation is the specification. When behaviour and `docs/` disagree,
-  fix one of them in the same change.
+  fix one of them in the same change, following the documentation rule in
+  `docs/lifecycle.md`.
 
 ## Working style
 
