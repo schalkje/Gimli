@@ -114,6 +114,10 @@ describes. A named document left unchanged is a deferred step and goes in
 the deviation list below with the reason. A document the change turns out to
 alter that the plan did not name is updated too, and recorded as a deviation.
 
+A new ADR the plan names is written as `docs/adr/README.md` says: its
+status, its number (the next one not used on `main`), and its entry in the
+index there.
+
 Commit in logical steps as you go: imperative mood, one logical change per
 commit, ending with the attribution lines this session requires. Reference
 the issue as `Refs #<n>` in the body, not `Closes`, so the pull request owns

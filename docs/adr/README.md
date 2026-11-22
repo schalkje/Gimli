@@ -53,7 +53,9 @@ is superseded or deprecated.
 | `Superseded by NNNN` | Applied, then replaced by a later ADR, which links back to this one. |
 | `Deprecated` | Applied, but no longer does, and nothing replaces it. |
 
-An accepted ADR is not rewritten once it is on `main`. A changed decision is a
+A `Proposed` ADR may be edited until it is decided, and the pull request that
+accepts or rejects it may change its content along with its status. An
+accepted ADR is not rewritten once it is on `main`. A changed decision is a
 new ADR that supersedes the old one; the only edit to the old ADR is its
 status line.
 
