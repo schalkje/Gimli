@@ -30,6 +30,10 @@ flowchart LR
   exit criteria are met and its artifact exists. Stages are not skipped.
 - **Evidence over assertion.** A claim that something works is backed by test
   output, screenshots, or logs attached to the pull request.
+- **Documentation is part of the change.** A change updates the documentation
+  that describes what it changes, in the same pull request. The
+  [documentation rule](#documentation-rule) says what that covers and where it
+  is checked.
 
 ## Stage status
 
@@ -42,6 +46,35 @@ label and posts a `Stage: <old> → <new>` comment so the transition is in the
 audit trail. Change the tier with `scripts/risk.sh <issue> <tier> [note]`,
 which does the same with a `Risk: <old> → <new>` comment. Do not edit stage
 or risk labels by hand.
+
+## Documentation rule
+
+Documentation is the specification, so a change that alters what a document
+describes updates that document in the same pull request. Documentation means
+everything that describes behaviour:
+
+- every document under `docs/`;
+- `README.md`: its stage, status and documentation map tables, and the
+  colours of its lifecycle diagram, which show who carries out each stage;
+- `scripts/README.md`, when a script's behaviour changes;
+- the skill files under `.claude/skills/`, when a stage's procedure changes;
+- the issue and pull request templates under `.github/`;
+- the Repository layout section of `CLAUDE.md`.
+
+A new document is added to the documentation map in `README.md`.
+
+The rule is applied at three stages:
+
+- **Plan** names the documents the change updates, or says
+  `None, because <reason>`.
+- **Evidence** lists the documents updated in the pull request's
+  Documentation section, or says `None, because <reason>`. An empty section,
+  or a bare `None`, does not meet the Evidence exit criteria.
+- **Review** checks the Documentation section against the diff: every
+  behaviour the diff changes is reflected in a listed document.
+
+The skills, the pull request template and `CLAUDE.md` refer to this section
+rather than repeating the list.
 
 ## Stages
 
@@ -77,9 +110,9 @@ An implementation plan is produced and recorded on the issue.
 | | |
 |---|---|
 | Entry | Issue has `stage:plan`. |
-| Activity | Inspect the codebase, identify affected files and components, decide on approach, list steps, identify tests to add or change, confirm or revise the risk tier. |
+| Activity | Inspect the codebase, identify affected files and components, decide on approach, list steps, identify tests to add or change, identify the documentation to update under the [documentation rule](#documentation-rule), confirm or revise the risk tier. |
 | Artifact | A plan posted as an issue comment, headed `## Plan`. A comment headed `## Plan: draft` is an unconfirmed draft from a non-interactive run and `## Plan: not ready` records that the Refine exit criteria were not met; neither is the Plan artifact. |
-| Exit | The plan lists concrete steps, files or areas affected, the tests that will prove each acceptance criterion, and the assessed risk tier with reasoning. For `risk:high` and above, a human has acknowledged the plan with a comment or reaction before Build starts. |
+| Exit | The plan lists concrete steps, files or areas affected, the documents the change updates under the documentation rule or `None, because <reason>`, the tests that will prove each acceptance criterion, and the assessed risk tier with reasoning. For `risk:high` and above, a human has acknowledged the plan with a comment or reaction before Build starts. |
 | Label | `risk:<tier>` applied with `scripts/risk.sh`. `stage:build` for low and medium. High and critical stay at `stage:plan` until a human acknowledges the plan; the Build transition is then made by hand. |
 
 ### 4. Build
@@ -113,9 +146,9 @@ The pull request is completed with everything a reviewer needs.
 | | |
 |---|---|
 | Entry | `stage:evidence`. |
-| Activity | Fill the pull request template: summary, linked issue, acceptance criteria and evidence (one row per criterion, keyed by the criterion's `AC<n>` identifier), test output or screenshots, known limitations, deviations from plan (summarising the deviation comments on the issue). Leave the Risk assessment section for the Assess stage. |
+| Activity | Fill the pull request template: summary, linked issue, acceptance criteria and evidence (one row per criterion, keyed by the criterion's `AC<n>` identifier), documentation (the documents updated, starting from the plan's list), test output or screenshots, known limitations, deviations from plan (summarising the deviation comments on the issue). Leave the Risk assessment section for the Assess stage. |
 | Artifact | A complete pull request body following `.github/PULL_REQUEST_TEMPLATE.md`. |
-| Exit | Each acceptance criterion has a stated evidence item. The pull request is marked ready for review, which starts the AI review workflow (see Review); it runs while Assess is under way. |
+| Exit | Each acceptance criterion has a stated evidence item. The Documentation section lists the documents updated, or `None, because <reason>`; an empty section or a bare `None` does not meet this criterion (see the [documentation rule](#documentation-rule)). The pull request is marked ready for review, which starts the AI review workflow (see Review); it runs while Assess is under way. |
 | Label | `stage:assess` |
 
 ### 7. Assess
@@ -144,9 +177,9 @@ The change is reviewed by the path the risk tier requires.
 | | |
 |---|---|
 | Entry | `stage:review`. |
-| Activity | AI review runs on every pull request (see below). Findings are addressed or explicitly dismissed with a reason in a `## AI review` comment, posted by whoever does Review. Human review as required by tier. |
+| Activity | AI review runs on every pull request (see below). Findings are addressed or explicitly dismissed with a reason in a `## AI review` comment, posted by whoever does Review. The Documentation section is checked against the diff: every behaviour the diff changes is reflected in a listed document. Human review as required by tier. |
 | Artifact | A `## AI review` comment resolving every AI review finding, the `Human approval:` comment where the tier requires one, and resolved review threads on the pull request. |
-| Exit | An AI review that is present, complete, and current (see below) exists, and its findings are fixed or dismissed in the `## AI review` comment. Every required human approval is recorded in a `Human approval:` comment (see below). All review threads are resolved. CI is green. |
+| Exit | An AI review that is present, complete, and current (see below) exists, and its findings are fixed or dismissed in the `## AI review` comment. Every required human approval is recorded in a `Human approval:` comment (see below). The Documentation section matches the diff. All review threads are resolved. CI is green. |
 | Label | `stage:merge` |
 
 **Human approval.** For `risk:medium` and higher, human approval is the

@@ -108,6 +108,12 @@ plan's Tests table names. Do not invent a test runner the repository lacks;
 if the proof for a criterion is a manual check or a transcript, say so and
 leave it for the Test stage.
 
+The plan's **Documentation** entry is part of its Steps: update each
+document it names, as the documentation rule in `docs/lifecycle.md`
+describes. A named document left unchanged is a deferred step and goes in
+the deviation list below with the reason. A document the change turns out to
+alter that the plan did not name is updated too, and recorded as a deviation.
+
 Commit in logical steps as you go: imperative mood, one logical change per
 commit, ending with the attribution lines this session requires. Reference
 the issue as `Refs #<n>` in the body, not `Closes`, so the pull request owns

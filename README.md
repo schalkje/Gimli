@@ -63,10 +63,10 @@ Each stage has entry and exit criteria and leaves an artifact on GitHub. The spe
 |---|---|---|
 | [Idea](docs/lifecycle.md#1-idea) | A need is captured as an issue from the work item template. | Issue with `stage:refine` |
 | [Refine](docs/lifecycle.md#2-refine) | The issue is clarified until its acceptance criteria are testable and its scope is stated. | Refined issue body |
-| [Plan](docs/lifecycle.md#3-plan) | Steps, affected files, tests per criterion and a risk tier are decided. | `## Plan` comment, `risk:*` label |
+| [Plan](docs/lifecycle.md#3-plan) | Steps, affected files, documentation to update, tests per criterion and a risk tier are decided. | `## Plan` comment, `risk:*` label |
 | [Build](docs/lifecycle.md#4-build) | The plan is implemented on a branch. | Commits and a draft pull request |
 | [Test](docs/lifecycle.md#5-test) | Automated and planned manual checks run. | Green CI, captured output |
-| [Evidence](docs/lifecycle.md#6-evidence) | The pull request body proves each acceptance criterion; the pull request is marked ready. | Completed pull request body |
+| [Evidence](docs/lifecycle.md#6-evidence) | The pull request body proves each acceptance criterion and lists the documentation updated; the pull request is marked ready. | Completed pull request body |
 | [Assess](docs/lifecycle.md#7-assess) | The final risk tier is set against the actual diff. | Risk assessment section, `risk:*` label |
 | [Review](docs/lifecycle.md#8-review) | AI review always; human review as the tier requires. | `## AI review` comment, approvals |
 | [Merge](docs/lifecycle.md#9-merge) | Squash merge; the issue is closed. | Commit on `main` |
@@ -132,7 +132,7 @@ scripts/risk.sh <issue-or-pr> <tier> [note]   # low, medium, high, critical
 
 | Document | What it covers |
 |---|---|
-| [`docs/lifecycle.md`](docs/lifecycle.md) | The specification: principles, stage labels, every stage's entry and exit criteria and artifact, returning to an earlier stage, and what is automated. |
+| [`docs/lifecycle.md`](docs/lifecycle.md) | The specification: principles, stage labels, every stage's entry and exit criteria and artifact, the documentation rule, returning to an earlier stage, and what is automated. |
 | [`docs/risk-assessment.md`](docs/risk-assessment.md) | Risk tiers, the dimensions that score them, the procedure, and escalation. |
 
 ### Review and repository controls
