@@ -14,7 +14,7 @@ README.md                          what Gimli is, and the map
 ├── docs/specs/                    what Gimli does
 │   └── <capability>/spec.md       requirements and scenarios
 ├── docs/architecture/             how Gimli is built
-│   └── component documents        one part each
+│   └── README.md                  overview, principles, index
 └── docs/adr/                      why Gimli is built this way
     └── NNNN-<slug>.md             one decision each
 ```
@@ -22,7 +22,7 @@ README.md                          what Gimli is, and the map
 | Layer | Holds | Entry point | Format |
 |---|---|---|---|
 | Specs | Requirements as SHALL statements, each with scenarios that have stable IDs | [`specs/README.md`](specs/README.md) | [`specs/template.md`](specs/template.md) |
-| Architecture | Gimli's parts, how they interact, and the principles changes are reviewed against | [`architecture/README.md`](architecture/README.md) | Free form, short, one part per document |
+| Architecture | Gimli's parts, how they interact, and the principles changes are reviewed against | [`architecture/README.md`](architecture/README.md) | Free form, short: one overview, with a document per part added when the overview would grow too long |
 | Decisions | One decision each: context, decision, options, consequences | [`adr/README.md`](adr/README.md) | [`adr/template.md`](adr/template.md) |
 
 ## How the layers link
@@ -43,8 +43,9 @@ README.md                          what Gimli is, and the map
 | What Gimli does, in a way that can be tested | a capability spec in `docs/specs/` |
 | How a part of Gimli works, or a principle code is reviewed against | `docs/architecture/` |
 | A decision and why it was made | a new ADR in `docs/adr/` |
-| How to run the process | the process documents already in `docs/`, placed in the [architecture overview](architecture/README.md#where-the-existing-documents-fit) |
+| A process document that is not a capability spec yet, such as a new stage procedure | directly in `docs/`, placed in a layer in the [architecture overview](architecture/README.md#where-the-documents-in-docs-fit) and listed in the README map's Process group |
 
-A new document is added to its layer's index. It goes in the
+A new document is added to its layer's index; a document directly in `docs/`
+is added to the placement table in the architecture overview instead. It goes in the
 [documentation map](../README.md#documentation) only when it is the entry
 point of a layer or a document people start from.

@@ -49,17 +49,18 @@ Changes are reviewed against these. Each links to where it is defined.
   ([ADR 0001](../adr/0001-progressive-disclosure.md)).
 - **Scripts are small, deterministic, and use only `gh` and POSIX shell,** so
   they run on Windows, macOS and Linux ([`scripts/README.md`](../../scripts/README.md)).
-- **Record before acting.** A script posts its comment before it changes a
-  label or an issue's state, so a failure part way leaves the change documented
+- **Record before acting.** The scripts that change issue or pull request
+  labels or state, `stage.sh` and `risk.sh`, post their comment first, so a
+  failure part way leaves the change documented
   ([STAGE-4](../specs/stage-transitions/spec.md#requirement-stage-4-comment-before-label)).
 - **Pinned and vendored dependencies.** Workflow actions are pinned and the
   review plugin is vendored, never edited by hand
   ([`workflow-dependencies.md`](../workflow-dependencies.md)).
 
-## Where the existing documents fit
+## Where the documents in docs/ fit
 
-The documents that predate the documentation model stay where they are. This
-table places each one in a layer.
+The documents directly in `docs/`, outside the three layer folders, stay where
+they are. This table places each one in a layer; a new one is added here.
 
 | Document | Layer | Notes |
 |---|---|---|
