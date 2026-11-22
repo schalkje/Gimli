@@ -1,5 +1,7 @@
 # Repository settings
 
+Part of the [Gimli documentation](../README.md#documentation).
+
 Gimli's lifecycle (`lifecycle.md`) delivers every change as a pull request.
 This document records the GitHub settings that enforce that on `main`, the
 exact calls that apply them, and what they do not enforce.

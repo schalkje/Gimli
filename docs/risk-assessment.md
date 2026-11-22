@@ -1,5 +1,7 @@
 # Risk assessment
 
+Part of the [Gimli documentation](../README.md#documentation).
+
 Every change receives a risk tier. The tier decides how much human involvement
 the change requires before merge. Risk is assessed twice: preliminarily during
 Refine and Plan, and finally during Assess against the actual diff.

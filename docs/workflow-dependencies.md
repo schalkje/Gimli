@@ -1,5 +1,7 @@
 # Workflow dependencies
 
+Part of the [Gimli documentation](../README.md#documentation).
+
 The Claude workflows in `.github/workflows/` run code from outside this
 repository: two GitHub Actions and the `code-review` plugin. Each is pinned, so
 an upstream change cannot alter how pull requests are reviewed, or what the

@@ -1,5 +1,7 @@
 # Development lifecycle
 
+Part of the [Gimli documentation](../README.md#documentation).
+
 This document defines the Gimli development lifecycle. It is the specification
 that Gimli's skills, agents, and GitHub automation implement. When tooling and
 this document disagree, one of them is wrong and must be fixed.
