@@ -24,6 +24,10 @@ with status `Accepted` applies, and one in a pull request that never merges
 never reaches `main`. A routine change that follows an existing decision needs
 no ADR.
 
+Only when the owner wants the options on record before deciding does a plan
+name an ADR with status `Proposed`. A later pull request then changes it to
+`Accepted` or `Rejected`.
+
 ## Format
 
 ADRs use a lightweight form of [MADR](https://adr.github.io/madr/): Status,
@@ -43,10 +47,11 @@ is superseded or deprecated.
 
 | Status | Meaning |
 |---|---|
-| `Proposed` | On `main` for discussion, without a decision yet. A later pull request changes it to `Accepted`, or to `Deprecated` if it is rejected. |
+| `Proposed` | On `main` for discussion, without a decision yet. |
 | `Accepted` | The decision applies. An ADR is written with this status in the pull request that makes the decision. |
-| `Superseded by NNNN` | Replaced by a later ADR, which links back to this one. |
-| `Deprecated` | No longer applies, and nothing replaces it. |
+| `Rejected` | A proposal that was decided against; it never applied. |
+| `Superseded by NNNN` | Applied, then replaced by a later ADR, which links back to this one. |
+| `Deprecated` | Applied, but no longer does, and nothing replaces it. |
 
 An accepted ADR is not rewritten once it is on `main`. A changed decision is a
 new ADR that supersedes the old one; the only edit to the old ADR is its
