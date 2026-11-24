@@ -83,21 +83,30 @@ Read "When a change gets a folder" in `docs/changes/README.md` and decide:
 - **Change folder:** a criterion holds. Say which in the draft. The plan is a
   change folder plus a shorter comment, as step 3 describes.
 
-For a change folder, refuse to start on a dirty working tree, derive the
-branch name per the Conventions in `CLAUDE.md`, and create it locally from
-`origin/main`:
+For a change folder, find where it lives before drafting anything:
 
-```sh
-git fetch origin main
-git checkout -b <type>/<short-description> origin/main
-```
+- **An open pull request for the issue:** look it up as `/build` does, with
+  `gh pr list --state open --search "Closes #<n> in:body"` and the same check
+  that `Closes #<n>` is followed by a non-digit or the end of the line. Its
+  head branch is the change branch; never open a second branch or pull
+  request for the issue.
+- **Otherwise:** derive the branch name per the Conventions in `CLAUDE.md`.
+  If that branch exists locally or on `origin`, a previous run got this far
+  and it is the change branch. Otherwise the branch is created in step 5
+  from `origin/main`.
 
-If that branch already exists locally or on `origin`, a previous run got this
-far: check it out and continue from it. Write the folder
-`docs/changes/<n>-<slug>/` on it from the templates in
-`docs/changes/_template/`, following the formats in `docs/changes/README.md`,
-and add a row to the index there. Nothing is committed or pushed before
-step 5. A non-interactive run never creates a branch or writes files in the
+If the change branch already holds `docs/changes/<n>-<slug>/`, read it
+without checking the branch out (`git fetch origin` and
+`git show <branch>:<path>`, or `origin/<branch>`) and start the draft from it:
+keep every task's ID and status, give new tasks new IDs, and mark a task
+whose work the new plan drops `deferred` with the reason in its text, never
+deleting it. Otherwise start from the templates in
+`docs/changes/_template/`, following the formats in
+`docs/changes/README.md`.
+
+Write the draft folder in your scratchpad, not in the repository: Plan does
+not switch branches or write repository files before the user confirms.
+A non-interactive run never creates a branch or writes files in the
 repository: its `## Plan: draft` comment carries the draft folder files
 inline instead.
 
@@ -179,9 +188,9 @@ genuinely the user's, make a recommendation in the draft and mark it.
 ## 4. Confirm, or post the draft and stop
 
 - **Interactive:** show the complete draft, and for a change folder the
-  paths of the folder files written in step 2a, and ask for confirmation. For
-  a change folder, say that applying it commits and pushes the branch and
-  opens a draft pull request. Do not commit, push, post, change a label, or
+  draft folder's files from step 2a, and ask for confirmation. For a change
+  folder, say which branch applying it commits to and pushes, and whether it
+  opens a draft pull request or uses the existing one. Do not commit, push, post, change a label, or
   move the stage until the user confirms. If they
   ask for changes, revise and show again. The user may override the tier;
   record the override and its reason in the justification.
@@ -193,19 +202,34 @@ genuinely the user's, make a recommendation in the draft and mark it.
 ## 5. Apply
 
 Once confirmed, save the final plan to a file in your scratchpad and apply it
-in this order. For a change folder, first:
+in this order. For a change folder, first bring the branch and pull request
+up to date. Each step checks whether it is already done, so a rerun after a
+failure repeats this list and skips what earlier runs completed:
 
-- Commit the folder: `Add the change folder for #<n>`, with `Refs #<n>` and
-  this session's attribution lines in the body.
-- `git push -u origin <branch>`.
-- Open the draft pull request as `/build` does, from
-  `.github/PULL_REQUEST_TEMPLATE.md` with the Summary written, `Closes #<n>`,
-  and the attribution lines:
-  `gh pr create --draft --base main --title "<issue title without the [Work item]: prefix>" --body-file <path>`.
-- Put the pull request number and the folder link in the comment.
+1. Refuse to continue on a dirty working tree (`git status --porcelain` is
+   not empty): say what is uncommitted and stop.
+2. Check out the change branch from step 2a: `git fetch origin`, then
+   `git checkout <branch>` and `git pull --ff-only` if it exists, otherwise
+   `git checkout -b <branch> origin/main`. If the pull fails, the branch has
+   diverged from the remote; stop and say so.
+3. Copy the draft folder from the scratchpad to `docs/changes/<n>-<slug>/`,
+   and add its row to the index in `docs/changes/README.md` if it is missing.
+4. Commit only if `git status --porcelain` shows changes:
+   `Add the change folder for #<n>`, or `Update the change folder for #<n>`
+   when the folder existed, with `Refs #<n>` and this session's attribution
+   lines in the body.
+5. Push only if the branch has no upstream or is ahead of it
+   (`git rev-list --count @{u}..HEAD` is not 0): `git push -u origin <branch>`.
+6. Use the pull request from step 2a if there is one; otherwise look it up
+   again as in step 2a, in case a previous run opened it, and if there is
+   still none, open the draft pull request as `/build` does, from
+   `.github/PULL_REQUEST_TEMPLATE.md` with the Summary written,
+   `Closes #<n>`, and the attribution lines:
+   `gh pr create --draft --base main --title "<issue title without the [Work item]: prefix>" --body-file <path>`.
+7. Put the pull request number and the folder link in the comment.
 
 If one of these fails, stop before posting anything and report which steps
-completed; the next run finds the branch in step 2a and continues. Then:
+completed; the next run repeats them and skips what is done. Then:
 
 1. `gh issue comment <n> --body-file <path-to-plan>`
 2. `scripts/risk.sh <n> <tier> "Plan posted."` It leaves exactly one

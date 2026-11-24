@@ -46,7 +46,7 @@ are right when copied.
 
 | Stage | What happens |
 |---|---|
-| Plan | Plan writes the folder, creates the change branch, commits the folder, opens the draft pull request, and posts the `## Plan` comment linking to it. |
+| Plan | Plan writes the folder, creates the change branch, commits the folder, opens the draft pull request, and posts the `## Plan` comment linking to it. When the issue returns to Plan, Plan updates the folder on the existing branch and pull request, keeping the status of tasks already done. |
 | Build | Build follows `tasks.md` and applies each delta to its living spec as a `spec` task, so the documentation rule holds. |
 | Review | The folder is reviewed with the rest of the pull request. |
 | Merge | The folder stays in `docs/changes/` as the record of the change. |
@@ -81,7 +81,7 @@ folders, are later work (#46, Track A step 7).
 | Complexity | `low`, `medium` or `high`. |
 | Owns | The files the task changes. Two tasks in different streams own different files, so parallel work does not conflict. |
 | Covers | The scenario IDs, in the form of [`specs/README.md`](../specs/README.md#scenario-ids), that the task implements or tests. |
-| Status | `todo` until done. Build sets `done` in the commit that completes the task, or `deferred` with a `## Build: deviation` comment saying why. |
+| Status | `todo` until done. Build sets `done` in the commit that completes the task, or `deferred` with a `## Build: deviation` comment saying why. A task that depends on a `deferred` task is deferred too. |
 
 The kinds and complexity levels are a fixed list, so later steps can choose
 an agent and model from them. Adding a kind is a change to this document.

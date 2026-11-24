@@ -15,7 +15,9 @@ format is in [`docs/changes/README.md`](../README.md#tasksmd).
 | D | T8, T9 | The Plan and Build skills |
 | E | T10 | Checks |
 
-T1 is the contract: every other stream depends on the format it defines.
+T1 is the contract: streams B, D and E depend on the format it defines.
+Stream C applies a delta that was written at Plan and changes only the spec
+and `stage.sh`, so it does not wait for T1.
 
 ### T1: Define the change folder, tasks and delta formats
 
@@ -125,8 +127,10 @@ Accept `parent` as a target next to `close`; update the usage header and the
 Decide the folder by the criteria; for a folder, write it from the templates,
 and after confirmation create the branch, commit, push, open the draft pull
 request, and post a `## Plan` comment with the folder link, the Tests table
-and the risk assessment. Comment-only plans stay as today. A non-interactive
-run never creates a branch.
+and the risk assessment. The folder is drafted in the scratchpad until
+confirmed; an existing pull request, branch or folder for the issue is
+reused, and each apply step can be rerun. Comment-only plans stay as today.
+A non-interactive run never creates a branch.
 
 ### T9: Teach /build to follow tasks.md
 
@@ -138,8 +142,8 @@ run never creates a branch.
 - **Covers:** none
 - **Status:** done
 
-Tell a first Build on Plan's pull request from a re-entry by the latest
-`Stage: … → build` comment; follow `tasks.md` in dependency order, setting
+Tell a first Build on Plan's pull request from a re-entry by whether the
+issue has a `Stage: … → test` comment; follow `tasks.md` in dependency order, setting
 each status in its commit; push only, without opening a second pull request.
 
 ### T10: Check links and the worked example

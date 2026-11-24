@@ -39,11 +39,13 @@ table and the risk assessment, so nothing is written twice.
 3. **Build follows `tasks.md`.** Build takes the next `todo` task whose
    dependencies are `done`, implements it, and sets its status to `done` in
    the same commit. A deferred task gets status `deferred` and a deviation
-   comment. Running tasks in parallel is Track A step 5.
+   comment, and so does every task that depends on it. Running tasks in parallel is Track A step 5.
 4. **First Build or re-entry.** With Plan opening the pull request, an open
-   pull request no longer means re-entry. Build reads the most recent
-   `Stage: … → build` comment: `plan → build` is a first Build on Plan's pull
-   request; any other old stage is a re-entry.
+   pull request no longer means re-entry. Only Build's publish step moves an
+   issue to Test, so a `Stage: … → test` comment on the issue means Build has
+   published before: that is a re-entry, even when the issue went back to
+   Plan and the latest transition is `plan → build`. Without one, Build
+   continues on the existing pull request as a first Build.
 5. **Deltas and living specs.** Until Track A step 7 defines the archive,
    Build applies each delta to the living spec by hand, as a `spec` task in
    the same pull request, so the documentation rule holds. The delta stays in

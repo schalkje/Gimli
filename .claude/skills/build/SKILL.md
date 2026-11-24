@@ -52,7 +52,14 @@ branch, no comment, no label change.
 
 - Read the most recent `Stage: … → build` comment. On a first build it is the
   Plan transition. On re-entry (for example `Stage: review → build`) its note
-  is the reason the issue came back; treat it as part of the plan.
+  is the reason the issue came back; treat it as part of the plan. When the
+  issue went back to Plan from a later stage, the latest transition is
+  `plan → build` again, and the reason is the note of that earlier
+  `Stage: … → plan` comment, which the superseding plan answers.
+- Note whether the issue has any `Stage: … → test` comment. Only Build's
+  publish step moves an issue to Test, so such a comment means Build has
+  published before and this run is a re-entry, whatever the latest `→ build`
+  transition says.
 - Refuse to start on a dirty working tree (`git status --porcelain` is not
   empty). Say what is uncommitted and stop.
 
@@ -69,10 +76,12 @@ Confirm the match by checking the body for `Closes #<n>` followed by a
 non-digit or the end of the line (the search also matches, for example,
 `Closes #<n>0`, and so would a plain substring check).
 
-- **A pull request exists and the most recent `Stage: … → build` comment
-  is `Stage: plan → build`:** Plan opened it for a change folder, and this is
-  a first build on it, not a re-entry. Run `git fetch origin`, check out its
-  head branch, `git pull --ff-only`, and continue with step 3.
+- **A pull request exists and the issue has no `Stage: … → test`
+  comment:** Plan opened it for a change folder, or an earlier Build run
+  stopped before moving the stage. This is a first build on it, not a
+  re-entry. Run `git fetch origin`, check out its head branch,
+  `git pull --ff-only`, and continue with step 3, from the tasks not yet
+  `done`.
 - **A pull request exists otherwise:** this is a re-entry. Run `git fetch origin`,
   check out its head branch, and `git pull --ff-only`; if that fails, the
   local branch has diverged from the remote, so stop and say so rather than
@@ -112,7 +121,9 @@ its `tasks.md` holds the steps, in the format of `docs/changes/README.md`:
 take the next task with status `todo` whose dependencies are all `done`,
 lowest ID first; implement it; and set its status to `done` in the commit
 that completes it. A task you cannot complete gets status `deferred` and an
-entry in the deviation list. A `spec` task applies its delta to the living
+entry in the deviation list. A task that depends on a `deferred` task is
+deferred too, with its own deviation entry naming that dependency, so no task
+is left `todo` when Build reaches the gate. A `spec` task applies its delta to the living
 spec. The folder's `design.md` "Where it lands" section is the plan's
 Documentation entry. On re-entry, tasks already `done` stay done unless the
 return note or review asks for changes to them.

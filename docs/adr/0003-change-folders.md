@@ -55,8 +55,10 @@ exactly one stage label: they are never refined, planned or built themselves.
 - Plan gains a write it did not have: a branch, a push and a draft pull
   request, always behind the user's confirmation.
 - Build follows `tasks.md` and finds Plan's pull request instead of opening
-  one; it tells a first Build from a re-entry by the latest
-  `Stage: … → build` comment.
+  one; it tells a first Build from a re-entry by whether Build has moved the
+  issue to Test before.
+- A return to Plan updates the folder on the existing branch and pull
+  request, keeping the status of tasks already done.
 - Large pull requests take a higher risk tier for their size; the design in
   the pull request, reviewed first, is what keeps them reviewable.
 - Later steps of #46 build on the task fields: routing on kind and
