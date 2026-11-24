@@ -9,17 +9,22 @@ Bash tool on Windows (Git Bash), macOS, and Linux.
 ## stage.sh
 
 Move an issue between lifecycle stages. Keeps exactly one `stage:*` label on
-the issue and posts a comment for every transition.
+a work item, none on a parent issue, and posts a comment for every transition.
 
 ```sh
 scripts/stage.sh 5                       # print current stage, or "none"
 scripts/stage.sh 5 plan                  # refine → plan, comment "Stage: refine → plan"
 scripts/stage.sh 5 build "Plan posted."  # same, with a note under the first line
 scripts/stage.sh 5 close "Merged in #6." # comment, remove stage label, close
+scripts/stage.sh 46 parent "Roadmap."    # comment, remove stage label, keep open
 ```
 
 Valid stages: `refine plan build test evidence assess review merge`, plus
-`close`. Anything else exits with status 2 and changes nothing. Returning to an
+`close` and `parent`. Anything else exits with status 2 and changes nothing.
+`parent` marks a [parent issue](../docs/lifecycle.md#parent-issues): it posts
+`Stage: <old> → parent` and removes the stage label without closing or
+reopening; on an issue without a stage label it prints `no stage label` and
+changes nothing. Returning to an
 earlier stage is allowed; put the reason in the note. Words after the stage are
 joined into the note, so quoting is optional.
 

@@ -4,9 +4,10 @@
 #   stage.sh <issue>                   print the current stage, or "none"
 #   stage.sh <issue> <stage> [note...]  post a comment, then replace the stage label
 #   stage.sh <issue> close [note...]    post a comment, remove the stage label, close
+#   stage.sh <issue> parent [note...]   post a comment, remove the stage label, keep state
 #
 # Stages: refine plan build test evidence assess review merge
-# See docs/lifecycle.md, section "Stage status".
+# See docs/lifecycle.md, sections "Stage status" and "Parent issues".
 
 set -eu
 
@@ -16,8 +17,8 @@ STAGES="refine plan build test evidence assess review merge"
 
 parse_args "$@"
 
-if [ -n "$TARGET" ] && [ "$TARGET" != "close" ] && ! in_list "$TARGET" "$STAGES"; then
-  echo "$PROG: unknown stage '$TARGET'. Valid: $STAGES close" >&2
+if [ -n "$TARGET" ] && ! in_list "$TARGET" "$STAGES close parent"; then
+  echo "$PROG: unknown stage '$TARGET'. Valid: $STAGES close parent" >&2
   exit 2
 fi
 
@@ -40,6 +41,11 @@ if [ -z "$TARGET" ]; then
   exit 0
 fi
 
+if [ "$TARGET" = "parent" ] && [ -z "$CURRENT" ]; then
+  echo "#$ISSUE: no stage label"
+  exit 0
+fi
+
 if [ "$TARGET" != "close" ] && [ "$OLD" = "$TARGET" ]; then
   echo "#$ISSUE: already at $TARGET"
   exit 0
@@ -54,6 +60,8 @@ if [ "$TARGET" = "close" ]; then
   if [ "$STATE" != "CLOSED" ]; then
     gh issue close "$ISSUE" >/dev/null
   fi
+elif [ "$TARGET" = "parent" ]; then
+  swap_labels "$ISSUE" "$REMOVE" ""
 else
   if [ "$STATE" = "CLOSED" ]; then
     gh issue reopen "$ISSUE" >/dev/null
