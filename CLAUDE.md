@@ -36,7 +36,8 @@ lifecycle described in `docs/lifecycle.md`.
   settings unless the owner asks in that session. The admin credentials Claude
   runs with could; that is why this rule exists.
 - Record decisions and evidence in GitHub, not only in the conversation. Plans
-  go on the issue as a comment; test evidence goes in the pull request body.
+  go on the issue as a `## Plan` comment, which for a large change links to its
+  change folder in `docs/changes/`; test evidence goes in the pull request body.
 
 ## Repository layout
 
@@ -50,6 +51,8 @@ lifecycle described in `docs/lifecycle.md`.
   reviewed against.
 - `docs/adr/`: architecture decision records; when to write one is in
   `docs/adr/README.md`.
+- `docs/changes/`: one change folder per large change (design, tasks, spec
+  deltas); format in `docs/changes/README.md`.
 - `docs/lifecycle.md`: stage definitions, entry and exit criteria, artifacts.
 - `docs/risk-assessment.md`: risk tiers and the criteria that assign them.
 - `docs/ai-review.md`: how the AI review workflow, the local `/code-review`
@@ -80,7 +83,8 @@ lifecycle described in `docs/lifecycle.md`.
   or `fix/issue-template-typo`. Reference the issue number in the pull request.
 - Commit messages: imperative mood, one logical change per commit.
 - Pull requests target `main` and use `.github/PULL_REQUEST_TEMPLATE.md`.
-  Build opens the draft with only the Summary and linked issue filled; every
+  Build, or Plan for a change with a change folder, opens the draft with only
+  the Summary and linked issue filled; every
   section is filled by the Evidence and Assess stages, which the template
   implements.
 - Documentation is the specification. When behaviour and `docs/` disagree,
@@ -89,7 +93,8 @@ lifecycle described in `docs/lifecycle.md`.
 
 ## Working style
 
-- Prefer small, well-scoped issues. If refinement reveals a large change, split
-  it into multiple issues and link them.
+- One change is one issue and one pull request. A large change gets a change
+  folder at Plan instead of being split; work that is really several changes
+  becomes children of a parent issue (`docs/lifecycle.md`, Parent issues).
 - When a stage cannot be completed as specified, say so explicitly in the issue
   or pull request rather than silently adapting the process.

@@ -66,7 +66,7 @@ the pull request; one pull request per large change.
 - **Complexity:** low
 - **Owns:** `CLAUDE.md`, `README.md`
 - **Covers:** none
-- **Status:** todo
+- **Status:** done
 
 `CLAUDE.md`: where plans go, who opens the draft pull request, the splitting
 rule in Working style, `docs/changes/` in Repository layout. `README.md`: the
