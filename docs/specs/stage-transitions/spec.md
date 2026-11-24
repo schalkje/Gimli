@@ -14,7 +14,8 @@ label. Stage transitions read and change that label so that each change is
 also recorded as a comment on the issue, which keeps the audit trail complete.
 
 The valid stages are `refine`, `plan`, `build`, `test`, `evidence`,
-`assess`, `review` and `merge`. `close` is a valid target, but not a stage.
+`assess`, `review` and `merge`. `close` and `parent` are valid targets, but
+not stages.
 
 ## Requirements
 
@@ -187,6 +188,33 @@ carries a `stage:*` label that is not one of the valid stages.
 - **THEN** it reports the non-canonical label, says to fix it by hand, and
   exits with status 1
 - **AND** posts no comment and changes no label
+
+### Requirement STAGE-9: Mark a parent issue
+
+Given the target `parent`, the system SHALL record the transition and remove
+every stage label, without closing or reopening the issue.
+
+#### Scenario STAGE-9.1: Issue with a stage becomes a parent
+
+- **GIVEN** an open issue at `stage:refine`
+- **WHEN** `scripts/stage.sh <issue> parent "Roadmap for Track A."` runs
+- **THEN** a comment `Stage: refine → parent` with the note is posted
+- **AND** the issue carries no `stage:*` label and stays open
+- **AND** it prints `#<issue>: refine → parent`
+
+#### Scenario STAGE-9.2: Issue without a stage label
+
+- **GIVEN** an issue with no `stage:*` label
+- **WHEN** `scripts/stage.sh <issue> parent` runs
+- **THEN** it prints `#<issue>: no stage label`
+- **AND** posts no comment and changes no label
+
+#### Scenario STAGE-9.3: Closed issue stays closed
+
+- **GIVEN** a closed issue that carries a stage label
+- **WHEN** `scripts/stage.sh <issue> parent` runs
+- **THEN** the comment is posted and the label removed
+- **AND** the issue stays closed
 
 ## Retired scenario IDs
 

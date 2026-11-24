@@ -94,7 +94,7 @@ format.
 - **Complexity:** low
 - **Owns:** `docs/specs/stage-transitions/spec.md`
 - **Covers:** STAGE-9.1, STAGE-9.2, STAGE-9.3
-- **Status:** todo
+- **Status:** done
 
 Apply [the delta](specs/stage-transitions/delta.md) to the living spec.
 
