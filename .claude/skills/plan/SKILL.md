@@ -1,6 +1,6 @@
 ---
 name: plan
-description: Run the Plan stage of the Gimli lifecycle on a GitHub issue. Checks the issue is ready, inspects the codebase, drafts an implementation plan with a risk tier, and only after confirmation posts it on the issue, applies the risk label, and moves the issue to Build.
+description: Run the Plan stage of the Gimli lifecycle on a GitHub issue. Checks the issue is ready, inspects the codebase, drafts an implementation plan with a risk tier (for a large change, as a change folder), and only after confirmation posts it on the issue (for a change folder, after committing the folder and opening the draft pull request), applies the risk label, and moves the issue to Build.
 argument-hint: <issue-number>
 disable-model-invocation: true
 ---
@@ -74,9 +74,36 @@ change, the patterns already in place that the change should follow, and the
 tests or checks that exist. Bounded: enough to name files and tests, not to
 implement. Use `Grep`, `Glob`, and `Read`.
 
+## 2a. Choose the form of the plan
+
+Read "When a change gets a folder" in `docs/changes/README.md` and decide:
+
+- **Comment plan:** none of the criteria hold. The plan is one comment, in the
+  structure of step 3.
+- **Change folder:** a criterion holds. Say which in the draft. The plan is a
+  change folder plus a shorter comment, as step 3 describes.
+
+For a change folder, refuse to start on a dirty working tree, derive the
+branch name per the Conventions in `CLAUDE.md`, and create it locally from
+`origin/main`:
+
+```sh
+git fetch origin main
+git checkout -b <type>/<short-description> origin/main
+```
+
+If that branch already exists locally or on `origin`, a previous run got this
+far: check it out and continue from it. Write the folder
+`docs/changes/<n>-<slug>/` on it from the templates in
+`docs/changes/_template/`, following the formats in `docs/changes/README.md`,
+and add a row to the index there. Nothing is committed or pushed before
+step 5. A non-interactive run never creates a branch or writes files in the
+repository: its `## Plan: draft` comment carries the draft folder files
+inline instead.
+
 ## 3. Draft the plan
 
-Use exactly this structure.
+For a comment plan, use exactly this structure.
 
 ```
 ## Plan
@@ -105,6 +132,24 @@ preliminary tier from the issue body and whether this confirms or changes
 it, and whether human acknowledgement is required before Build.
 ```
 
+For a change folder, the folder holds the steps (`tasks.md`), the design and
+the spec deltas, and its `design.md` "Where it lands" section is the
+Documentation entry. The comment holds only what the folder does not, in
+this structure:
+
+```
+## Plan
+
+Change folder: link to docs/changes/<n>-<slug>/ on the change branch, and
+the draft pull request #<pr>. Which folder criterion applies.
+
+### Tests
+As above.
+
+### Risk assessment
+As above.
+```
+
 Tier rules:
 
 - Score the dimensions yourself; do not copy the preliminary tier.
@@ -116,7 +161,8 @@ Tier rules:
   keep the preliminary tier in the draft and flag the proposed lower tier.
 - If your tier is **higher**, use yours and explain what raised it.
 
-Documentation entry: read the "Documentation rule" section of
+Documentation entry (in the comment, or in `design.md` for a change folder):
+read the "Documentation rule" section of
 `docs/lifecycle.md` and name each document it covers whose described
 behaviour this change alters, including the index and README map entries a
 new document needs under "Where a new document goes" in
@@ -132,8 +178,11 @@ genuinely the user's, make a recommendation in the draft and mark it.
 
 ## 4. Confirm, or post the draft and stop
 
-- **Interactive:** show the complete draft and ask for confirmation. Do not
-  post it, change a label, or move the stage until the user confirms. If they
+- **Interactive:** show the complete draft, and for a change folder the
+  paths of the folder files written in step 2a, and ask for confirmation. For
+  a change folder, say that applying it commits and pushes the branch and
+  opens a draft pull request. Do not commit, push, post, change a label, or
+  move the stage until the user confirms. If they
   ask for changes, revise and show again. The user may override the tier;
   record the override and its reason in the justification.
 - **Non-interactive:** apply the preamble's duplicate guard for the heading
@@ -144,7 +193,19 @@ genuinely the user's, make a recommendation in the draft and mark it.
 ## 5. Apply
 
 Once confirmed, save the final plan to a file in your scratchpad and apply it
-in this order:
+in this order. For a change folder, first:
+
+- Commit the folder: `Add the change folder for #<n>`, with `Refs #<n>` and
+  this session's attribution lines in the body.
+- `git push -u origin <branch>`.
+- Open the draft pull request as `/build` does, from
+  `.github/PULL_REQUEST_TEMPLATE.md` with the Summary written, `Closes #<n>`,
+  and the attribution lines:
+  `gh pr create --draft --base main --title "<issue title without the [Work item]: prefix>" --body-file <path>`.
+- Put the pull request number and the folder link in the comment.
+
+If one of these fails, stop before posting anything and report which steps
+completed; the next run finds the branch in step 2a and continues. Then:
 
 1. `gh issue comment <n> --body-file <path-to-plan>`
 2. `scripts/risk.sh <n> <tier> "Plan posted."` It leaves exactly one
@@ -158,7 +219,8 @@ in this order:
 
 ## 6. Report
 
-Tell the user: the issue link, the plan comment link, the tier and whether it
-changed from the preliminary one, the stage the issue is now at, and whether
+Tell the user: the issue link, the plan comment link, for a change folder the
+branch and draft pull request, the tier and whether it changed from the
+preliminary one, the stage the issue is now at, and whether
 anything is waiting on a human. Suggest `/build <n>` as the next step if that
 skill exists.

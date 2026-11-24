@@ -119,7 +119,7 @@ Accept `parent` as a target next to `close`; update the usage header and the
 - **Complexity:** high
 - **Owns:** `.claude/skills/plan/SKILL.md`
 - **Covers:** none
-- **Status:** todo
+- **Status:** done
 
 Decide the folder by the criteria; for a folder, write it from the templates,
 and after confirmation create the branch, commit, push, open the draft pull

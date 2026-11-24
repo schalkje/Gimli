@@ -14,7 +14,7 @@ A change folder does not restate what lives elsewhere:
 |---|---|
 | The issue body | The proposal: goal, scope, requirements, acceptance criteria. |
 | The `## Plan` comment | The link to the folder, the Tests table and the risk assessment. |
-| The change folder | The design, the tasks and the spec deltas. |
+| The change folder | The design, including the plan's Documentation entry in `design.md`, the tasks and the spec deltas. |
 
 ## When a change gets a folder
 

@@ -21,7 +21,11 @@ it touches instead of describing them.
 
 ## Where it lands
 
-- The documents, skills, scripts or code each decision changes.
+This section is the plan's Documentation entry: the documents the change
+updates under the documentation rule in `docs/lifecycle.md`, each with what
+changes, plus the skills, scripts or code each decision changes.
+
+- `<file>`: what changes.
 
 ## Risks
 
