@@ -81,7 +81,7 @@ folders, are later work (#46, Track A step 7).
 | Complexity | `low`, `medium` or `high`. |
 | Owns | The files the task changes. Two tasks in different streams own different files, so parallel work does not conflict. |
 | Covers | The scenario IDs, in the form of [`specs/README.md`](../specs/README.md#scenario-ids), that the task implements or tests. |
-| Status | `todo` until done. Build sets `done` in the commit that completes the task, or `deferred` with a `## Build: deviation` comment saying why. A task that depends on a `deferred` task is deferred too. |
+| Status | `todo` until done. Build sets `done` in the commit that completes the task, or `deferred` with a `## Build: deviation` comment saying why. A task that depends on a `deferred` task is deferred too. On re-entry, a deferred task that review or the return note asks for goes back to `todo`, with the tasks deferred because of it. |
 
 The kinds and complexity levels are a fixed list, so later steps can choose
 an agent and model from them. Adding a kind is a change to this document.

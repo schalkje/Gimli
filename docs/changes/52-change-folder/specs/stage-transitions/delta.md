@@ -4,6 +4,10 @@ Part of the [change folder for #52](../../design.md). Changes the
 [stage transitions spec](../../../../specs/stage-transitions/spec.md). The format
 is in [`docs/changes/README.md`](../../../README.md#spec-deltas).
 
+STAGE-2.3 keeps its ID: it still describes rejecting a target that is not
+valid, and `parent` joins the valid targets. The spec's introduction also
+names `parent` next to `close` as a valid target that is not a stage.
+
 ## ADDED
 
 ### Requirement STAGE-9: Mark a parent issue
@@ -35,15 +39,15 @@ every stage label, without closing or reopening the issue.
 
 ## MODIFIED
 
+### Requirement STAGE-2: Reject invalid arguments
+
+Unchanged; one of its scenarios changes.
+
 #### Scenario STAGE-2.3: Unknown stage
 
 - **WHEN** the target is not one of the valid stages and not `close` or `parent`
 - **THEN** it names the valid targets and exits with status 2
 - **AND** posts no comment and changes no label
-
-The same behaviour with `parent` added to the accepted targets, so it keeps
-its ID. The spec's introduction also names `parent` next to `close` as a
-valid target that is not a stage; that is description, not a requirement.
 
 ## REMOVED
 

@@ -56,10 +56,11 @@ branch, no comment, no label change.
   issue went back to Plan from a later stage, the latest transition is
   `plan → build` again, and the reason is the note of that earlier
   `Stage: … → plan` comment, which the superseding plan answers.
-- Note whether the issue has any `Stage: build → test` comment. Build's
-  publish step makes that transition, so such a comment means Build has
-  published before and this run is a re-entry, whatever the latest `→ build`
-  transition says.
+- Note whether the issue has any `Stage: … → test` comment. Build's publish
+  step makes one, so such a comment means Build has published before and
+  this run is a re-entry, whatever the latest `→ build` transition says. A
+  hand-made move to Test also counts; that errs towards re-entry, which only
+  adds a read of the pull request's review comments.
 - Refuse to start on a dirty working tree (`git status --porcelain` is not
   empty). Say what is uncommitted and stop.
 
@@ -76,7 +77,7 @@ Confirm the match by checking the body for `Closes #<n>` followed by a
 non-digit or the end of the line (the search also matches, for example,
 `Closes #<n>0`, and so would a plain substring check).
 
-- **A pull request exists and the issue has no `Stage: build → test`
+- **A pull request exists and the issue has no `Stage: … → test`
   comment:** Plan opened it for a change folder, or an earlier Build run
   stopped before moving the stage. This is a first build on it, not a
   re-entry. Run `git fetch origin`, check out its head branch, and
@@ -127,9 +128,10 @@ deferred too, with its own deviation entry naming that dependency, so no task
 is left `todo` when Build reaches the gate. A `spec` task applies its delta to the living
 spec. The folder's `design.md` "Where it lands" section is the plan's
 Documentation entry. On re-entry, tasks already `done` stay done unless the
-return note or review asks for changes to them, and a `deferred` task they
-ask for goes back to `todo`, recorded as a reversed deferral in the deviation
-list.
+return note or review asks for changes to them. A `deferred` task they ask
+for goes back to `todo`, and so does every task deferred only because it
+depends on that task; each is recorded as a reversed deferral in the
+deviation list.
 
 Add or update the tests or checks the
 plan's Tests table names. Do not invent a test runner the repository lacks;
