@@ -28,6 +28,7 @@ flowchart LR
 | Part | Where | What it does |
 |---|---|---|
 | Lifecycle documents | `docs/` | The specification every other part implements. |
+| Change folders | `docs/changes/` | The design, tasks and spec deltas of each large change, written at Plan and followed by Build. |
 | Stage skills | `.claude/skills/` | Run a lifecycle stage in Claude Code, invoked as `/<stage> <issue>`; each starts with the shared preamble. |
 | Scripts | `scripts/` | Deterministic helpers for stage and risk labels, the duplicate guard, and the ruleset. |
 | Templates | `.github/ISSUE_TEMPLATE/`, `.github/PULL_REQUEST_TEMPLATE.md` | Shape the work item that starts the cycle and the pull request that carries the evidence. |

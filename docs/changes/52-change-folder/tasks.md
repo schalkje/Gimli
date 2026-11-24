@@ -80,7 +80,7 @@ documentation map and the layout tree.
 - **Complexity:** low
 - **Owns:** `docs/documentation-model.md`, `docs/architecture/README.md`, `docs/specs/README.md`
 - **Covers:** none
-- **Status:** todo
+- **Status:** done
 
 A row for change folders in "Where a new document goes"; change folders in
 the architecture overview's parts; `docs/specs/README.md` links to the delta
