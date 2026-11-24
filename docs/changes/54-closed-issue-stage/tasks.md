@@ -47,7 +47,7 @@ closed issue.
 - **Complexity:** low
 - **Owns:** none
 - **Covers:** none
-- **Status:** todo
+- **Status:** done
 
 Run the link check from `README.md` and confirm the spec and folder links
 resolve.
