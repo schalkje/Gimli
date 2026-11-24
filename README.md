@@ -120,7 +120,7 @@ You need [Claude Code](https://claude.com/claude-code), the [GitHub CLI](https:/
 Move an issue between stages and set its tier only with the scripts, never by editing the labels directly:
 
 ```sh
-scripts/stage.sh <issue> <stage> [note]   # refine, plan, build, test, evidence, assess, review, merge, close
+scripts/stage.sh <issue> <stage> [note]   # refine, plan, build, test, evidence, assess, review, merge, close, parent
 scripts/risk.sh <issue-or-pr> <tier> [note]   # low, medium, high, critical
 ```
 

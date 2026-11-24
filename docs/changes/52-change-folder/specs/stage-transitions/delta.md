@@ -35,8 +35,15 @@ every stage label, without closing or reopening the issue.
 
 ## MODIFIED
 
-None. The spec's introduction also names `parent` next to `close` as a valid
-target that is not a stage; that is description, not a requirement.
+#### Scenario STAGE-2.3: Unknown stage
+
+- **WHEN** the target is not one of the valid stages and not `close` or `parent`
+- **THEN** it names the valid targets and exits with status 2
+- **AND** posts no comment and changes no label
+
+The same behaviour with `parent` added to the accepted targets, so it keeps
+its ID. The spec's introduction also names `parent` next to `close` as a
+valid target that is not a stage; that is description, not a requirement.
 
 ## REMOVED
 

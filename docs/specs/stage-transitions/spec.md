@@ -58,7 +58,7 @@ invalid.
 
 #### Scenario STAGE-2.3: Unknown stage
 
-- **WHEN** the target is not one of the valid stages and not `close`
+- **WHEN** the target is not one of the valid stages and not `close` or `parent`
 - **THEN** it names the valid targets and exits with status 2
 - **AND** posts no comment and changes no label
 
