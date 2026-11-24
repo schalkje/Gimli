@@ -111,3 +111,4 @@ ADDED, MODIFIED and REMOVED.
 | Change folder | Issue |
 |---|---|
 | [`52-change-folder`](52-change-folder/design.md) | #52: the change folder and tasks format |
+| [`54-closed-issue-stage`](54-closed-issue-stage/design.md) | #54: reading the stage of a closed issue (test fixture for #52) |
