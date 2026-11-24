@@ -120,7 +120,7 @@ You need [Claude Code](https://claude.com/claude-code), the [GitHub CLI](https:/
 Move an issue between stages and set its tier only with the scripts, never by editing the labels directly:
 
 ```sh
-scripts/stage.sh <issue> <stage> [note]   # refine, plan, build, test, evidence, assess, review, merge, close
+scripts/stage.sh <issue> <stage> [note]   # refine, plan, build, test, evidence, assess, review, merge, close, parent
 scripts/risk.sh <issue-or-pr> <tier> [note]   # low, medium, high, critical
 ```
 
@@ -139,6 +139,7 @@ The documentation is layered: start here and follow the links down. The
 | [`docs/specs/README.md`](docs/specs/README.md) | What Gimli does: the capability spec format, scenario IDs, and the index of specs. |
 | [`docs/architecture/README.md`](docs/architecture/README.md) | How Gimli is built: its parts, the principles changes are reviewed against, and where the process documents fit. |
 | [`docs/adr/README.md`](docs/adr/README.md) | Why Gimli is built this way: when to write an architecture decision record, the format, and the index of decisions. |
+| [`docs/changes/README.md`](docs/changes/README.md) | How each large change is planned: the change folder, `tasks.md` and spec delta formats, and the index of change folders. |
 
 ### Process
 
@@ -182,7 +183,8 @@ The documentation is layered: start here and follow the links down. The
 ├── docs/                         the specification (see Documentation)
 │   ├── specs/                    capability specs: what Gimli does
 │   ├── architecture/             how Gimli is built
-│   └── adr/                      architecture decision records: why
+│   ├── adr/                      architecture decision records: why
+│   └── changes/                  change folders: how each large change is planned
 ├── scripts/                      stage, risk and guard helpers, ruleset setup
 ├── .claude/skills/               one skill per automated lifecycle stage
 ├── .github/ISSUE_TEMPLATE/       the work item template that starts the cycle

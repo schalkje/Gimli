@@ -48,6 +48,9 @@ refer to them:
 - New requirements and scenarios take the next number never used on `main`,
   retired numbers included.
 
+A change with a change folder states what it does to a spec in a
+[spec delta](../changes/README.md#spec-deltas), which follows these rules.
+
 ## Index
 
 | Capability | Prefix | What it covers |
