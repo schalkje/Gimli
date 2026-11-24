@@ -37,6 +37,13 @@ and change nothing, unless STAGE-8 applies.
 - **WHEN** `scripts/stage.sh <issue>` runs
 - **THEN** it prints `none`
 
+#### Scenario STAGE-1.3: Closed issue with a stage
+
+- **GIVEN** a closed issue that still carries `stage:merge`
+- **WHEN** `scripts/stage.sh <issue>` runs
+- **THEN** it prints `merge`
+- **AND** posts no comment, changes no label, and the issue stays closed
+
 The output for an issue carrying several stage labels is not specified yet:
 `stage.sh` prints all of them, for example `plan build`, which is not a stage.
 It is part of #49.

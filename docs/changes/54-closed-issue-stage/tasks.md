@@ -20,7 +20,7 @@ its status in the commit that completes it. The format is in
 - **Complexity:** low
 - **Owns:** `docs/specs/stage-transitions/spec.md`
 - **Covers:** STAGE-1.3
-- **Status:** todo
+- **Status:** done
 
 Apply [the delta](specs/stage-transitions/delta.md) to the living spec:
 STAGE-1.3 after STAGE-1.2. Check each line against the `gh issue view` call
