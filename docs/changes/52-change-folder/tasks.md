@@ -143,7 +143,7 @@ A non-interactive run never creates a branch.
 - **Status:** done
 
 Tell a first Build on Plan's pull request from a re-entry by whether the
-issue has a `Stage: … → test` comment; follow `tasks.md` in dependency order, setting
+issue has a `Stage: build → test` comment; follow `tasks.md` in dependency order, setting
 each status in its commit; push only, without opening a second pull request.
 
 ### T10: Check links and the worked example

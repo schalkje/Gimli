@@ -41,9 +41,9 @@ table and the risk assessment, so nothing is written twice.
    the same commit. A deferred task gets status `deferred` and a deviation
    comment, and so does every task that depends on it. Running tasks in parallel is Track A step 5.
 4. **First Build or re-entry.** With Plan opening the pull request, an open
-   pull request no longer means re-entry. Only Build's publish step moves an
-   issue to Test, so a `Stage: … → test` comment on the issue means Build has
-   published before: that is a re-entry, even when the issue went back to
+   pull request no longer means re-entry. Build's publish step moves the
+   issue from Build to Test, so a `Stage: build → test` comment on the issue
+   means Build has published before: that is a re-entry, even when the issue went back to
    Plan and the latest transition is `plan → build`. Without one, Build
    continues on the existing pull request as a first Build.
 5. **Deltas and living specs.** Until Track A step 7 defines the archive,

@@ -149,8 +149,9 @@ this structure:
 ```
 ## Plan
 
-Change folder: link to docs/changes/<n>-<slug>/ on the change branch, and
-the draft pull request #<pr>. Which folder criterion applies.
+Change folder: docs/changes/<n>-<slug>/, linked twice: on the change branch,
+for until merge, and on main, where the link keeps working once the branch
+is deleted. The draft pull request #<pr>. Which folder criterion applies.
 
 ### Tests
 As above.
