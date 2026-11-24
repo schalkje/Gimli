@@ -40,7 +40,7 @@ at the same depth as a real folder, so their links are right when copied.
 - **Complexity:** low
 - **Owns:** `docs/adr/0003-change-folders.md`, `docs/adr/README.md`
 - **Covers:** none
-- **Status:** todo
+- **Status:** done
 
 Decisions 1, 2, 7 and 8 of the design; index row in `docs/adr/README.md`.
 

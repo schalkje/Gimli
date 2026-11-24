@@ -65,3 +65,4 @@ status line.
 |---|---|---|
 | [0001](0001-progressive-disclosure.md) | Progressive disclosure | Accepted |
 | [0002](0002-documentation-model.md) | Documentation model: specs, architecture and ADRs under `docs/` | Accepted |
+| [0003](0003-change-folders.md) | Change folders, parent issues and one pull request per large change | Accepted |
