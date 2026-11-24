@@ -52,7 +52,7 @@ Decisions 1, 2, 7 and 8 of the design; index row in `docs/adr/README.md`.
 - **Complexity:** medium
 - **Owns:** `docs/lifecycle.md`
 - **Covers:** none
-- **Status:** todo
+- **Status:** done
 
 A "Parent issues" section; the Plan stage's activity, artifact and exit for a
 change with a folder; the Build stage's entry and artifact when Plan opened

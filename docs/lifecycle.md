@@ -38,14 +38,29 @@ flowchart LR
 ## Stage status
 
 Stage progress is recorded on the issue with labels of the form
-`stage:<name>`, for example `stage:refine` or `stage:build`. Exactly one stage
-label is present at any time. The risk tier is recorded with `risk:<tier>`.
+`stage:<name>`, for example `stage:refine` or `stage:build`. A work item
+carries exactly one stage label at any time; a [parent issue](#parent-issues)
+carries none. The risk tier is recorded with `risk:<tier>`.
 
 Change the stage with `scripts/stage.sh <issue> <stage> [note]`. It swaps the
 label and posts a `Stage: <old> → <new>` comment so the transition is in the
 audit trail. Change the tier with `scripts/risk.sh <issue> <tier> [note]`,
 which does the same with a `Risk: <old> → <new>` comment. Do not edit stage
 or risk labels by hand.
+
+## Parent issues
+
+One change is one issue and one pull request, however large: a large change
+gets a [change folder](changes/README.md) at Plan instead of being split.
+Work that is really several changes, such as a roadmap, is a **parent
+issue**:
+
+- it holds the plan of the whole, and its children are work items, linked as
+  GitHub sub-issues, that each run the lifecycle;
+- it carries no `stage:*` label; `scripts/stage.sh <issue> parent` removes
+  one with a recorded `Stage: <old> → parent` transition;
+- it is closed when every child is closed or dropped, with a comment linking
+  each child.
 
 ## Documentation rule
 
@@ -103,7 +118,7 @@ Gimli asks questions, proposes wording, and updates the issue body.
 | | |
 |---|---|
 | Entry | Issue exists with `stage:refine`. |
-| Activity | Clarify goal, scope (in and out), requirements, acceptance criteria, technical considerations, and expected test evidence. Split the issue if it is too large. |
+| Activity | Clarify goal, scope (in and out), requirements, acceptance criteria, technical considerations, and expected test evidence. If the issue is really several changes, split it into children of a [parent issue](#parent-issues); a single large change stays one issue. |
 | Artifact | Updated issue body with all template sections filled. |
 | Exit | Acceptance criteria are specific and testable. Expected test evidence is named. Scope boundaries are stated. A preliminary risk tier is proposed. |
 | Label | `stage:plan` |
@@ -115,9 +130,9 @@ An implementation plan is produced and recorded on the issue.
 | | |
 |---|---|
 | Entry | Issue has `stage:plan`. |
-| Activity | Inspect the codebase, identify affected files and components, decide on approach, list steps, identify tests to add or change, identify the documentation to update under the [documentation rule](#documentation-rule), decide whether the change needs an architecture decision record under [`adr/README.md`](adr/README.md#when-to-write-an-adr), confirm or revise the risk tier. |
-| Artifact | A plan posted as an issue comment, headed `## Plan`. A comment headed `## Plan: draft` is an unconfirmed draft from a non-interactive run and `## Plan: not ready` records that the Refine exit criteria were not met; neither is the Plan artifact. |
-| Exit | The plan lists concrete steps, files or areas affected, the documents the change updates under the documentation rule or `None, because <reason>`, including a new architecture decision record when [`adr/README.md`](adr/README.md#when-to-write-an-adr) calls for one, the tests that will prove each acceptance criterion, and the assessed risk tier with reasoning. For `risk:high` and above, a human has acknowledged the plan with a comment or reaction before Build starts. |
+| Activity | Inspect the codebase, identify affected files and components, decide on approach, list steps, identify tests to add or change, identify the documentation to update under the [documentation rule](#documentation-rule), decide whether the change needs an architecture decision record under [`adr/README.md`](adr/README.md#when-to-write-an-adr), decide whether it gets a [change folder](changes/README.md#when-a-change-gets-a-folder), confirm or revise the risk tier. For a change with a folder, write the folder and, after confirmation in an interactive run, create the branch, commit the folder and open the draft pull request before posting the plan comment. |
+| Artifact | A plan posted as an issue comment, headed `## Plan`. For a change with a folder, the comment links to the folder on the change branch and holds the Tests table and the risk assessment; the folder holds the rest. A comment headed `## Plan: draft` is an unconfirmed draft from a non-interactive run and `## Plan: not ready` records that the Refine exit criteria were not met; neither is the Plan artifact. |
+| Exit | The plan, in the comment or in the comment and its change folder, lists concrete steps (the tasks, for a folder), files or areas affected, the documents the change updates under the documentation rule or `None, because <reason>`, including a new architecture decision record when [`adr/README.md`](adr/README.md#when-to-write-an-adr) calls for one, the tests that will prove each acceptance criterion, and the assessed risk tier with reasoning. For `risk:high` and above, a human has acknowledged the plan with a comment or reaction before Build starts. |
 | Label | `risk:<tier>` applied with `scripts/risk.sh`. `stage:build` for low and medium. High and critical stay at `stage:plan` until a human acknowledges the plan; the Build transition is then made by hand. |
 
 ### 4. Build
@@ -127,8 +142,8 @@ The change is implemented on a branch.
 | | |
 |---|---|
 | Entry | Issue has `stage:build`. |
-| Activity | Create a branch named per `CLAUDE.md` conventions. Implement following the plan. Add or update tests. Commit in logical steps. Deviations from the plan and deferred steps are noted as issue comments headed `## Build: deviation`. `/build` stops for confirmation before anything is pushed; a non-interactive run proceeds unattended only when the issue carries `risk:low`, and refuses otherwise. |
-| Artifact | A branch with commits, and a draft pull request referencing the issue. |
+| Activity | Create a branch named per `CLAUDE.md` conventions, or, for a change with a folder, continue on the branch and draft pull request Plan opened. Implement following the plan; with a change folder, follow `tasks.md` in dependency order, set each task's status in the commit that completes it, and apply each spec delta to its living spec. Add or update tests. Commit in logical steps. Deviations from the plan and deferred steps are noted as issue comments headed `## Build: deviation`. `/build` stops for confirmation before anything is pushed; a non-interactive run proceeds unattended only when the issue carries `risk:low`, and refuses otherwise. |
+| Artifact | A branch with commits, and a draft pull request referencing the issue, opened by Build or, for a change with a folder, by Plan. |
 | Exit | All planned steps are implemented or explicitly deferred with a reason recorded on the issue. The draft pull request exists. |
 | Label | `stage:test` |
 
