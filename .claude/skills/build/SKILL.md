@@ -1,6 +1,6 @@
 ---
 name: build
-description: Run the Build stage of the Gimli lifecycle on a GitHub issue. Takes the confirmed plan on the issue, implements it on a branch with step-sized commits, records deviations, and after confirmation pushes the branch, opens the draft pull request, and moves the issue to Test. Runs unattended only for risk:low issues.
+description: Run the Build stage of the Gimli lifecycle on a GitHub issue. Takes the confirmed plan on the issue (for a large change, the tasks in its change folder), implements it on a branch with step-sized commits, records deviations, and after confirmation pushes the branch, opens the draft pull request unless Plan already did, and moves the issue to Test. Runs unattended only for risk:low issues.
 argument-hint: <issue-number>
 disable-model-invocation: true
 ---
@@ -69,7 +69,11 @@ Confirm the match by checking the body for `Closes #<n>` followed by a
 non-digit or the end of the line (the search also matches, for example,
 `Closes #<n>0`, and so would a plain substring check).
 
-- **A pull request exists:** this is a re-entry. Run `git fetch origin`,
+- **A pull request exists and the most recent `Stage: … → build` comment
+  is `Stage: plan → build`:** Plan opened it for a change folder, and this is
+  a first build on it, not a re-entry. Run `git fetch origin`, check out its
+  head branch, `git pull --ff-only`, and continue with step 3.
+- **A pull request exists otherwise:** this is a re-entry. Run `git fetch origin`,
   check out its head branch, and `git pull --ff-only`; if that fails, the
   local branch has diverged from the remote, so stop and say so rather than
   merging. Read the pull request's review comments and threads with
@@ -103,7 +107,17 @@ non-digit or the end of the line (the search also matches, for example,
 
 ## 3. Implement
 
-Follow the plan's Steps in order. Add or update the tests or checks the
+Follow the plan's Steps in order. When the plan links to a change folder,
+its `tasks.md` holds the steps, in the format of `docs/changes/README.md`:
+take the next task with status `todo` whose dependencies are all `done`,
+lowest ID first; implement it; and set its status to `done` in the commit
+that completes it. A task you cannot complete gets status `deferred` and an
+entry in the deviation list. A `spec` task applies its delta to the living
+spec. The folder's `design.md` "Where it lands" section is the plan's
+Documentation entry. On re-entry, tasks already `done` stay done unless the
+return note or review asks for changes to them.
+
+Add or update the tests or checks the
 plan's Tests table names. Do not invent a test runner the repository lacks;
 if the proof for a criterion is a manual check or a transcript, say so and
 leave it for the Test stage.
@@ -135,7 +149,9 @@ deviation to record, so the issue says the deferral was reversed.
 ## 4. Gate
 
 - **Interactive:** show the user, in this order, the commits this run will
-  push (`git log --oneline origin/main..HEAD` on a first build,
+  push (`git log --oneline origin/main..HEAD` on a first build without a
+  pull request, `git log --oneline origin/<branch>..HEAD` on a first build on
+  Plan's pull request,
   `git log --oneline origin/<branch>..HEAD` on re-entry or a resumed branch),
   `git diff --stat origin/main...HEAD` for the whole change, and the
   deviation list (or "none"). Ask whether to publish. Until they confirm nothing is
@@ -155,7 +171,7 @@ a pull request behind it:
    `## Build: deviation` comment already records, and post nothing when
    there is nothing new. Save the body to a file in your scratchpad and pass
    it with `--body-file`.
-3. On a first build, open the draft pull request:
+3. On a first build without a pull request, open the draft pull request:
 
    ```sh
    gh pr create --draft --base main --title "<issue title without the [Work item]: prefix>" --body-file <path>
@@ -166,7 +182,8 @@ a pull request behind it:
    exactly as the template has it; later stages fill them. Append the
    attribution lines this session requires for pull requests.
 
-   On re-entry, push only. The existing pull request picks up the commits.
+   On a first build on Plan's pull request, or on re-entry, push only. The
+   existing pull request picks up the commits.
 4. `scripts/stage.sh <n> test "Draft PR #<pr>."` On re-entry, say what the
    return note asked for, for example
    `"Review findings addressed on PR #<pr>."`.

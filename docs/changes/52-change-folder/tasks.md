@@ -135,7 +135,7 @@ run never creates a branch.
 - **Complexity:** high
 - **Owns:** `.claude/skills/build/SKILL.md`
 - **Covers:** none
-- **Status:** todo
+- **Status:** done
 
 Tell a first Build on Plan's pull request from a re-entry by the latest
 `Stage: … → build` comment; follow `tasks.md` in dependency order, setting
