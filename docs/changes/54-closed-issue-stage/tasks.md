@@ -34,7 +34,7 @@ and the no-target branch of `scripts/stage.sh`.
 - **Complexity:** low
 - **Owns:** `scripts/README.md`
 - **Covers:** STAGE-1.3
-- **Status:** todo
+- **Status:** done
 
 In "Behaviour worth knowing", add that reading the stage works the same on a
 closed issue.

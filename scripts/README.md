@@ -32,6 +32,8 @@ Behaviour worth knowing:
 
 - The comment is posted before the label changes, so a failure part way leaves
   a documented but unmoved issue rather than a moved but undocumented one.
+- Reading the stage works the same on a closed issue: `stage.sh 5` prints
+  the stage label it still carries, and leaves the issue closed.
 - Moving to the stage the issue is already in prints `already at <stage>` and
   changes nothing.
 - `close` on an issue GitHub already closed still posts the comment and removes
