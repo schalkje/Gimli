@@ -24,7 +24,7 @@ T1 is the contract: every other stream depends on the format it defines.
 - **Complexity:** medium
 - **Owns:** `docs/changes/README.md`, `docs/changes/_template/design.md`, `docs/changes/_template/tasks.md`, `docs/changes/_template/specs/capability/delta.md`
 - **Covers:** none
-- **Status:** todo
+- **Status:** done
 
 `docs/changes/README.md`: location and name, files, the criteria for a
 folder, who writes it at which stage, life after merge, the `tasks.md` fields
