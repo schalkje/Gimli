@@ -1,7 +1,8 @@
 # Delta: stage transitions
 
 Part of the [change folder for #52](../../design.md). Changes the
-[stage transitions spec](../../../../specs/stage-transitions/spec.md).
+[stage transitions spec](../../../../specs/stage-transitions/spec.md). The format
+is in [`docs/changes/README.md`](../../../README.md#spec-deltas).
 
 ## ADDED
 

@@ -4,7 +4,8 @@ Part of the [change folder for #52](design.md).
 
 Build takes the next `todo` task whose dependencies are all `done`, and sets
 its status in the commit that completes it. Streams group tasks that could
-run in parallel; until Track A step 5, Build runs them one at a time.
+run in parallel; until Track A step 5, Build runs them one at a time. The
+format is in [`docs/changes/README.md`](../README.md#tasksmd).
 
 | Stream | Tasks | Concern |
 |---|---|---|
@@ -149,7 +150,7 @@ each status in its commit; push only, without opening a second pull request.
 - **Complexity:** low
 - **Owns:** none
 - **Covers:** none
-- **Status:** todo
+- **Status:** done
 
 Run the link check from `README.md`; check this folder against the templates
 from T1.
