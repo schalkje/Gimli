@@ -36,7 +36,7 @@ ROUTE-5 after ROUTE-4, and replace ROUTE-2.3 with its new text.
 - **Complexity:** low
 - **Owns:** `scripts/route.sh`
 - **Covers:** ROUTE-2.3, ROUTE-5.1
-- **Status:** todo
+- **Status:** done
 
 Accept `--table` as the only argument; loop over the kinds and levels in
 table order and print `<kind> <complexity>` followed by the single-cell
