@@ -106,7 +106,7 @@ not do.
 - **Complexity:** medium
 - **Owns:** `docs/architecture/agents.md`, `docs/architecture/README.md`
 - **Covers:** none
-- **Status:** todo
+- **Status:** done
 
 `docs/architecture/agents.md`: the seven agents and their defaults, the
 context packet and why (ADR 0001), the Owns check, the rule that agents
