@@ -74,7 +74,7 @@ endings, and an empty tests folder.
 - **Complexity:** medium
 - **Owns:** `scripts/trace.sh`
 - **Covers:** TRACE-1.1, TRACE-1.2, TRACE-2.1, TRACE-2.2, TRACE-2.3, TRACE-3.1, TRACE-3.2, TRACE-4.1, TRACE-4.2, TRACE-5.1, TRACE-5.2
-- **Status:** todo
+- **Status:** done
 
 POSIX shell, following `route.sh`: a usage header, `lib.sh` for `usage`,
 `trace.sh [<specs> <tests>]`. Collect scenario IDs and Verified by lines
