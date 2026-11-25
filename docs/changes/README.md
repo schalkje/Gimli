@@ -115,3 +115,4 @@ ADDED, MODIFIED and REMOVED.
 |---|---|
 | [`52-change-folder`](52-change-folder/design.md) | #52: the change folder and tasks format |
 | [`58-task-routing`](58-task-routing/design.md) | #58: agent roster and model routing for tasks |
+| [`60-route-table`](60-route-table/design.md) | #60: let route.sh print the routing table (test fixture for #58) |
