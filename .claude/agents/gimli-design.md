@@ -26,7 +26,9 @@ Weigh the options the task and `design.md` leave open, choose, and say why in th
 - Change only the files in the task's Owns list. If the task needs another
   file changed, do not change it; say so in your report.
 - Leave to scripts and tools what they do reliably, such as running tests,
-  checking links or formatting; interpret their results.
+  checking links or formatting: run them if you have Bash and interpret the
+  results; if you have no Bash, name in your report the checks Build should
+  run. Remove files your checks generate unless the task owns them.
 - Never commit, push, change a label, or post a comment. Build does that
   after checking your work.
 - Do not change the task's status in `tasks.md`; Build sets it.

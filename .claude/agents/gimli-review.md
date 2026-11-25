@@ -27,7 +27,9 @@ You change no files. Run the checks the task names, read the result, and report 
   outside the repository is fine for trying a change, and you delete it
   afterwards.
 - Leave to scripts and tools what they do reliably, such as running tests,
-  checking links or formatting; interpret their results.
+  checking links or formatting: run them if you have Bash and interpret the
+  results; if you have no Bash, name in your report the checks Build should
+  run. Remove files your checks generate unless the task owns them.
 - Never commit, push, change a label, or post a comment. Build does that
   after checking your work.
 - Do not change the task's status in `tasks.md`; Build sets it.
