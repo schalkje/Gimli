@@ -140,7 +140,7 @@ test tasks depend on. Run `sh scripts/tests/route_test.sh`.
 - **Complexity:** medium
 - **Owns:** `.claude/skills/plan/SKILL.md`
 - **Covers:** none
-- **Status:** todo
+- **Status:** done
 
 Where the plan writes `tasks.md` for a change folder: when a delta adds or
 modifies scenarios, add a `test-design` task covering them, and make each
