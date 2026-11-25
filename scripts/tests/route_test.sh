@@ -37,16 +37,23 @@ check_route() {
   fi
 }
 
-# check_invalid <label> <args...>: status 2 and nothing on standard output.
+# check_invalid <label> <expected on stderr> <args...>: status 2, nothing on
+# standard output, and standard error contains the expected text.
 check_invalid() {
   _label=$1
-  shift
+  _want=$2
+  shift 2
+  _err=$(sh "$ROUTE" "$@" 2>&1 >/dev/null)
   _out=$(sh "$ROUTE" "$@" 2>/dev/null)
   _status=$?
-  if [ "$_status" -eq 2 ] && [ -z "$_out" ]; then
-    ok "$_label: route.sh $* -> status 2, no output"
+  case "$_err" in
+    *"$_want"*) _named=yes ;;
+    *) _named=no ;;
+  esac
+  if [ "$_status" -eq 2 ] && [ -z "$_out" ] && [ "$_named" = yes ]; then
+    ok "$_label: route.sh $* -> status 2, no output, names '$_want'"
   else
-    not_ok "$_label: route.sh $* -> '$_out' (status $_status), expected status 2 and no output"
+    not_ok "$_label: route.sh $* -> '$_out' (status $_status), stderr '$_err'; expected status 2, no output, and '$_want'"
   fi
 }
 
@@ -86,11 +93,13 @@ check_route "ROUTE-1.1" implement high "gimli-implement opus high"
 check_route "ROUTE-1.2" docs low "gimli-docs haiku low"
 check_route "ROUTE-1.3" review low "gimli-review sonnet high"
 
-check_invalid "ROUTE-2.1" deploy low
-check_invalid "ROUTE-2.2" implement extreme
-check_invalid "ROUTE-2.3"
-check_invalid "ROUTE-2.3" implement
-check_invalid "ROUTE-2.3" implement high extra
+KINDS="design spec implement test-unit test-e2e docs review"
+USAGE="route.sh <kind> <complexity>"
+check_invalid "ROUTE-2.1" "Valid: $KINDS" deploy low
+check_invalid "ROUTE-2.2" "Valid: low medium high" implement extreme
+check_invalid "ROUTE-2.3" "$USAGE"
+check_invalid "ROUTE-2.3" "$USAGE" implement
+check_invalid "ROUTE-2.3" "$USAGE" implement high extra
 
 echo "$PASS passed, $FAIL failed"
 [ "$FAIL" -eq 0 ]
