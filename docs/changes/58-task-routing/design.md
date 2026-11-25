@@ -57,7 +57,9 @@ packet.
    where it may beat Opus on low. `route.sh` prints one line of three words,
    `<agent> <model> <effort>`, and Build always passes both. Haiku cells
    name `low`: Haiku 5.5 supports effort, but the `haiku` alias resolves to
-   Haiku 4.5, which has none, on Bedrock and Vertex AI. The starting table follows an outside review
+   Haiku 4.5, which has none, on Bedrock and Vertex AI; whether an effort
+   passed there is ignored or rejected is not documented, and a rejected
+   call is a task that cannot be routed. The starting table follows an outside review
    of the first draft: design at medium complexity uses Sonnet on high
    effort. Documentation is Gimli's specification, so `docs` is split by
    what the writing needs: Haiku only for mechanical updates the task
@@ -74,8 +76,8 @@ packet.
    prints one line per check. It calls no network and no `gh`. Running it in
    CI is later work.
 6. **Agents edit, Build commits.** An agent never commits, pushes, changes a
-   label or posts a comment; if its branch, commit or remote changed, Build
-   stops and reports it.
+   label or posts a comment; if the branch or any ref moved while it ran,
+   Build stops without publishing and reports it.
    A change outside the task's Owns list is reverted and the task returned
    to the agent once; a repeat is reverted or kept, and recorded as a
    deviation either way. Build never commits it silently. Changed in Review

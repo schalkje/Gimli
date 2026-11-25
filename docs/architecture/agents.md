@@ -57,8 +57,8 @@ follow, the agent reads when it needs it.
    file outside it is reverted and the task returned to the agent once, with
    the list; if it happens again, Build reverts or keeps it and records a
    `## Build: deviation` either way. It is never committed silently.
-   If the agent switched branch, committed or pushed, Build stops and
-   reports it instead of repairing it. A task the agent cannot finish is fixed by Build as a
+   If the branch or any ref moved while the agent ran, Build stops without
+   publishing and reports it instead of repairing it. A task the agent cannot finish is fixed by Build as a
    deviation, with a `Fixed-by: build` line in its commit, or deferred with
    the agent's changes reverted.
 5. Build sets the task's status and commits, with a line

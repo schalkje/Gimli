@@ -154,22 +154,26 @@ the result and commit. One task at a time:
    scenario IDs in its Covers field, and the Principles section of
    `docs/architecture/README.md`. Paste them into the prompt; do not tell the
    agent to read the whole folder.
-4. Note the branch (`git symbolic-ref --short HEAD`), the commit
-   (`git rev-parse HEAD`) and the remote branch
-   (`git rev-parse origin/<branch>` after `git fetch origin`, if it exists).
-   Then call the Agent tool with `subagent_type` set to the agent, `model`
+4. Run `git fetch origin`, then note the branch
+   (`git symbolic-ref --short HEAD`) and every ref with its commit
+   (`git for-each-ref --format='%(refname) %(objectname)'`, which covers the
+   branch, the remote branches, tags and the stash). Then call the Agent tool with `subagent_type` set to the agent, `model`
    set to the model, and `effort` set to the effort `route.sh` printed. This
    skill asks for that effort explicitly. Wait for the agent's report.
-5. Read the three again, after `git fetch origin`. If any of them changed,
-   the agent switched branch, committed or pushed despite its rules: stop
-   implementing, change nothing, and report it at the gate as a deviation
+5. Fetch and read both again. If either changed, the branch or a ref moved
+   while the agent ran: the agent committed, stashed, switched or pushed
+   despite its rules, or someone else pushed. Stop: change nothing, do not
+   publish, push or move the stage, in an interactive or a non-interactive
+   run, and post a `## Build: incomplete` comment saying which ref changed,
    for the user to resolve. Otherwise list what changed with
-   `git status --porcelain --untracked-files=all`.
+   `git status --porcelain --untracked-files=all`. An agent that reports the
+   task done but changed nothing a task with an Owns list should change has
+   failed the task (step 6).
    Every path must be in the task's Owns list. If one is not, revert the
    paths outside it yourself (`git restore --staged --worktree -- <path>`
    for a tracked file, delete an untracked one), then return the task to the
-   agent once, with the Owns list and the paths you reverted. If the second
-   attempt changes such a path again, revert it, or keep it when the task
+   agent once, with the Owns list and the paths you reverted; the second
+   attempt repeats steps 4 and 5 in full. If it changes such a path again, revert it, or keep it when the task
    really needs it, and record either as a deviation; never commit it
    without one of the two.
 6. Read the agent's report, and run every check it names for Build to run.
