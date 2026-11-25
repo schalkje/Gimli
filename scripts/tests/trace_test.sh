@@ -20,7 +20,8 @@ FAIL=0
 CR=$(printf '\r')
 
 TMP=$(mktemp -d)
-trap 'rm -rf "$TMP"' EXIT INT TERM
+trap 'rm -rf "$TMP"' EXIT
+trap 'exit 130' INT TERM
 
 ok() {
   PASS=$((PASS + 1))
@@ -104,7 +105,7 @@ mkcheck() {
 # tocrlf <file>...: rewrite the files with CRLF line endings.
 tocrlf() {
   for _f in "$@"; do
-    sed 's/$/\r/' "$_f" > "$_f.crlf" && mv "$_f.crlf" "$_f"
+    sed "s/\$/$CR/" "$_f" > "$_f.crlf" && mv "$_f.crlf" "$_f"
   done
 }
 
@@ -414,6 +415,10 @@ mkspec a CAP-1.1 CAP-1.2
 mktest helper.sh "echo 'ok CAP-1.1: works'" 'exit 0'
 mktest x_test.txt "echo 'ok CAP-1.1: works'" 'exit 0'
 chk "TRACE-4.1: c, only *_test.sh files count" 1 "$(lines 'CAP-1.1 uncovered -' 'CAP-1.2 uncovered -')"
+
+fx 41d
+mkspec a "CAP-1.1|" "CAP-1.2|   "
+chk "TRACE-4.1: d, an empty Verified by line covers nothing" 1 "$(lines 'CAP-1.1 uncovered -' 'CAP-1.2 uncovered -')"
 
 # ---- TRACE-4.2: Every scenario covered
 

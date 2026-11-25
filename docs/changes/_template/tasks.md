@@ -14,7 +14,7 @@ its status in the commit that completes it. The format is in
 
 - **Stream:** A
 - **Depends on:** none
-- **Kind:** <design | spec | implement | test-unit | test-e2e | docs | review>
+- **Kind:** <design | spec | test-design | implement | test-unit | test-e2e | docs | review>
 - **Complexity:** <low | medium | high>
 - **Owns:** <files, or none>
 - **Covers:** <scenario IDs, or none>

@@ -154,7 +154,7 @@ Automated tests are run against the change.
 | | |
 |---|---|
 | Entry | Draft pull request exists with `stage:test`. |
-| Activity | Run the full automated test suite locally and in CI. Run `scripts/trace.sh`, which runs every test and reports each spec scenario as tested, evidenced, not yet or uncovered ([traceability spec](specs/traceability/spec.md)). Run any manual or exploratory checks the plan called for. Fix failures and return to Build if the fix is non-trivial. |
+| Activity | Run the full automated test suite locally and in CI. Run `scripts/trace.sh`, which runs every test and reports each spec scenario as tested, evidenced, not yet, failing or uncovered ([traceability spec](specs/traceability/spec.md)). Run any manual or exploratory checks the plan called for. Fix failures and return to Build if the fix is non-trivial. |
 | Artifact | Green CI on the pull request. Test output captured. |
 | Exit | CI is green. `scripts/trace.sh` exits 0: no scenario is uncovered or failing. Every acceptance criterion has at least one test or check that exercises it. |
 | Label | `stage:evidence` |

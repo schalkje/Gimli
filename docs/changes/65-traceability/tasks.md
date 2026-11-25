@@ -173,7 +173,7 @@ principle. `docs/architecture/agents.md` and `README.md`: the new agent.
 - **Complexity:** medium
 - **Owns:** none
 - **Covers:** none
-- **Status:** todo
+- **Status:** done
 
 Run `sh scripts/trace.sh` (it must exit 0 and list all scenarios),
 `sh scripts/tests/route_test.sh` and `sh scripts/tests/trace_test.sh`.

@@ -24,9 +24,10 @@ case $# in
   *) usage >&2 ;;
 esac
 
-TMP=$(mktemp -d)
-trap 'rm -rf "$TMP"' EXIT INT TERM
-: > "$TMP/records"
+WORK=$(mktemp -d)
+trap 'rm -rf "$WORK"' EXIT
+trap 'exit 130' INT TERM
+: > "$WORK/records"
 BAD=0
 
 # lib.sh turned globbing off; the two loops below need it.
@@ -53,14 +54,14 @@ for f in "$SPECS"/*/spec.md; do
       sub(/[ \t]+$/, "", t)
       print "V\t" cur "\t" t
     }
-  ' "$f" >> "$TMP/records"
+  ' "$f" >> "$WORK/records"
 done
 
 # Check records "R<TAB>file<TAB>exit<TAB>ok|FAIL<TAB>ID", one per check line.
 for f in "$TESTS"/*_test.sh; do
   [ -e "$f" ] || continue
   st=0
-  sh "$f" > "$TMP/out" 2>/dev/null < /dev/null || st=$?
+  sh "$f" > "$WORK/out" 2>/dev/null < /dev/null || st=$?
   [ "$st" -eq 0 ] || BAD=1
   awk -v base="$(basename "$f")" -v st="$st" '
     { sub(/\r$/, "") }
@@ -71,13 +72,17 @@ for f in "$TESTS"/*_test.sh; do
     /^FAIL [A-Z]+-[0-9]+\.[0-9]+:/ {
       print "R\t" base "\t" st "\tFAIL\t" substr($0, 6, index($0, ":") - 6)
     }
-  ' "$TMP/out" >> "$TMP/records"
+  ' "$WORK/out" >> "$WORK/records"
 done
 
 # Combine: order and text from the S and V records, checks from the R records.
 awk -F'\t' '
   $1 == "S" { n++; ids[n] = $2; next }
-  $1 == "V" { vb[$2] = substr($0, length($2) + 4); has[$2] = 1; next }
+  $1 == "V" {
+    t = substr($0, length($2) + 4)
+    if (t != "") { vb[$2] = t; has[$2] = 1 }
+    next
+  }
   $1 == "R" {
     bad = ($4 == "FAIL" || $3 != 0)
     if (bad && !($5 in failing)) failing[$5] = $2
@@ -90,7 +95,7 @@ awk -F'\t' '
       else if (id in tested) { s = "tested";   src = tested[id] }
       else if (id in has) {
         t = vb[id]
-        if (t ~ /^not yet/) {
+        if (t ~ /^not yet([ \t:]|$)/) {
           s = "not-yet"
           src = substr(t, 8)
           sub(/^[ \t]*:?/, "", src)
@@ -102,10 +107,10 @@ awk -F'\t' '
       print id " " s " " src
     }
   }
-' "$TMP/records" > "$TMP/lines"
+' "$WORK/records" > "$WORK/lines"
 
-cat "$TMP/lines"
-if grep -Eq '^[^ ]+ (uncovered|failing) ' "$TMP/lines"; then
+cat "$WORK/lines"
+if grep -Eq '^[^ ]+ (uncovered|failing) ' "$WORK/lines"; then
   BAD=1
 fi
 exit "$BAD"

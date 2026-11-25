@@ -44,7 +44,8 @@ T4 and T5 both follow these. Where the spec is silent, this is the decision.
 - A `**Verified by:**` line belongs to the nearest scenario heading above it,
   up to the next heading of any level. One above the first scenario heading,
   or under a requirement heading, belongs to no scenario. The line starts in
-  column 1; the text after the label is trimmed of spaces at both ends.
+  column 1; the text after the label is trimmed of spaces at both ends. A
+  line whose text is empty after trimming counts as no line.
 - A test file names an ID by a line of its standard output that starts in
   column 1 with `ok` and one or more spaces (`route_test.sh` prints `ok   `),
   or `FAIL` and one space, then the ID exactly, then `:`. `CAP-1.1:` does not
@@ -55,7 +56,8 @@ T4 and T5 both follow these. Where the spec is silent, this is the decision.
      prints `ok <ID>:` and exits non-zero. Failing beats a passing file and a
      Verified by line.
   2. `tested`: a file prints `ok <ID>:` and exits 0. Beats a Verified by line.
-  3. `not-yet` if the Verified by text starts with `not yet`, else
+  3. `not-yet` if the Verified by text starts with `not yet` followed by a
+     space, `:` or the end of the text, else
      `evidence`, when the scenario has the line.
   4. `uncovered`.
 - Source: `tested` and `failing` give the base name of the test file (for
@@ -200,6 +202,7 @@ Implemented by: T5.
 | a | normal | `spec a: CAP-1.1`; `a_test.sh: ok OTH-1.1; exit 0` | `CAP-1.1 uncovered -`, status 1 |
 | b | edge | `spec a: CAP-1.1 VB [run](https://example.org/1), CAP-1.2`; the tests folder exists and is empty | `CAP-1.1 evidence [run](https://example.org/1)`, `CAP-1.2 uncovered -`, status 1, nothing on standard error: an empty tests folder is not an error, and no scenario is hidden because the other is covered |
 | c | edge | `spec a: CAP-1.1, CAP-1.2`; the tests folder holds `helper.sh` and `x_test.txt` printing `ok CAP-1.1`, and none is `*_test.sh` | both `uncovered -`, status 1: only `*_test.sh` files count |
+| d | failure | `spec a: CAP-1.1 VB` with empty text, `CAP-1.2 VB` with only spaces | both `uncovered -`, status 1: an empty Verified by line covers nothing |
 
 ### TRACE-4.2: Every scenario covered
 

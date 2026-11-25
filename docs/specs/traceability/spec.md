@@ -10,7 +10,7 @@ Part of the [Gimli specs](../README.md).
 `scripts/trace.sh` lists every scenario of the [specs](../README.md) with
 whether something shows that it holds: a passing check, a linked piece of
 evidence, or an admitted gap. It fails when a scenario has none of these or
-when a check fails. Maintainers and the Assess stage use it to see what the
+when a check fails. Maintainers and the Test stage use it to see what the
 specs claim that nothing yet backs up.
 
 ## Requirements
