@@ -1,6 +1,6 @@
 ---
 name: build
-description: Run the Build stage of the Gimli lifecycle on a GitHub issue. Takes the confirmed plan on the issue (for a large change, the tasks in its change folder), implements it on a branch with step-sized commits, records deviations, and after confirmation pushes the branch, opens the draft pull request unless Plan already did, and moves the issue to Test. Runs unattended only for risk:low issues.
+description: Run the Build stage of the Gimli lifecycle on a GitHub issue. Takes the confirmed plan on the issue (for a large change, the tasks in its change folder, each handed to the agent the routing table gives), implements it on a branch with step-sized commits, records deviations, and after confirmation pushes the branch, opens the draft pull request unless Plan already did, and moves the issue to Test. Runs unattended only for risk:low issues.
 argument-hint: <issue-number>
 disable-model-invocation: true
 ---
@@ -121,8 +121,9 @@ non-digit or the end of the line (the search also matches, for example,
 Follow the plan's Steps in order. When the plan links to a change folder,
 its `tasks.md` holds the steps, in the format of `docs/changes/README.md`:
 take the next task with status `todo` whose dependencies are all `done`,
-lowest ID first; implement it; and set its status to `done` in the commit
-that completes it. A task you cannot complete gets status `deferred` and an
+lowest ID first; have its agent do it, as "Delegating a task of a change
+folder" below describes; and set its status to `done` in the commit that
+completes it. A task you cannot complete gets status `deferred` and an
 entry in the deviation list. A task that depends on a `deferred` task is
 deferred too, with its own deviation entry naming that dependency, so no task
 is left `todo` when Build reaches the gate. A `spec` task applies its delta to the living
@@ -132,6 +133,44 @@ return note or review asks for changes to them. A `deferred` task they ask
 for goes back to `todo`, and so does every task deferred only because it
 depends on that task; each is recorded as a reversed deferral in the
 deviation list.
+
+### Delegating a task of a change folder
+
+Each task of a change folder is done by the agent the routing table gives,
+as `docs/specs/task-routing/spec.md` (ROUTE-3) and `docs/architecture/agents.md`
+describe. You stay the orchestrator: you choose the task, hand it over, check
+the result and commit. One task at a time:
+
+1. Start from a clean working tree; the previous task's commit leaves one.
+2. Run `scripts/route.sh <kind> <complexity>` with the task's Kind and
+   Complexity. It prints `<agent> <model> <effort>`. A task without a Kind
+   or Complexity, a `route.sh` error, or an agent file missing from
+   `.claude/agents/` is a deviation: record it, leave the task `todo`, and
+   stop implementing; go to the gate.
+3. Build the context packet: the task's section of `tasks.md`, its Owns list,
+   the Decisions section of `design.md`, the spec or delta sections for the
+   scenario IDs in its Covers field, and the Principles section of
+   `docs/architecture/README.md`. Paste them into the prompt; do not tell the
+   agent to read the whole folder.
+4. Call the Agent tool with `subagent_type` set to the agent, `model` set to
+   the model, and `effort` set to the effort `route.sh` printed. This skill
+   asks for that effort explicitly. Wait for the agent's report.
+5. List what changed with `git status --porcelain --untracked-files=all`.
+   Every path must be in the task's Owns list. If one is not, return the
+   task to the agent once, with the Owns list and the paths outside it. If
+   the second attempt still changes such a path, either revert that path or
+   keep it and record it as a deviation; never commit it without one of the
+   two.
+6. Read the agent's report. If it says the task is not done, or the checks
+   it ran failed, decide as for any task you cannot complete: fix it
+   yourself as a recorded deviation, or set it `deferred`.
+7. Set the task's status in `tasks.md` and commit the agent's changes with
+   it, as one commit. The message body has a line
+   `Routed: <agent> <model> <effort>` with what `route.sh` printed, before
+   `Refs #<n>`.
+
+A change planned as a comment, without a change folder, is not routed: you
+implement its Steps yourself, as before (ROUTE-4).
 
 Add or update the tests or checks the
 plan's Tests table names. Do not invent a test runner the repository lacks;

@@ -123,7 +123,7 @@ Build commits", linking ROUTE-3.
 - **Complexity:** high
 - **Owns:** `.claude/skills/build/SKILL.md`
 - **Covers:** ROUTE-3.1, ROUTE-3.2, ROUTE-3.3, ROUTE-4.1
-- **Status:** todo
+- **Status:** done
 
 In step 3, for a change folder: for each task, run `scripts/route.sh` on its
 Kind and Complexity, assemble the context packet, call the Agent tool with
