@@ -112,8 +112,9 @@ the commit itself.
 - **THEN** Build sets the task's status to `done` and commits the change
 - **AND** the commit message has a line `Routed: <agent> <model> <effort>`
   with what `route.sh` gave
-- **AND** the branch and every ref are as before the agent ran; if not,
-  Build stops without publishing and reports it
+- **AND** the branch, every local ref and the branch's remote copy are as
+  before the agent ran; if not, Build stops without publishing and reports
+  it
 
 #### Scenario ROUTE-3.3: File outside the task
 

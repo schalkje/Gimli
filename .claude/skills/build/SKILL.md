@@ -25,7 +25,8 @@ follow it with:
   `risk:low`**. For a `risk:low` issue a non-interactive run may push the
   branch, post one comment headed `## Build: deviation`, open the draft pull
   request, run `scripts/stage.sh <n> test`, and, if publishing fails part
-  way, post one comment headed `## Build: incomplete`. Nothing else. The
+  way or a ref moves during an agent run (step 3, "Delegating a task"), post
+  one comment headed `## Build: incomplete`. Nothing else. The
   preamble's duplicate guard is for repeated runs that would say the same
   thing again; it does not apply to these two headings, which report what
   this run did.
@@ -148,27 +149,34 @@ the result and commit. One task at a time:
    Complexity. It prints `<agent> <model> <effort>`. A task without a Kind
    or Complexity, a `route.sh` error, or an agent file missing from
    `.claude/agents/` cannot be routed: defer it as in step 6, and continue
-   with the next task.
+   with the next task. So can a task whose Agent call fails, for example
+   because the platform rejects the model or effort, or that returns no
+   report.
 3. Build the context packet: the task's section of `tasks.md`, its Owns list,
    the Decisions section of `design.md`, the spec or delta sections for the
    scenario IDs in its Covers field, and the Principles section of
    `docs/architecture/README.md`. Paste them into the prompt; do not tell the
    agent to read the whole folder.
 4. Run `git fetch origin`, then note the branch
-   (`git symbolic-ref --short HEAD`) and every ref with its commit
-   (`git for-each-ref --format='%(refname) %(objectname)'`, which covers the
-   branch, the remote branches, tags and the stash). Then call the Agent tool with `subagent_type` set to the agent, `model`
+   (`git symbolic-ref --short HEAD`) and the refs an agent could move, with
+   their commits: `git for-each-ref --format='%(refname) %(objectname)'
+   refs/heads refs/tags refs/stash refs/remotes/origin/<branch>`. That is
+   every local branch and tag, the stash, and this branch's remote copy;
+   other branches on `origin` are left out, so another pull request merging
+   does not stop Build. Then call the Agent tool with `subagent_type` set to the agent, `model`
    set to the model, and `effort` set to the effort `route.sh` printed. This
    skill asks for that effort explicitly. Wait for the agent's report.
 5. Fetch and read both again. If either changed, the branch or a ref moved
    while the agent ran: the agent committed, stashed, switched or pushed
-   despite its rules, or someone else pushed. Stop: change nothing, do not
+   despite its rules, or someone else pushed to this branch. Stop: change nothing, do not
    publish, push or move the stage, in an interactive or a non-interactive
    run, and post a `## Build: incomplete` comment saying which ref changed,
    for the user to resolve. Otherwise list what changed with
-   `git status --porcelain --untracked-files=all`. An agent that reports the
-   task done but changed nothing a task with an Owns list should change has
-   failed the task (step 6).
+   `git status --porcelain --untracked-files=all`; this sees tracked and
+   untracked files in the repository, not gitignored files or files outside
+   it. An agent that reports the task done but changed nothing, on a task
+   other than `review` whose Owns list is not `none`, has failed the task
+   (step 6).
    Every path must be in the task's Owns list. If one is not, revert the
    paths outside it yourself (`git restore --staged --worktree -- <path>`
    for a tracked file, delete an untracked one), then return the task to the
@@ -269,7 +277,8 @@ a pull request behind it:
 If any command fails, for example because a `claude -p` run lacks permission
 for `git push` or `gh pr create`, stop there and do not move the stage. Post
 one issue comment headed `## Build: incomplete` saying exactly which of the
-four steps completed, which failed, and the error, so the record is on the
+four steps completed, which failed, and the error (or, when a ref moved
+during an agent run, which ref and which task), so the record is on the
 issue and not only in a transcript; then report the same to the user. The
 next run of this skill resumes from the existing branch and does not repeat
 the completed steps.
