@@ -56,3 +56,4 @@ A change with a change folder states what it does to a spec in a
 | Capability | Prefix | What it covers |
 |---|---|---|
 | [Stage transitions](stage-transitions/spec.md) | `STAGE` | Reading and changing an issue's lifecycle stage with `scripts/stage.sh`. |
+| [Task routing](task-routing/spec.md) | `ROUTE` | Choosing the agent, model and effort for a task of a change folder, and Build delegating it. |

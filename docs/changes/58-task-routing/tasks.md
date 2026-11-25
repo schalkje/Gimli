@@ -26,7 +26,7 @@ T1 is the contract: every other stream depends on the spec it writes.
 - **Complexity:** medium
 - **Owns:** `docs/specs/task-routing/spec.md`, `docs/specs/README.md`
 - **Covers:** ROUTE-1.1, ROUTE-1.2, ROUTE-1.3, ROUTE-1.4, ROUTE-2.1, ROUTE-2.2, ROUTE-2.3, ROUTE-3.1, ROUTE-3.2, ROUTE-3.3, ROUTE-4.1
-- **Status:** todo
+- **Status:** done
 
 Create the living spec from [the delta](specs/task-routing/delta.md), using
 the spec template, with `scripts/route.sh` and `.claude/skills/build/SKILL.md`
