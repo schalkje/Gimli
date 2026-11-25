@@ -88,7 +88,7 @@ table has fewer than 21 cells, so a broken parse cannot pass.
 - **Complexity:** medium
 - **Owns:** `.claude/agents/gimli-design.md`, `.claude/agents/gimli-spec.md`, `.claude/agents/gimli-implement.md`, `.claude/agents/gimli-test-unit.md`, `.claude/agents/gimli-test-e2e.md`, `.claude/agents/gimli-docs.md`, `.claude/agents/gimli-review.md`
 - **Covers:** ROUTE-3.2
-- **Status:** todo
+- **Status:** done
 
 One file per kind: `name`, a `description` that names the kind and says it
 is called by `/build` for one task, `model` and `effort` as design decision
