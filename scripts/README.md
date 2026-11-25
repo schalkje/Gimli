@@ -115,14 +115,17 @@ an agent. Reads nothing and calls no `gh`.
 ```sh
 scripts/route.sh implement high   # gimli-implement opus high
 scripts/route.sh docs low         # gimli-docs haiku low
+scripts/route.sh --table          # all 21 cells, one per line
 ```
 
-The output is one line, `<agent> <model> <effort>`. The table it implements,
+The output is one line, `<agent> <model> <effort>`. With `--table` alone it
+prints every cell as `<kind> <complexity> <agent> <model> <effort>`, one per
+line. The table it implements,
 and what each `docs` complexity level means, are in the
 [task routing spec](../docs/specs/task-routing/spec.md#requirement-route-1-route-a-task-by-kind-and-complexity).
-An unknown kind or complexity, or a number of arguments other than two,
-exits with status 2 and prints nothing on standard output; the message goes
-to standard error.
+An unknown kind or complexity, or any arguments other than a kind and a
+complexity or `--table` alone, exits with status 2 and prints nothing on
+standard output; the message goes to standard error.
 
 Changing the table means changing the spec and this script together; the
 test below fails until they agree.

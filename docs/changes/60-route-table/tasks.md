@@ -64,7 +64,7 @@ ROUTE-2.3 checks passing.
 - **Complexity:** low
 - **Owns:** `scripts/README.md`
 - **Covers:** none
-- **Status:** todo
+- **Status:** done
 
 In the `route.sh` section, add `scripts/route.sh --table` to the example
 block with a comment `# all 21 cells, one per line`, and say in one sentence
