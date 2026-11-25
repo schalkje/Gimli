@@ -72,7 +72,7 @@ section in `scripts/README.md`.
 - **Complexity:** medium
 - **Owns:** `scripts/tests/route_test.sh`
 - **Covers:** ROUTE-1.1, ROUTE-1.2, ROUTE-1.3, ROUTE-1.4, ROUTE-2.1, ROUTE-2.2, ROUTE-2.3
-- **Status:** todo
+- **Status:** done
 
 Read the routing table from `docs/specs/task-routing/spec.md` with `awk`,
 run `route.sh` for every cell and check the agent, model and effort, then check the three
