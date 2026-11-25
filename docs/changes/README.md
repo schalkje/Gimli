@@ -100,7 +100,9 @@ format, comes first, and the other streams depend on it.
 When a change's spec delta adds or modifies scenarios, `tasks.md` has a
 `test-design` task covering them, and every `test-unit` and `test-e2e` task
 for those scenarios depends on it. The task writes `test-design.md`, so the
-tests and the code are decided from the same cases.
+tests and the code are decided from the same cases: its Owns list names
+`test-design.md`, and Build gives that file to each task that depends on it
+([context packet](../architecture/agents.md#context-packet)).
 
 ## Spec deltas
 

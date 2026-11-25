@@ -42,6 +42,7 @@ context also lets a cheaper model do the task. `/build` gives each agent:
 | The files it may change | the task's Owns list |
 | The design decisions | the Decisions section of `design.md` |
 | What it implements or tests | the spec or delta sections for the scenario IDs in the task's Covers field |
+| The cases to test | the folder's `test-design.md`, when the task depends on a `test-design` task |
 | What it is reviewed against | the Principles section of the [architecture overview](README.md#principles) |
 
 Anything else, such as a file the task names or an existing pattern to

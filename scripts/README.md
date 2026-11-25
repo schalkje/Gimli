@@ -145,18 +145,22 @@ Windows. The output is one line per scenario, `<ID> <status> <source>`:
 | Status | Meaning | Source |
 |---|---|---|
 | `tested` | A test file exits 0 and prints `ok <ID>:` | the test file name |
-| `evidence` | The scenario has a `**Verified by:**` link | the text |
-| `not-yet` | Its Verified by line starts `not yet` | the reason |
+| `evidence` | The scenario's `**Verified by:**` line holds a Markdown link | the text |
+| `not-yet` | Its Verified by line starts `not yet`, in any case | the reason |
 | `failing` | A test prints a `FAIL <ID>:` line, or its file exits non-zero | the file |
-| `uncovered` | None of the above | `-` |
+| `uncovered` | None of the above, including Verified by text that is neither | `-` |
+
+Standard error names each test file that exits non-zero, and each
+`#### Scenario` line that is not a well-formed heading, with its file and
+line; headings inside fenced code blocks are skipped.
 
 The Verified by format is in the [spec format](../docs/specs/README.md).
 
 | Exit | Meaning |
 |---|---|
-| 0 | No scenario is uncovered or failing, and every test file exited 0 |
-| 1 | A scenario is uncovered or failing, or a test file exited non-zero |
-| 2 | Usage error: not zero or two arguments |
+| 0 | No scenario is uncovered or failing, every test file exited 0, and every scenario heading is well formed |
+| 1 | A scenario is uncovered or failing, a test file exited non-zero, or a scenario heading is malformed |
+| 2 | Usage error: not zero or two arguments, or a folder that does not exist |
 
 The rules are the [traceability spec](../docs/specs/traceability/spec.md);
 why they are so is [ADR 0005](../docs/adr/0005-traceability.md).

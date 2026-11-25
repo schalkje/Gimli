@@ -154,7 +154,8 @@ the result and commit. One task at a time:
    report.
 3. Build the context packet: the task's section of `tasks.md`, its Owns list,
    the Decisions section of `design.md`, the spec or delta sections for the
-   scenario IDs in its Covers field, and the Principles section of
+   scenario IDs in its Covers field, the folder's `test-design.md` when the
+   task depends on a `test-design` task, and the Principles section of
    `docs/architecture/README.md`. Paste them into the prompt; do not tell the
    agent to read the whole folder.
 4. Run `git fetch origin`, then note the branch

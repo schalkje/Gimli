@@ -27,7 +27,8 @@ are already right for that location.
   `**Verified by:** <link to the evidence>`, or
   `**Verified by:** not yet: <reason>`, followed where one exists by the
   issue that will close the gap, as in
-  `**Verified by:** not yet: needs a gh stub, #66`. It records coverage, not
+  `**Verified by:** not yet: needs a gh stub, #66`. Evidence must be a
+  Markdown link; any other text counts as no line. It records coverage, not
   behaviour, so adding or editing one needs no [spec delta](../changes/README.md#spec-deltas).
   A scenario with a passing check, an `ok <ID>:` line printed by a test in
   `scripts/tests/` that exits 0, needs no Verified by line.

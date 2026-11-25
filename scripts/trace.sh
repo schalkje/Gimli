@@ -8,7 +8,8 @@
 # Status: tested (a test file exits 0 and prints "ok <ID>:"), evidence or
 # not-yet (a "**Verified by:**" line under the scenario), failing, uncovered.
 # The source is "-" when there is none. Exit 1 when a scenario is uncovered or
-# failing, or a test file exits non-zero. The rules are in
+# failing, a test file exits non-zero, or a "#### Scenario" line is not a
+# well-formed heading; exit 2 when a folder is missing. The rules are in
 # docs/specs/traceability/spec.md; scripts/tests/trace_test.sh checks them.
 
 set -eu
@@ -24,6 +25,13 @@ case $# in
   *) usage >&2 ;;
 esac
 
+for d in "$SPECS" "$TESTS"; do
+  if [ ! -d "$d" ]; then
+    echo "trace.sh: not a folder: $d" >&2
+    exit 2
+  fi
+done
+
 WORK=$(mktemp -d)
 trap 'rm -rf "$WORK"' EXIT
 trap 'exit 130' INT TERM
@@ -33,26 +41,32 @@ BAD=0
 # lib.sh turned globbing off; the two loops below need it.
 set +f
 
-# Scenario records "S<TAB>ID<TAB>has<TAB>text", in file and heading order.
+# Records, in file and heading order: "S<TAB>ID" per scenario heading,
+# "V<TAB>ID<TAB>text" for its first non-empty Verified by line, and
+# "M<TAB>file:line<TAB>text" per "#### Scenario" line that does not parse.
+# Lines in fenced code blocks are skipped; a heading is #s and a space.
 for f in "$SPECS"/*/spec.md; do
   [ -e "$f" ] || continue
   case $f in */_template/spec.md) continue ;; esac
   awk '
     { sub(/\r$/, "") }
-    /^#/ {
+    /^(```|~~~)/ { fence = !fence; next }
+    fence { next }
+    /^#+( |$)/ {
       cur = ""
       if (match($0, /^#### Scenario [A-Z]+-[0-9]+\.[0-9]+:/)) {
         cur = substr($0, 15, RLENGTH - 15)
-        print "S\t" cur "\t0\t"
+        print "S\t" cur
+      } else if ($0 ~ /^#### Scenario( |$)/) {
+        print "M\t" FILENAME ":" FNR "\t" $0
       }
       next
     }
     cur != "" && index($0, "**Verified by:**") == 1 && !(cur in seen) {
-      seen[cur] = 1
       t = substr($0, 17)
       sub(/^[ \t]+/, "", t)
       sub(/[ \t]+$/, "", t)
-      print "V\t" cur "\t" t
+      if (t != "") { seen[cur] = 1; print "V\t" cur "\t" t }
     }
   ' "$f" >> "$WORK/records"
 done
@@ -62,7 +76,10 @@ for f in "$TESTS"/*_test.sh; do
   [ -e "$f" ] || continue
   st=0
   sh "$f" > "$WORK/out" 2>/dev/null < /dev/null || st=$?
-  [ "$st" -eq 0 ] || BAD=1
+  if [ "$st" -ne 0 ]; then
+    BAD=1
+    echo "trace.sh: $(basename "$f") exited $st" >&2
+  fi
   awk -v base="$(basename "$f")" -v st="$st" '
     { sub(/\r$/, "") }
     /^ok +[A-Z]+-[0-9]+\.[0-9]+:/ {
@@ -78,11 +95,7 @@ done
 # Combine: order and text from the S and V records, checks from the R records.
 awk -F'\t' '
   $1 == "S" { n++; ids[n] = $2; next }
-  $1 == "V" {
-    t = substr($0, length($2) + 4)
-    if (t != "") { vb[$2] = t; has[$2] = 1 }
-    next
-  }
+  $1 == "V" { vb[$2] = substr($0, length($2) + 4); has[$2] = 1; next }
   $1 == "R" {
     bad = ($4 == "FAIL" || $3 != 0)
     if (bad && !($5 in failing)) failing[$5] = $2
@@ -95,14 +108,15 @@ awk -F'\t' '
       else if (id in tested) { s = "tested";   src = tested[id] }
       else if (id in has) {
         t = vb[id]
-        if (t ~ /^not yet([ \t:]|$)/) {
+        if (tolower(t) ~ /^not yet([ \t:]|$)/) {
           s = "not-yet"
           src = substr(t, 8)
           sub(/^[ \t]*:?/, "", src)
           sub(/^[ \t]+/, "", src)
           sub(/[ \t]+$/, "", src)
           if (src == "") src = "-"
-        } else { s = "evidence"; src = t }
+        } else if (t ~ /\[[^]]+\]\([^)]+\)/) { s = "evidence"; src = t }
+        else { s = "uncovered"; src = "-" }
       } else { s = "uncovered"; src = "-" }
       print id " " s " " src
     }
@@ -110,6 +124,12 @@ awk -F'\t' '
 ' "$WORK/records" > "$WORK/lines"
 
 cat "$WORK/lines"
+TAB=$(printf '\t')
+while IFS=$TAB read -r kind loc text; do
+  [ "$kind" = M ] || continue
+  echo "trace.sh: $loc: not a scenario heading: $text" >&2
+  BAD=1
+done < "$WORK/records"
 if grep -Eq '^[^ ]+ (uncovered|failing) ' "$WORK/lines"; then
   BAD=1
 fi

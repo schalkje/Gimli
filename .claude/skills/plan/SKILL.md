@@ -144,7 +144,8 @@ it, and whether human acknowledgement is required before Build.
 When a change folder's spec delta adds or modifies scenarios, its `tasks.md`
 has the `test-design` task that the
 [test design task rule](../../../docs/changes/README.md#test-design-task)
-requires, with the test tasks for those scenarios depending on it.
+requires, owning `test-design.md`, with the test tasks for those scenarios
+depending on it.
 
 For a change folder, the folder holds the steps (`tasks.md`), the design and
 the spec deltas, and its `design.md` "Where it lands" section is the

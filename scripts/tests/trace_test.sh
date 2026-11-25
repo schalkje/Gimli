@@ -3,7 +3,7 @@
 #
 #   sh scripts/tests/trace_test.sh
 #
-# Covers TRACE-1.1 to TRACE-5.2 in docs/specs/traceability/spec.md; the cases
+# Covers TRACE-1.1 to TRACE-5.3 in docs/specs/traceability/spec.md; the cases
 # are in docs/changes/65-traceability/test-design.md. Each case builds fixture
 # spec and test folders in a temporary directory and runs trace.sh on them,
 # never on scripts/tests, so this test does not run itself. Prints one line
@@ -212,6 +212,37 @@ fx 12c
 mkspec _template CAP-1.1
 chk "TRACE-1.2: c, only a template gives no output" 0 ""
 
+# ---- TRACE-1.3: Malformed scenario heading
+
+fx 13a
+mkspec a "CAP-1.1|not yet: r"
+echo '#### Scenario CAP-1.2 S' >> "$S/a/spec.md"
+chk "TRACE-1.3: a, a heading without a colon gives no line and fails" 1 "CAP-1.1 not-yet r"
+check_err "TRACE-1.3: a, standard error names the file and line" "a/spec.md:13: not a scenario heading: #### Scenario CAP-1.2 S"
+
+fx 13b
+mkspec a "CAP-1.1|not yet: r"
+echo '#### Scenario C4P-1.2: S' >> "$S/a/spec.md"
+chk "TRACE-1.3: b, a prefix with a digit is malformed" 1 "CAP-1.1 not-yet r"
+check_err "TRACE-1.3: b, standard error names it" "not a scenario heading: #### Scenario C4P-1.2: S"
+
+fx 13c
+mkspec a "CAP-1.1|not yet: r"
+echo '#### Scenarios' >> "$S/a/spec.md"
+chk "TRACE-1.3: c, another heading is not malformed" 0 "CAP-1.1 not-yet r"
+
+# ---- TRACE-1.4: Code blocks left out
+
+fx 14a
+mkspec a "CAP-1.1|not yet: r"
+printf '%s\n' '```' '#### Scenario EX-1.1: S' '#### Scenario bad' '```' '' '**Verified by:** [run](https://example.org/9)' >> "$S/a/spec.md"
+chk "TRACE-1.4: a, headings in a fenced block are not scenarios" 0 "CAP-1.1 not-yet r"
+
+fx 14b
+mkspec a "CAP-1.1|not yet: r"
+printf '%s\n' '~~~' '#### Scenario EX-1.1: S' '~~~' >> "$S/a/spec.md"
+chk "TRACE-1.4: b, a tilde fence too" 0 "CAP-1.1 not-yet r"
+
 # ---- TRACE-2.1: Passing check
 
 fx 21a
@@ -370,6 +401,16 @@ printf 'Verified by: [run](%s)\n' "$U1" >> "$S/a/spec.md"
 printf ' **Verified by:** [run](%s)\n' "$U1" >> "$S/b/spec.md"
 chk "TRACE-3.1: h, no bold or an indent is not a Verified by line" 1 "$(lines 'CAP-1.1 uncovered -' 'OTH-1.1 uncovered -')"
 
+fx 31i
+mkdir "$S/a"
+printf '#### Scenario CAP-1.1: S\n\n#66 tracks this\n\n**Verified by:** [run](%s)\n' "$U1" > "$S/a/spec.md"
+chk "TRACE-3.1: i, a # line that is not a heading keeps the scope" 0 "CAP-1.1 evidence [run]($U1)"
+
+fx 31j
+mkspec a "CAP-1.1|"
+printf '**Verified by:** [run](%s)\n' "$U1" >> "$S/a/spec.md"
+chk "TRACE-3.1: j, an empty line does not hide the next one" 0 "CAP-1.1 evidence [run]($U1)"
+
 # ---- TRACE-3.2: Not yet
 
 fx 32a
@@ -393,6 +434,20 @@ fx 32e
 mkspec a "CAP-1.1|not yet: needs a gh stub, #1"
 tocrlf "$S/a/spec.md"
 chk "TRACE-3.2: e, CRLF spec gives no CR" 0 "CAP-1.1 not-yet needs a gh stub, #1"
+
+fx 32f
+mkspec a "CAP-1.1|Not yet: later" "CAP-1.2|NOT YET"
+chk "TRACE-3.2: f, not yet in any case" 0 "$(lines 'CAP-1.1 not-yet later' 'CAP-1.2 not-yet -')"
+
+# ---- TRACE-3.3: Neither evidence nor not yet
+
+fx 33a
+mkspec a "CAP-1.1|TODO" "CAP-1.2|see the pull request" "CAP-1.3|[run]" "CAP-1.4|notyet"
+chk "TRACE-3.3: a, text without a link covers nothing" 1 "$(lines 'CAP-1.1 uncovered -' 'CAP-1.2 uncovered -' 'CAP-1.3 uncovered -' 'CAP-1.4 uncovered -')"
+
+fx 33b
+mkspec a "CAP-1.1|see [run]($U1)"
+chk "TRACE-3.3: b, a link anywhere in the text is evidence" 0 "CAP-1.1 evidence see [run]($U1)"
 
 # ---- TRACE-4.1: Uncovered scenario
 
@@ -446,6 +501,20 @@ mkcheck a_test.sh 0 "ok CAP-1.1"
 mkcheck b_test.sh 1 "ok NOPE-9.9"
 chk "TRACE-4.2: e, a failing file naming an unknown ID fails the run" 1 "$(lines 'CAP-1.1 tested a_test.sh' "CAP-1.2 evidence [run]($U1)" 'CAP-1.3 not-yet r')"
 
+# ---- TRACE-4.3: Failing test file named
+
+fx 43a
+mkspec a "CAP-1.1|not yet: r"
+mktest a_test.sh 'exit 3'
+mkcheck b_test.sh 0 "ok OTH-1.1"
+chk "TRACE-4.3: a, a test file that exits non-zero fails the run" 1 "CAP-1.1 not-yet r"
+check_err "TRACE-4.3: a, standard error names the file and status" "trace.sh: a_test.sh exited 3"
+if grep -q b_test.sh "$TMP/err"; then
+  not_ok "TRACE-4.3: b, a passing file is not named: $(cat "$TMP/err")"
+else
+  ok "TRACE-4.3: b, a passing file is not named"
+fi
+
 # ---- TRACE-5.1: Other folders
 
 fx 51a
@@ -492,6 +561,19 @@ check_err "TRACE-5.2: b, usage on standard error" "$USAGE"
 check_run "TRACE-5.2: c, four arguments are a usage error" 2 "" "$S" "$T" extra more
 check_err "TRACE-5.2: c, usage on standard error" "$USAGE"
 check_no_file "TRACE-5.2: d, no test file was run" "$T/a_test.sh.ran"
+
+# ---- TRACE-5.3: Missing folder
+
+fx 53a
+mkspec a "CAP-1.1|not yet: r"
+mktest a_test.sh ': > "$0.ran"' 'exit 0'
+check_run "TRACE-5.3: a, a missing specs folder exits 2" 2 "" "$D/nope" "$T"
+check_err "TRACE-5.3: a, standard error names it" "trace.sh: not a folder: $D/nope"
+check_no_file "TRACE-5.3: a, no test file was run" "$T/a_test.sh.ran"
+check_run "TRACE-5.3: b, a missing tests folder exits 2" 2 "" "$S" "$D/nope"
+check_err "TRACE-5.3: b, standard error names it" "trace.sh: not a folder: $D/nope"
+: > "$D/file"
+check_run "TRACE-5.3: c, a file is not a folder" 2 "" "$D/file" "$T"
 
 # ---- Trial break: the helper must be able to fail
 

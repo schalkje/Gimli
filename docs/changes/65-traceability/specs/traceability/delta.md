@@ -11,7 +11,10 @@ with prefix `TRACE`. The format is in
 
 The system SHALL print one line per scenario heading in the capability specs,
 `<ID> <status> <source>`, in the order of the spec files and of the
-scenarios in them, leaving out the spec template.
+scenarios in them, leaving out the spec template and fenced code blocks. A
+line starting `#### Scenario` that is not a heading
+`#### Scenario <ID>: <name>` SHALL get no line, be named on standard error
+with its file and line number, and make the run exit with status 1.
 
 #### Scenario TRACE-1.1: Every scenario
 
@@ -24,6 +27,22 @@ scenarios in them, leaving out the spec template.
 - **GIVEN** `docs/specs/_template/spec.md` with its example scenarios
 - **WHEN** `scripts/trace.sh` runs
 - **THEN** no line names a scenario of the template
+
+#### Scenario TRACE-1.3: Malformed scenario heading
+
+- **GIVEN** a spec with the line `#### Scenario CAP-1.2 Name`, without the
+  colon
+- **WHEN** `scripts/trace.sh` runs
+- **THEN** no line names CAP-1.2
+- **AND** standard error names the spec file and the line number
+- **AND** it exits with status 1
+
+#### Scenario TRACE-1.4: Code blocks left out
+
+- **GIVEN** a spec that shows `#### Scenario EX-1.1: Example` inside a
+  fenced code block
+- **WHEN** `scripts/trace.sh` runs
+- **THEN** no line names EX-1.1
 
 ### Requirement TRACE-2: Tested by a passing check
 
@@ -53,10 +72,13 @@ non-zero makes the scenarios it names `failing`.
 
 ### Requirement TRACE-3: Verified by
 
-A scenario without a passing check SHALL take its status from a
-`**Verified by:**` line under it in the spec: `not-yet` when the text starts
-with `not yet`, otherwise `evidence`; the source is the rest of the line. A
-passing check takes precedence over the line.
+A scenario without a passing check SHALL take its status from the first
+`**Verified by:**` line under it in the spec whose text is not empty:
+`not-yet` when the text starts with `not yet`, in any case, followed by a
+space, `:` or the end of the text, with the reason after it as the source;
+`evidence` when the text holds a Markdown link `[text](target)`, with the
+text as the source. Any other text counts as no line. A passing check takes
+precedence over the line.
 
 #### Scenario TRACE-3.1: Evidence
 
@@ -72,10 +94,20 @@ passing check takes precedence over the line.
 - **WHEN** `scripts/trace.sh` runs
 - **THEN** its line has status `not-yet` and the reason as its source
 
+#### Scenario TRACE-3.3: Neither evidence nor not yet
+
+- **GIVEN** a scenario with `**Verified by:** TODO` and no test
+- **WHEN** `scripts/trace.sh` runs
+- **THEN** its line has status `uncovered`
+- **AND** it exits with status 1
+
 ### Requirement TRACE-4: Exit status
 
 The system SHALL exit with status 1 when any scenario is `uncovered` or
-`failing`, or a test file exits non-zero, and with status 0 otherwise.
+`failing`, a test file exits non-zero, or a scenario heading is malformed
+(TRACE-1), and with status 0 otherwise. It SHALL name on standard error each
+test file that exits non-zero, with its status; standard output holds only
+the scenario lines.
 
 #### Scenario TRACE-4.1: Uncovered scenario
 
@@ -90,11 +122,20 @@ The system SHALL exit with status 1 when any scenario is `uncovered` or
 - **WHEN** `scripts/trace.sh` runs
 - **THEN** it exits with status 0
 
+#### Scenario TRACE-4.3: Failing test file named
+
+- **GIVEN** a test file that names no scenario and exits 3
+- **WHEN** `scripts/trace.sh` runs
+- **THEN** standard error holds `trace.sh: <test file> exited 3`
+- **AND** it exits with status 1
+
 ### Requirement TRACE-5: Folders
 
 The system SHALL read the specs and tests from `docs/specs` and
 `scripts/tests` by default, or from the two folders given as arguments, and
-exit with status 2 and its usage on any other number of arguments.
+exit with status 2 and its usage on any other number of arguments. It SHALL
+exit with status 2, naming the folder on standard error and running no
+test, when either folder is not a directory.
 
 #### Scenario TRACE-5.1: Other folders
 
@@ -105,6 +146,13 @@ exit with status 2 and its usage on any other number of arguments.
 
 - **WHEN** `scripts/trace.sh` runs with one argument, or more than two
 - **THEN** it prints its usage and exits with status 2
+
+#### Scenario TRACE-5.3: Missing folder
+
+- **WHEN** `scripts/trace.sh <specs> <tests>` runs and one of them does not
+  exist
+- **THEN** standard error names it
+- **AND** it exits with status 2 without running a test
 
 ## MODIFIED
 

@@ -40,12 +40,21 @@ T4 and T5 both follow these. Where the spec is silent, this is the decision.
   glob, runs nothing and is not an error.
 - A scenario is a line starting `#### Scenario <ID>:`. The ID is
   `[A-Z]+-[0-9]+.[0-9]+`. Requirement headings, other prose that names an ID,
-  and the Retired section produce no line.
+  and the Retired section produce no line. Any other line starting
+  `#### Scenario` and a space or the end, such as one without the colon or
+  with a digit in the prefix, is malformed: no line, a message
+  `trace.sh: <file>:<line>: not a scenario heading: <line>` on standard
+  error, and status 1. Lines inside a fenced code block, from a line
+  starting ```` ``` ```` or `~~~` to the next, are skipped.
+- A heading is a line of one or more `#` followed by a space or the end; a
+  line such as `#66 tracks this` is prose.
 - A `**Verified by:**` line belongs to the nearest scenario heading above it,
   up to the next heading of any level. One above the first scenario heading,
   or under a requirement heading, belongs to no scenario. The line starts in
   column 1; the text after the label is trimmed of spaces at both ends. A
-  line whose text is empty after trimming counts as no line.
+  line whose text is empty after trimming counts as no line, so a later
+  line under the same scenario is read; after a non-empty one, later lines
+  are ignored.
 - A test file names an ID by a line of its standard output that starts in
   column 1 with `ok` and one or more spaces (`route_test.sh` prints `ok   `),
   or `FAIL` and one space, then the ID exactly, then `:`. `CAP-1.1:` does not
@@ -56,18 +65,23 @@ T4 and T5 both follow these. Where the spec is silent, this is the decision.
      prints `ok <ID>:` and exits non-zero. Failing beats a passing file and a
      Verified by line.
   2. `tested`: a file prints `ok <ID>:` and exits 0. Beats a Verified by line.
-  3. `not-yet` if the Verified by text starts with `not yet` followed by a
-     space, `:` or the end of the text, else
-     `evidence`, when the scenario has the line.
+  3. `not-yet` if the Verified by text starts with `not yet`, in any case,
+     followed by a space, `:` or the end of the text; else `evidence` if
+     the text holds a Markdown link `[text](target)` anywhere; any other
+     text counts as no line.
   4. `uncovered`.
 - Source: `tested` and `failing` give the base name of the test file (for
   several files, the first in sorted order among those that fit the status);
   `evidence` the Verified by text, for example `[fixture run](https://example.org/1)`;
   `not-yet` the reason, which is the text after `not yet` and an optional
   `:`, trimmed; `-` when that is empty, and for `uncovered`.
-- Exit status 1 when any line is `uncovered` or `failing`, or any test file
-  exits non-zero even if it names nothing; else 0. All scenario lines are
-  printed first in every case, standard output holds only those lines.
+- Exit status 1 when any line is `uncovered` or `failing`, any test file
+  exits non-zero even if it names nothing, or a scenario heading is
+  malformed; else 0. All scenario lines are printed first in every case,
+  standard output holds only those lines. Each test file that exits
+  non-zero is named on standard error as `trace.sh: <file> exited <status>`.
+- A specs or tests folder that is not a directory exits 2 with
+  `trace.sh: not a folder: <path>` on standard error, before any test runs.
 - CRLF: a spec file or test output with CRLF line endings gives the same
   output as with LF, and no `\r` in any output line. The repository is
   checked out with `autocrlf` on Windows.
@@ -123,6 +137,25 @@ Implemented by: T5.
 | a | normal | `spec _template: CAP-1.1, CAP-1.2, CAP-2.1`; `spec real: OTH-1.1 VB not yet: r` | exactly `OTH-1.1 not-yet r`, status 0 |
 | b | edge | as a, plus `a_test.sh: ok CAP-1.1; exit 0` | still only the `OTH-1.1` line: a test naming a template ID adds nothing |
 | c | edge | only `spec _template: CAP-1.1`; empty tests folder | no output, status 0 |
+
+### TRACE-1.3: Malformed scenario heading
+
+Implemented by: T5, extended in Review.
+
+| Case | Kind | Given (fixture) | Expected |
+|---|---|---|---|
+| a | failure | `spec a: CAP-1.1 VB not yet: r`, then the line `#### Scenario CAP-1.2 S` (line 13) | `CAP-1.1 not-yet r`, status 1, standard error `a/spec.md:13: not a scenario heading: #### Scenario CAP-1.2 S` |
+| b | failure | as a with `#### Scenario C4P-1.2: S` | the same line, status 1, the heading named on standard error |
+| c | edge | as a with `#### Scenarios` | `CAP-1.1 not-yet r`, status 0: not a scenario heading at all |
+
+### TRACE-1.4: Code blocks left out
+
+Implemented by: T5, extended in Review.
+
+| Case | Kind | Given (fixture) | Expected |
+|---|---|---|---|
+| a | normal | `spec a: CAP-1.1 VB not yet: r`, then a ```` ``` ```` block holding `#### Scenario EX-1.1: S` and `#### Scenario bad`, then a Verified by link after it | `CAP-1.1 not-yet r`, status 0: no EX-1.1 line, no malformed heading, and the later link does not replace the first line |
+| b | edge | as a with a `~~~` block holding `#### Scenario EX-1.1: S` | `CAP-1.1 not-yet r`, status 0 |
 
 ### TRACE-2.1: Passing check
 
@@ -180,6 +213,8 @@ Implemented by: T5.
 | f | edge | `spec a: CAP-1.1 VB   [run](https://example.org/1)   ` (extra spaces both sides) | source `[run](https://example.org/1)`, trimmed |
 | g | edge | `spec a: CAP-1.1`; `spec b: OTH-1.1 VB [run](https://example.org/4)` | `CAP-1.1 uncovered -`: a line in the next file does not reach back |
 | h | failure | `spec a: CAP-1.1` with the paragraph `Verified by: [run](https://example.org/1)` (no bold), or ` **Verified by:** ...` (indented) | `CAP-1.1 uncovered -` |
+| i | edge | `#### Scenario CAP-1.1: S`, the prose line `#66 tracks this`, then `**Verified by:** [run](https://example.org/1)` | `CAP-1.1 evidence [run](https://example.org/1)`: a `#` line that is not a heading keeps the scope |
+| j | edge | `spec a: CAP-1.1 VB` with empty text, then `**Verified by:** [run](https://example.org/1)` | `CAP-1.1 evidence [run](https://example.org/1)`: an empty line does not hide the next one |
 
 ### TRACE-3.2: Not yet
 
@@ -192,6 +227,16 @@ Implemented by: T5.
 | c | edge | `VB not yet: r` and `a_test.sh: ok CAP-1.1; exit 0` | `CAP-1.1 tested a_test.sh` |
 | d | edge | `VB [run](https://example.org/1), not yet reviewed` | `evidence` with the whole text: `not yet` counts only at the start |
 | e | edge | as a with the spec in CRLF | the same line, no `\r` |
+| f | edge | `CAP-1.1 VB Not yet: later`, `CAP-1.2 VB NOT YET` | `CAP-1.1 not-yet later`, `CAP-1.2 not-yet -`, status 0 |
+
+### TRACE-3.3: Neither evidence nor not yet
+
+Implemented by: T5, extended in Review.
+
+| Case | Kind | Given (fixture) | Expected |
+|---|---|---|---|
+| a | failure | `CAP-1.1 VB TODO`, `CAP-1.2 VB see the pull request`, `CAP-1.3 VB [run]`, `CAP-1.4 VB notyet` | all four `uncovered -`, status 1 |
+| b | edge | `CAP-1.1 VB see [run](https://example.org/1)` | `CAP-1.1 evidence see [run](https://example.org/1)`, status 0: the link may be anywhere |
 
 ### TRACE-4.1: Uncovered scenario
 
@@ -215,6 +260,15 @@ Implemented by: T5.
 | c | edge | `specs` and `tests` both empty folders | no output, status 0 |
 | d | failure | as a, plus `b_test.sh` with `exit 1` that prints nothing | the same three lines, status 1: a test file that exits non-zero fails the run even when it names no scenario |
 | e | failure | as a, plus `b_test.sh: ok NOPE-9.9; exit 1` | the same three lines, status 1 |
+
+### TRACE-4.3: Failing test file named
+
+Implemented by: T5, extended in Review.
+
+| Case | Kind | Given (fixture) | Expected |
+|---|---|---|---|
+| a | failure | `spec a: CAP-1.1 VB not yet: r`; `a_test.sh` that only runs `exit 3`; `b_test.sh: ok OTH-1.1; exit 0` | `CAP-1.1 not-yet r`, status 1, standard error holds `trace.sh: a_test.sh exited 3` |
+| b | edge | as a | standard error does not name `b_test.sh` |
 
 ### TRACE-5.1: Other folders
 
@@ -240,3 +294,13 @@ Implemented by: T5.
 
 Zero arguments is the default mode and has no unit case (see the
 conventions); the real specs and tests cover it when T10 runs `trace.sh`.
+
+### TRACE-5.3: Missing folder
+
+Implemented by: T5, extended in Review.
+
+| Case | Kind | Given (fixture) | Expected |
+|---|---|---|---|
+| a | failure | a specs folder that does not exist; a tests folder whose `a_test.sh` writes a file `ran` | status 2, no standard output, standard error `trace.sh: not a folder: <path>`, no `ran` file |
+| b | failure | a tests folder that does not exist | status 2, the folder named on standard error |
+| c | failure | a plain file given as the specs folder | status 2 |
