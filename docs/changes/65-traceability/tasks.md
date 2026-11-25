@@ -91,7 +91,7 @@ and TRACE-5 say. No `gh`, no network.
 - **Complexity:** medium
 - **Owns:** `scripts/tests/trace_test.sh`
 - **Covers:** TRACE-1.1, TRACE-1.2, TRACE-2.1, TRACE-2.2, TRACE-2.3, TRACE-3.1, TRACE-3.2, TRACE-4.1, TRACE-4.2, TRACE-5.1, TRACE-5.2
-- **Status:** todo
+- **Status:** done
 
 Implement the cases in `test-design.md`: build fixture spec and tests
 folders in a temporary directory, run `trace.sh` on them, and check each
