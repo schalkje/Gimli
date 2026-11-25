@@ -57,8 +57,10 @@ follow, the agent reads when it needs it.
    file outside it is reverted and the task returned to the agent once, with
    the list; if it happens again, Build reverts or keeps it and records a
    `## Build: deviation` either way. It is never committed silently.
-   A task the agent cannot finish is fixed by Build as a deviation, or
-   deferred with the agent's changes reverted.
+   A commit the agent made is undone with `git reset --soft` before the
+   check, and recorded. A task the agent cannot finish is fixed by Build as a
+   deviation, with a `Fixed-by: build` line in its commit, or deferred with
+   the agent's changes reverted.
 5. Build sets the task's status and commits, with a line
    `Routed: <agent> <model> <effort>` in the message.
 
@@ -68,5 +70,7 @@ streams side by side without conflicts.
 ## Deterministic before a model
 
 An agent never does what a script or tool does reliably: running tests,
-formatting, checking links, changing labels or merging. It runs the tool,
-reads the result, and fixes what the result shows.
+formatting, checking links, changing labels or merging. An agent with Bash
+runs the tool, reads the result, and fixes what the result shows; one without
+Bash names in its report the checks Build should run. Files a check
+generates are removed again unless the task owns them.

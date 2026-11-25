@@ -74,9 +74,12 @@ packet.
    prints one line per check. It calls no network and no `gh`. Running it in
    CI is later work.
 6. **Agents edit, Build commits.** An agent never commits, pushes, changes a
-   label or posts a comment. A change outside the task's Owns list is either
-   returned to the agent once, with the list, or kept and recorded as a
-   deviation; Build never commits it silently. Recorded in ADR 0004.
+   label or posts a comment; Build undoes an agent's commit before checking.
+   A change outside the task's Owns list is reverted and the task returned
+   to the agent once; a repeat is reverted or kept, and recorded as a
+   deviation either way. Build never commits it silently. Changed in Review
+   from "return once or keep", so the retry can succeed. Recorded in
+   ADR 0004.
 7. **Agent defaults.** Frontmatter `model` and `effort` are the
    medium-complexity cell of the table, so an agent run without routing
    behaves like a medium task.

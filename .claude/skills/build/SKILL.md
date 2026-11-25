@@ -154,10 +154,16 @@ the result and commit. One task at a time:
    scenario IDs in its Covers field, and the Principles section of
    `docs/architecture/README.md`. Paste them into the prompt; do not tell the
    agent to read the whole folder.
-4. Call the Agent tool with `subagent_type` set to the agent, `model` set to
-   the model, and `effort` set to the effort `route.sh` printed. This skill
-   asks for that effort explicitly. Wait for the agent's report.
-5. List what changed with `git status --porcelain --untracked-files=all`.
+4. Note `git rev-parse HEAD`, then call the Agent tool with
+   `subagent_type` set to the agent, `model` set to the model, and `effort`
+   set to the effort `route.sh` printed. This skill asks for that effort
+   explicitly. Wait for the agent's report.
+5. If HEAD moved, the agent committed despite its rules: run
+   `git reset --soft <noted HEAD>` so its work is uncommitted again, and
+   record a deviation; if it also pushed (`git rev-list --count
+   origin/<branch>..<noted HEAD>` no longer matches what you pushed), stop
+   and say so. Then list what changed with
+   `git status --porcelain --untracked-files=all`.
    Every path must be in the task's Owns list. If one is not, revert the
    paths outside it yourself (`git restore --staged --worktree -- <path>`
    for a tracked file, delete an untracked one), then return the task to the
@@ -167,7 +173,9 @@ the result and commit. One task at a time:
    without one of the two.
 6. Read the agent's report. If it says the task is not done, or the checks
    it ran failed, either fix it yourself, recorded as a deviation, and go on
-   to step 7; or defer it: revert every change the agent made, set the task
+   to step 7 with a `Fixed-by: build` line under the `Routed:` line, so the
+   routing record does not count the task as the agent's success; or defer
+   it: revert every change the agent made, set the task
    and every task that depends on it to `deferred` with a deviation entry
    each, and commit only that status change, so the next task starts from a
    clean tree.

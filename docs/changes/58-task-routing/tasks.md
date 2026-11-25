@@ -128,11 +128,12 @@ Build commits", linking ROUTE-3.
 In step 3, for a change folder: for each task, run `scripts/route.sh` on its
 Kind and Complexity, assemble the context packet, call the Agent tool with
 the agent, model and effort; check the
-changed files against Owns (`git status --porcelain`), return the task once
-or record a deviation when they differ, then set the status and commit with
-a `Routed: <agent> <model> <effort>` line. A task
-with no Kind or Complexity, or a `route.sh` error, is a deviation and Build
-stops at the gate. A comment plan is built in the main session, unchanged.
+changed files against Owns (`git status --porcelain`), revert and return
+the task once or record a deviation when they differ, then set the status
+and commit with a `Routed: <agent> <model> <effort>` line. A task with no
+Kind or Complexity, or a `route.sh` error, is deferred with a deviation
+(changed in Review from stopping at the gate, so no task is left `todo`). A
+comment plan is built in the main session, unchanged.
 
 ### T8: Update the process documents
 
