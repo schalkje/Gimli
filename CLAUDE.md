@@ -60,8 +60,8 @@ lifecycle described in `docs/lifecycle.md`.
 - `docs/workflow-dependencies.md`: what the workflows pin and load, and how to
   update a pin or re-vendor the plugin.
 - `docs/repository-settings.md`: the `protect-main` ruleset and merge settings.
-- `scripts/`: the stage, risk and guard helpers and the ruleset setup,
-  documented in `scripts/README.md`.
+- `scripts/`: the stage, risk, guard and routing helpers and the ruleset
+  setup, documented in `scripts/README.md`; their tests in `scripts/tests/`.
 - `.github/workflows/`: the AI review (`claude-code-review.yml`) and the
   mention workflow (`claude.yml`).
 - `.github/ISSUE_TEMPLATE/`: the work item template that starts the cycle.
@@ -70,6 +70,8 @@ lifecycle described in `docs/lifecycle.md`.
 - `.claude/skills/`: one skill per automated lifecycle stage, invoked as
   `/<stage> <issue>`. The table at the end of `docs/lifecycle.md` says which
   stages have one.
+- `.claude/agents/`: one agent per task kind (`gimli-<kind>`), which `/build`
+  hands the tasks of a change folder to; see `docs/architecture/agents.md`.
 - `.claude-plugin/marketplace.json` and `vendor/claude-plugins/`: the
   `code-review` plugin the AI review workflow runs, vendored verbatim from
   upstream into `vendor/claude-plugins/code-review/`. Never edit that copy by

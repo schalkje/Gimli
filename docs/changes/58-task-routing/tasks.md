@@ -142,7 +142,7 @@ stops at the gate. A comment plan is built in the main session, unchanged.
 - **Complexity:** medium
 - **Owns:** `docs/lifecycle.md`, `docs/changes/README.md`, `CLAUDE.md`, `README.md`
 - **Covers:** none
-- **Status:** todo
+- **Status:** done
 
 `docs/lifecycle.md`: the Build activity says tasks of a change folder are
 routed to agents, linking the spec. `docs/changes/README.md`: Kind and
