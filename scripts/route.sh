@@ -51,6 +51,7 @@ case "$KIND/$LEVEL" in
   review/low)        CELL="sonnet high" ;;
   review/medium)     CELL="opus medium" ;;
   review/high)       CELL="opus high" ;;
+  *) echo "$PROG: no route for $KIND/$LEVEL" >&2; exit 2 ;;
 esac
 
 echo "gimli-$KIND $CELL"

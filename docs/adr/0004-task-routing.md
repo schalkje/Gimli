@@ -59,8 +59,8 @@ much of the work needs no model at all.
 ## Consequences
 
 - A kind added to `docs/changes/README.md` also needs an agent, a row in the
-  routing table and a change to `route.sh`; the routing test fails until the
-  table and the script agree.
+  routing table, a change to `route.sh`, and the kind list and cell count in
+  the routing test; the test fails until all of them agree.
 - The table is a starting policy, not a measurement. Each routed commit
   carries a `Routed: <agent> <model> <effort>` line, the first data for
   measuring it later (#46, Track D).
