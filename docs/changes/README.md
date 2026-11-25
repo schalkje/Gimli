@@ -87,8 +87,9 @@ The kinds and complexity levels are a fixed list, so Build can choose an
 agent, model and effort from them, as the
 [task routing spec](../specs/task-routing/spec.md) says. Adding a kind is a
 change to this document, and also needs an agent in `.claude/agents/`, a row
-in the routing table, a change to `scripts/route.sh`, and the kind list and
-cell count in `scripts/tests/route_test.sh`.
+in the routing table and a change to `scripts/route.sh`;
+`scripts/tests/route_test.sh` reads the kinds from the table and fails until
+the table and the script agree.
 
 A task that defines what other streams build on, such as an interface or a
 format, comes first, and the other streams depend on it.

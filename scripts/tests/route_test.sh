@@ -38,7 +38,8 @@ check_route() {
 }
 
 # check_invalid <label> <expected on stderr> <args...>: status 2, nothing on
-# standard output, and standard error contains the expected text.
+# standard output, and standard error contains the expected text, or equals
+# it exactly when the expected text starts with "=".
 check_invalid() {
   _label=$1
   _want=$2
@@ -46,9 +47,13 @@ check_invalid() {
   _err=$(sh "$ROUTE" "$@" 2>&1 >/dev/null)
   _out=$(sh "$ROUTE" "$@" 2>/dev/null)
   _status=$?
-  case "$_err" in
-    *"$_want"*) _named=yes ;;
-    *) _named=no ;;
+  case "$_want" in
+    "=$_err") _named=yes ;;
+    =*) _named=no ;;
+    *) case "$_err" in
+         *"$_want"*) _named=yes ;;
+         *) _named=no ;;
+       esac ;;
   esac
   if [ "$_status" -eq 2 ] && [ -z "$_out" ] && [ "$_named" = yes ]; then
     ok "$_label: route.sh $* -> status 2, no output, names '$_want'"
@@ -82,20 +87,24 @@ done <<EOF
 $ROWS
 EOF
 
-# A parse that finds too few cells must not pass.
-if [ "$CELLS" -eq 21 ]; then
-  ok "ROUTE-1.4: the spec's table has 21 cells"
+# The kinds in the spec's table, in order. A parse that finds no rows, or
+# rows without three cells, must not pass.
+SPEC_KINDS=$(echo "$ROWS" | awk 'NF { printf "%s%s", sep, $1; sep = " " }')
+NKINDS=$(echo "$SPEC_KINDS" | wc -w | tr -d ' ')
+if [ "$NKINDS" -gt 0 ] && [ "$CELLS" -eq $((NKINDS * 3)) ]; then
+  ok "ROUTE-1.4: the spec's table has $CELLS cells for $NKINDS kinds"
 else
-  not_ok "ROUTE-1.4: the spec's table has $CELLS cells, expected 21"
+  not_ok "ROUTE-1.4: the spec's table has $CELLS cells for $NKINDS kinds, expected three per kind"
 fi
 
 check_route "ROUTE-1.1" implement high "gimli-implement opus high"
 check_route "ROUTE-1.2" docs low "gimli-docs haiku low"
 check_route "ROUTE-1.3" review low "gimli-review sonnet high"
 
-KINDS="design spec implement test-unit test-e2e docs review"
+# ROUTE-2.1 compares the whole message, so route.sh naming a kind the spec
+# lacks, or lacking one it has, fails here.
 USAGE="route.sh <kind> <complexity>"
-check_invalid "ROUTE-2.1" "Valid: $KINDS" deploy low
+check_invalid "ROUTE-2.1" "=route.sh: unknown kind 'deploy'. Valid: $SPEC_KINDS" deploy low
 check_invalid "ROUTE-2.2" "Valid: low medium high" implement extreme
 check_invalid "ROUTE-2.3" "$USAGE"
 check_invalid "ROUTE-2.3" "$USAGE" implement
