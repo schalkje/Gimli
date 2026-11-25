@@ -24,7 +24,7 @@ T1 is the contract: every other stream depends on the spec it writes.
 - **Kind:** spec
 - **Complexity:** medium
 - **Owns:** `docs/specs/traceability/spec.md`, `docs/specs/README.md`
-- **Covers:** TRACE-1.1, TRACE-1.2, TRACE-2.1, TRACE-2.2, TRACE-2.3, TRACE-3.1, TRACE-3.2, TRACE-4.1, TRACE-4.2, TRACE-5.1, TRACE-5.2
+- **Covers:** TRACE-1.1, TRACE-1.2, TRACE-1.3, TRACE-1.4, TRACE-1.5, TRACE-2.1, TRACE-2.2, TRACE-2.3, TRACE-3.1, TRACE-3.2, TRACE-3.3, TRACE-4.1, TRACE-4.2, TRACE-4.3, TRACE-5.1, TRACE-5.2, TRACE-5.3
 - **Status:** done
 
 Create the living spec from [the delta](specs/traceability/delta.md), using
@@ -56,7 +56,7 @@ file, or grepping test files. Status `Accepted`, the next number unused on
 - **Kind:** design
 - **Complexity:** medium
 - **Owns:** `docs/changes/_template/test-design.md`, `docs/changes/65-traceability/test-design.md`
-- **Covers:** TRACE-1.1, TRACE-1.2, TRACE-2.1, TRACE-2.2, TRACE-2.3, TRACE-3.1, TRACE-3.2, TRACE-4.1, TRACE-4.2, TRACE-5.1, TRACE-5.2
+- **Covers:** TRACE-1.1, TRACE-1.2, TRACE-1.3, TRACE-1.4, TRACE-1.5, TRACE-2.1, TRACE-2.2, TRACE-2.3, TRACE-3.1, TRACE-3.2, TRACE-3.3, TRACE-4.1, TRACE-4.2, TRACE-4.3, TRACE-5.1, TRACE-5.2, TRACE-5.3
 - **Status:** done
 
 Write the template: per scenario, its ID, the cases to test (normal, edge,
@@ -73,7 +73,7 @@ endings, and an empty tests folder.
 - **Kind:** implement
 - **Complexity:** medium
 - **Owns:** `scripts/trace.sh`
-- **Covers:** TRACE-1.1, TRACE-1.2, TRACE-2.1, TRACE-2.2, TRACE-2.3, TRACE-3.1, TRACE-3.2, TRACE-4.1, TRACE-4.2, TRACE-5.1, TRACE-5.2
+- **Covers:** TRACE-1.1, TRACE-1.2, TRACE-1.3, TRACE-1.4, TRACE-1.5, TRACE-2.1, TRACE-2.2, TRACE-2.3, TRACE-3.1, TRACE-3.2, TRACE-3.3, TRACE-4.1, TRACE-4.2, TRACE-4.3, TRACE-5.1, TRACE-5.2, TRACE-5.3
 - **Status:** done
 
 POSIX shell, following `route.sh`: a usage header, `lib.sh` for `usage`,
@@ -90,7 +90,7 @@ and TRACE-5 say. No `gh`, no network.
 - **Kind:** test-unit
 - **Complexity:** medium
 - **Owns:** `scripts/tests/trace_test.sh`
-- **Covers:** TRACE-1.1, TRACE-1.2, TRACE-2.1, TRACE-2.2, TRACE-2.3, TRACE-3.1, TRACE-3.2, TRACE-4.1, TRACE-4.2, TRACE-5.1, TRACE-5.2
+- **Covers:** TRACE-1.1, TRACE-1.2, TRACE-1.3, TRACE-1.4, TRACE-1.5, TRACE-2.1, TRACE-2.2, TRACE-2.3, TRACE-3.1, TRACE-3.2, TRACE-3.3, TRACE-4.1, TRACE-4.2, TRACE-4.3, TRACE-5.1, TRACE-5.2, TRACE-5.3
 - **Status:** done
 
 Implement the cases in `test-design.md`: build fixture spec and tests
@@ -109,10 +109,12 @@ can fail.
 - **Covers:** none
 - **Status:** done
 
-Every STAGE scenario gets `**Verified by:** not yet: stage.sh calls gh;
-needs a gh stub, #66.` ROUTE-3.1 to 3.3 get a link to the fixture
+Every STAGE scenario gets `**Verified by:** not yet: stage.sh calls gh, so
+its test needs a gh stub, #66.` ROUTE-3.1 and 3.2 get a link to the fixture
 run on #60 (PR #62, summarised in PR #59), and ROUTE-4.1 to the run on #61
-(PR #63). ROUTE-1 and ROUTE-2 get none; `route_test.sh` covers them.
+(PR #63). ROUTE-3.3 gets `not yet`, pointing at #64: that run never showed
+it (a Build deviation). ROUTE-1 and ROUTE-2 get none; `route_test.sh`
+covers them.
 
 ### T7: Add the test-design kind
 

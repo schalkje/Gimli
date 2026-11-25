@@ -11,10 +11,13 @@ with prefix `TRACE`. The format is in
 
 The system SHALL print one line per scenario heading in the capability specs,
 `<ID> <status> <source>`, in the order of the spec files and of the
-scenarios in them, leaving out the spec template and fenced code blocks. A
-line starting `#### Scenario` that is not a heading
-`#### Scenario <ID>: <name>` SHALL get no line, be named on standard error
-with its file and line number, and make the run exit with status 1.
+scenarios in them, leaving out the spec template and fenced code blocks; a
+fence closes only on a line of the same character, at least as long. A
+heading `#### Scenario` followed by a space or the end of the line that does
+not start `#### Scenario <ID>:` SHALL get no line, be named on standard
+error with its file and line number, and make the run exit with status 1.
+So SHALL a scenario ID that heads more than one scenario, named with both
+places; each heading still gets its line.
 
 #### Scenario TRACE-1.1: Every scenario
 
@@ -43,6 +46,14 @@ with its file and line number, and make the run exit with status 1.
   fenced code block
 - **WHEN** `scripts/trace.sh` runs
 - **THEN** no line names EX-1.1
+
+#### Scenario TRACE-1.5: Duplicate scenario ID
+
+- **GIVEN** two scenario headings with the ID CAP-1.1
+- **WHEN** `scripts/trace.sh` runs
+- **THEN** standard error names the second heading's file and line and the
+  first one's
+- **AND** it exits with status 1
 
 ### Requirement TRACE-2: Tested by a passing check
 
@@ -105,7 +116,7 @@ precedence over the line.
 
 The system SHALL exit with status 1 when any scenario is `uncovered` or
 `failing`, a test file exits non-zero, or a scenario heading is malformed
-(TRACE-1), and with status 0 otherwise. It SHALL name on standard error each
+or reuses an ID (TRACE-1), and with status 0 otherwise. It SHALL name on standard error each
 test file that exits non-zero, with its status; standard output holds only
 the scenario lines.
 

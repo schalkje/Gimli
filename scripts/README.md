@@ -150,17 +150,18 @@ Windows. The output is one line per scenario, `<ID> <status> <source>`:
 | `failing` | A test prints a `FAIL <ID>:` line, or its file exits non-zero | the file |
 | `uncovered` | None of the above, including Verified by text that is neither | `-` |
 
-Standard error names each test file that exits non-zero, and each
-`#### Scenario` line that is not a well-formed heading, with its file and
-line; headings inside fenced code blocks are skipped.
+Standard error names each test file that exits non-zero, each
+`#### Scenario` line that is not a well-formed heading, and each scenario
+ID used by more than one heading, with file and line; headings inside
+fenced code blocks are skipped.
 
 The Verified by format is in the [spec format](../docs/specs/README.md).
 
 | Exit | Meaning |
 |---|---|
-| 0 | No scenario is uncovered or failing, every test file exited 0, and every scenario heading is well formed |
-| 1 | A scenario is uncovered or failing, a test file exited non-zero, or a scenario heading is malformed |
-| 2 | Usage error: not zero or two arguments, or a folder that does not exist |
+| 0 | No scenario is uncovered or failing, every test file exited 0, and every scenario heading is well formed with its own ID |
+| 1 | A scenario is uncovered or failing, a test file exited non-zero, or a scenario heading is malformed or reuses an ID |
+| 2 | Usage error: not zero or two arguments, or a path that is not a folder |
 
 The rules are the [traceability spec](../docs/specs/traceability/spec.md);
 why they are so is [ADR 0005](../docs/adr/0005-traceability.md).

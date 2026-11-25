@@ -243,6 +243,30 @@ mkspec a "CAP-1.1|not yet: r"
 printf '%s\n' '~~~' '#### Scenario EX-1.1: S' '~~~' >> "$S/a/spec.md"
 chk "TRACE-1.4: b, a tilde fence too" 0 "CAP-1.1 not-yet r"
 
+fx 14c
+mkspec a "CAP-1.1|not yet: r"
+printf '%s\n' '~~~md' '```sh' 'echo hi' '~~~' '' '#### Scenario CAP-1.2: After' '' '**Verified by:** not yet: s' >> "$S/a/spec.md"
+chk "TRACE-1.4: c, the other fence character does not close a block" 0 "$(lines 'CAP-1.1 not-yet r' 'CAP-1.2 not-yet s')"
+
+fx 14d
+mkspec a "CAP-1.1|not yet: r"
+printf '%s\n' '````' '```' '#### Scenario EX-1.1: S' '```' '````' >> "$S/a/spec.md"
+chk "TRACE-1.4: d, a shorter fence does not close a block" 0 "CAP-1.1 not-yet r"
+
+# ---- TRACE-1.5: Duplicate scenario ID
+
+fx 15a
+mkspec a "CAP-1.1|not yet: r"
+printf '%s\n' '#### Scenario CAP-1.1: Copy' >> "$S/a/spec.md"
+chk "TRACE-1.5: a, an ID used twice in a file fails" 1 "$(lines 'CAP-1.1 not-yet r' 'CAP-1.1 not-yet r')"
+check_err "TRACE-1.5: a, standard error names both places" "a/spec.md:13: duplicate scenario ID CAP-1.1, first at"
+
+fx 15b
+mkspec a "CAP-1.1|not yet: r"
+mkspec b "CAP-1.1|not yet: s"
+chk_ids "TRACE-1.5: b, an ID used in two files fails" 1 "$(lines CAP-1.1 CAP-1.1)"
+check_err "TRACE-1.5: b, standard error names the second file" "b/spec.md:5: duplicate scenario ID CAP-1.1"
+
 # ---- TRACE-2.1: Passing check
 
 fx 21a

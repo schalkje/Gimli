@@ -8,8 +8,9 @@
 # Status: tested (a test file exits 0 and prints "ok <ID>:"), evidence or
 # not-yet (a "**Verified by:**" line under the scenario), failing, uncovered.
 # The source is "-" when there is none. Exit 1 when a scenario is uncovered or
-# failing, a test file exits non-zero, or a "#### Scenario" line is not a
-# well-formed heading; exit 2 when a folder is missing. The rules are in
+# failing, a test file exits non-zero, a "#### Scenario" line is not a
+# well-formed heading, or two headings share an ID; exit 2 on a usage error
+# or a path that is not a folder. The rules are in
 # docs/specs/traceability/spec.md; scripts/tests/trace_test.sh checks them.
 
 set -eu
@@ -41,22 +42,30 @@ BAD=0
 # lib.sh turned globbing off; the two loops below need it.
 set +f
 
-# Records, in file and heading order: "S<TAB>ID" per scenario heading,
-# "V<TAB>ID<TAB>text" for its first non-empty Verified by line, and
+# Records, in file and heading order: "S<TAB>ID<TAB>file:line" per scenario
+# heading, "V<TAB>ID<TAB>text" for its first non-empty Verified by line, and
 # "M<TAB>file:line<TAB>text" per "#### Scenario" line that does not parse.
-# Lines in fenced code blocks are skipped; a heading is #s and a space.
+# Lines in fenced code blocks are skipped; a fence closes only on the same
+# character, at least as many times. A heading is #s and a space.
 for f in "$SPECS"/*/spec.md; do
   [ -e "$f" ] || continue
   case $f in */_template/spec.md) continue ;; esac
   awk '
     { sub(/\r$/, "") }
-    /^(```|~~~)/ { fence = !fence; next }
+    /^(```|~~~)/ {
+      c = substr($0, 1, 1)
+      n = 0
+      while (substr($0, n + 1, 1) == c) n++
+      if (!fence) { fence = 1; fc = c; fl = n }
+      else if (c == fc && n >= fl && substr($0, n + 1) ~ /^[ \t]*$/) fence = 0
+      next
+    }
     fence { next }
     /^#+( |$)/ {
       cur = ""
       if (match($0, /^#### Scenario [A-Z]+-[0-9]+\.[0-9]+:/)) {
         cur = substr($0, 15, RLENGTH - 15)
-        print "S\t" cur
+        print "S\t" cur "\t" FILENAME ":" FNR
       } else if ($0 ~ /^#### Scenario( |$)/) {
         print "M\t" FILENAME ":" FNR "\t" $0
       }
@@ -130,6 +139,16 @@ while IFS=$TAB read -r kind loc text; do
   echo "trace.sh: $loc: not a scenario heading: $text" >&2
   BAD=1
 done < "$WORK/records"
+awk -F'\t' '
+  $1 == "S" {
+    if ($2 in at) print "trace.sh: " $3 ": duplicate scenario ID " $2 ", first at " at[$2]
+    else at[$2] = $3
+  }
+' "$WORK/records" > "$WORK/dups"
+if [ -s "$WORK/dups" ]; then
+  cat "$WORK/dups" >&2
+  BAD=1
+fi
 if grep -Eq '^[^ ]+ (uncovered|failing) ' "$WORK/lines"; then
   BAD=1
 fi

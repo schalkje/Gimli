@@ -44,8 +44,13 @@ T4 and T5 both follow these. Where the spec is silent, this is the decision.
   `#### Scenario` and a space or the end, such as one without the colon or
   with a digit in the prefix, is malformed: no line, a message
   `trace.sh: <file>:<line>: not a scenario heading: <line>` on standard
-  error, and status 1. Lines inside a fenced code block, from a line
-  starting ```` ``` ```` or `~~~` to the next, are skipped.
+  error, and status 1. Lines inside a fenced code block are skipped: it
+  opens on a line starting ```` ``` ```` or `~~~` and closes only on a line
+  of the same character, at least as many, and nothing after them but
+  spaces. An ID heading a second scenario, in the same or a later file,
+  prints its line as usual, adds `trace.sh: <file>:<line>: duplicate
+  scenario ID <ID>, first at <file>:<line>` on standard error, and gives
+  status 1.
 - A heading is a line of one or more `#` followed by a space or the end; a
   line such as `#66 tracks this` is prose.
 - A `**Verified by:**` line belongs to the nearest scenario heading above it,
@@ -77,7 +82,7 @@ T4 and T5 both follow these. Where the spec is silent, this is the decision.
   `:`, trimmed; `-` when that is empty, and for `uncovered`.
 - Exit status 1 when any line is `uncovered` or `failing`, any test file
   exits non-zero even if it names nothing, or a scenario heading is
-  malformed; else 0. All scenario lines are printed first in every case,
+  malformed or reuses an ID; else 0. All scenario lines are printed first in every case,
   standard output holds only those lines. Each test file that exits
   non-zero is named on standard error as `trace.sh: <file> exited <status>`.
 - A specs or tests folder that is not a directory exits 2 with
@@ -156,6 +161,17 @@ Implemented by: T5, extended in Review.
 |---|---|---|---|
 | a | normal | `spec a: CAP-1.1 VB not yet: r`, then a ```` ``` ```` block holding `#### Scenario EX-1.1: S` and `#### Scenario bad`, then a Verified by link after it | `CAP-1.1 not-yet r`, status 0: no EX-1.1 line, no malformed heading, and the later link does not replace the first line |
 | b | edge | as a with a `~~~` block holding `#### Scenario EX-1.1: S` | `CAP-1.1 not-yet r`, status 0 |
+| c | edge | as a, then a `~~~md` block holding a ```` ```sh ```` line, then `#### Scenario CAP-1.2: After VB not yet: s` | both lines, status 0: the other fence character does not close the block |
+| d | edge | as a, then a ```` ```` ```` block holding ```` ``` ````, `#### Scenario EX-1.1: S` and ```` ``` ```` | `CAP-1.1 not-yet r`, status 0: a shorter fence does not close it |
+
+### TRACE-1.5: Duplicate scenario ID
+
+Implemented by: T5, extended in Review.
+
+| Case | Kind | Given (fixture) | Expected |
+|---|---|---|---|
+| a | failure | `spec a: CAP-1.1 VB not yet: r`, then `#### Scenario CAP-1.1: Copy` (line 13) | `CAP-1.1 not-yet r` twice, status 1, standard error `a/spec.md:13: duplicate scenario ID CAP-1.1, first at ...` |
+| b | failure | `spec a: CAP-1.1 VB not yet: r`; `spec b: CAP-1.1 VB not yet: s` | IDs `CAP-1.1` twice, status 1, standard error names `b/spec.md:5` |
 
 ### TRACE-2.1: Passing check
 

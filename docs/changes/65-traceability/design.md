@@ -71,7 +71,8 @@ This section is the plan's Documentation entry.
 - `docs/specs/stage-transitions/spec.md`: a not-yet Verified by line per
   scenario, linking the follow-up, #66.
 - `docs/specs/task-routing/spec.md`: the `test-design` row and ROUTE-1.4,
-  from the delta; evidence Verified by lines for ROUTE-3 and ROUTE-4.
+  from the delta; evidence Verified by lines for ROUTE-3.1, 3.2 and 4.1, and
+  not yet for ROUTE-3.3 (#64).
 - `docs/adr/0005-traceability.md` (new): decisions 1 to 3; a row in the
   index of `docs/adr/README.md`.
 - `scripts/trace.sh` and `scripts/tests/trace_test.sh` (new): a `trace.sh`
