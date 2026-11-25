@@ -91,10 +91,18 @@ EOF
 # rows without three cells, must not pass.
 SPEC_KINDS=$(echo "$ROWS" | awk 'NF { printf "%s%s", sep, $1; sep = " " }')
 NKINDS=$(echo "$SPEC_KINDS" | wc -w | tr -d ' ')
-if [ "$NKINDS" -gt 0 ] && [ "$CELLS" -eq $((NKINDS * 3)) ]; then
+# Every body row of the table, parsed or not, so a row with a missing cell
+# cannot drop out unnoticed.
+TABLE_ROWS=$(awk '
+  /^### Requirement ROUTE-1:/ { inreq = 1; next }
+  inreq && /^#/ { exit }
+  inreq && /^\| *[a-z]/ && !/^\| *Kind *\|/ { n++ }
+  END { print n + 0 }
+' "$SPEC")
+if [ "$NKINDS" -gt 0 ] && [ "$NKINDS" -eq "$TABLE_ROWS" ] && [ "$CELLS" -eq $((NKINDS * 3)) ]; then
   ok "ROUTE-1.4: the spec's table has $CELLS cells for $NKINDS kinds"
 else
-  not_ok "ROUTE-1.4: the spec's table has $CELLS cells for $NKINDS kinds, expected three per kind"
+  not_ok "ROUTE-1.4: the spec's table has $TABLE_ROWS rows, $NKINDS of them with three cells"
 fi
 
 check_route "ROUTE-1.1" implement high "gimli-implement opus high"
