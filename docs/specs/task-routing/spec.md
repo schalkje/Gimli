@@ -82,7 +82,8 @@ name the valid values when its input is invalid.
 
 #### Scenario ROUTE-2.3: Wrong number of arguments
 
-- **WHEN** `scripts/route.sh` runs with no arguments, one, or more than two
+- **WHEN** `scripts/route.sh` runs with no arguments, with one argument other
+  than `--table`, or with more than two
 - **THEN** it prints its usage and exits with status 2
 
 ### Requirement ROUTE-3: Delegate the tasks of a change folder
@@ -131,6 +132,21 @@ delegating.
 - **WHEN** `/build` runs
 - **THEN** it implements the plan's Steps in the main session and calls no
   `gimli-*` agent
+
+### Requirement ROUTE-5: Print the routing table
+
+Given `--table` as its only argument, the system SHALL print every cell of the
+table in ROUTE-1, one line per cell, as
+`<kind> <complexity> <agent> <model> <effort>`, in the table's order of kinds
+and of complexity levels, and exit with status 0.
+
+#### Scenario ROUTE-5.1: Whole table
+
+- **WHEN** `scripts/route.sh --table` runs
+- **THEN** it prints 21 lines, starting with
+  `design low gimli-design sonnet medium`
+- **AND** each line agrees with `scripts/route.sh <kind> <complexity>` for
+  that cell
 
 ## Retired scenario IDs
 

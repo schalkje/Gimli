@@ -23,7 +23,7 @@ T1 is the contract: streams B and C depend on the scenario it writes.
 - **Complexity:** low
 - **Owns:** `docs/specs/task-routing/spec.md`
 - **Covers:** ROUTE-2.3, ROUTE-5.1
-- **Status:** todo
+- **Status:** done
 
 Apply [the delta](specs/task-routing/delta.md) to the living spec: add
 ROUTE-5 after ROUTE-4, and replace ROUTE-2.3 with its new text.
