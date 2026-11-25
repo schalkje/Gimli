@@ -111,3 +111,4 @@ ADDED, MODIFIED and REMOVED.
 | Change folder | Issue |
 |---|---|
 | [`52-change-folder`](52-change-folder/design.md) | #52: the change folder and tasks format |
+| [`58-task-routing`](58-task-routing/design.md) | #58: agent roster and model routing for tasks |
