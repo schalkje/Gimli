@@ -110,7 +110,7 @@ trailing whitespace like the comment's first line, and must be one line.
 
 Print the agent, model and effort for a task of a change folder, from its
 Kind and Complexity in `tasks.md`. `/build` runs it for each task it hands to
-an agent. Reads nothing and calls no `gh`.
+an [agent](../docs/architecture/agents.md). Reads nothing and calls no `gh`.
 
 ```sh
 scripts/route.sh implement high   # gimli-implement opus high
