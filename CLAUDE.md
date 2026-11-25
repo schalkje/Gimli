@@ -60,8 +60,8 @@ lifecycle described in `docs/lifecycle.md`.
 - `docs/workflow-dependencies.md`: what the workflows pin and load, and how to
   update a pin or re-vendor the plugin.
 - `docs/repository-settings.md`: the `protect-main` ruleset and merge settings.
-- `scripts/`: the stage, risk, guard and routing helpers and the ruleset
-  setup, documented in `scripts/README.md`; their tests in `scripts/tests/`.
+- `scripts/`: the stage, risk, guard, routing and traceability helpers and the
+  ruleset setup, documented in `scripts/README.md`; their tests in `scripts/tests/`.
 - `.github/workflows/`: the AI review (`claude-code-review.yml`) and the
   mention workflow (`claude.yml`).
 - `.github/ISSUE_TEMPLATE/`: the work item template that starts the cycle.

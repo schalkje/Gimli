@@ -155,7 +155,7 @@ rule in `docs/changes/README.md` instead of restating it.
 - **Complexity:** medium
 - **Owns:** `docs/lifecycle.md`, `.github/PULL_REQUEST_TEMPLATE.md`, `scripts/README.md`, `docs/architecture/README.md`, `docs/architecture/agents.md`, `README.md`, `CLAUDE.md`
 - **Covers:** none
-- **Status:** todo
+- **Status:** done
 
 `docs/lifecycle.md`: Test runs `scripts/trace.sh`; Evidence pastes its lines
 for the scenarios the change touches. The pull request template's Test

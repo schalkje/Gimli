@@ -154,9 +154,9 @@ Automated tests are run against the change.
 | | |
 |---|---|
 | Entry | Draft pull request exists with `stage:test`. |
-| Activity | Run the full automated test suite locally and in CI. Run any manual or exploratory checks the plan called for. Fix failures and return to Build if the fix is non-trivial. |
+| Activity | Run the full automated test suite locally and in CI. Run `scripts/trace.sh`, which runs every test and reports each spec scenario as tested, evidenced, not yet or uncovered ([traceability spec](specs/traceability/spec.md)). Run any manual or exploratory checks the plan called for. Fix failures and return to Build if the fix is non-trivial. |
 | Artifact | Green CI on the pull request. Test output captured. |
-| Exit | CI is green. Every acceptance criterion has at least one test or check that exercises it. |
+| Exit | CI is green. `scripts/trace.sh` exits 0: no scenario is uncovered or failing. Every acceptance criterion has at least one test or check that exercises it. |
 | Label | `stage:evidence` |
 
 ### 6. Evidence
@@ -166,7 +166,7 @@ The pull request is completed with everything a reviewer needs.
 | | |
 |---|---|
 | Entry | `stage:evidence`. |
-| Activity | Fill the pull request template: summary, linked issue, acceptance criteria and evidence (one row per criterion, keyed by the criterion's `AC<n>` identifier), documentation (the documents updated, starting from the plan's list), test output or screenshots, known limitations, deviations from plan (summarising the deviation comments on the issue). Leave the Risk assessment section for the Assess stage. |
+| Activity | Fill the pull request template: summary, linked issue, acceptance criteria and evidence (one row per criterion, keyed by the criterion's `AC<n>` identifier), documentation (the documents updated, starting from the plan's list), test output, including the `scripts/trace.sh` lines for the scenarios the change touches, or screenshots, known limitations, deviations from plan (summarising the deviation comments on the issue). Leave the Risk assessment section for the Assess stage. |
 | Artifact | A complete pull request body following `.github/PULL_REQUEST_TEMPLATE.md`. |
 | Exit | Each acceptance criterion has a stated evidence item. The Documentation section lists the documents updated, or `None, because <reason>`; an empty section or a bare `None` does not meet this criterion (see the [documentation rule](#documentation-rule)). The pull request is marked ready for review, which starts the AI review workflow (see Review); it runs while Assess is under way. |
 | Label | `stage:assess` |
@@ -281,7 +281,7 @@ executed by a person working with Claude Code interactively, using
 | Refine | `/refine <issue>` skill in `.claude/skills/refine/` |
 | Plan | `/plan <issue>` skill in `.claude/skills/plan/` |
 | Build | `/build <issue>` skill in `.claude/skills/build/` |
-| Test | Manual |
+| Test | Manual, with `scripts/trace.sh` |
 | Evidence | Pull request template `.github/PULL_REQUEST_TEMPLATE.md`, filled manually |
 | Assess | Manual |
 | Review | AI review via `.github/workflows/claude-code-review.yml` when the pull request is marked ready; `/code-review <pr>` as local fallback. See [`ai-review.md`](ai-review.md) |

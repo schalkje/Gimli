@@ -20,6 +20,7 @@ every call.
 | [`gimli-design`](../../.claude/agents/gimli-design.md) | `design` | sonnet, high | Read, Grep, Glob, Edit, Write | Yes |
 | [`gimli-spec`](../../.claude/agents/gimli-spec.md) | `spec` | sonnet, high | Read, Grep, Glob, Edit, Write | Yes |
 | [`gimli-implement`](../../.claude/agents/gimli-implement.md) | `implement` | sonnet, medium | Read, Grep, Glob, Edit, Write, Bash | Yes |
+| [`gimli-test-design`](../../.claude/agents/gimli-test-design.md) | `test-design` | sonnet, high | Read, Grep, Glob, Edit, Write | Yes |
 | [`gimli-test-unit`](../../.claude/agents/gimli-test-unit.md) | `test-unit` | sonnet, low | Read, Grep, Glob, Edit, Write, Bash | Yes |
 | [`gimli-test-e2e`](../../.claude/agents/gimli-test-e2e.md) | `test-e2e` | sonnet, medium | Read, Grep, Glob, Edit, Write, Bash | Yes |
 | [`gimli-docs`](../../.claude/agents/gimli-docs.md) | `docs` | sonnet, medium | Read, Grep, Glob, Edit, Write | Yes |

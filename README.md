@@ -98,7 +98,7 @@ The lifecycle above is the target. Today the stages are carried out like this (f
 | 🟦 | Refine | `/refine <issue>` skill |
 | 🟦 | Plan | `/plan <issue>` skill |
 | 🟦 | Build | `/build <issue>` skill; runs unattended only for `risk:low` issues |
-| ⬜ | Test | Manual |
+| ⬜ | Test | Manual, with `scripts/trace.sh` |
 | ⬜ | Evidence | Pull request template [`.github/PULL_REQUEST_TEMPLATE.md`](.github/PULL_REQUEST_TEMPLATE.md), filled manually |
 | ⬜ | Assess | Manual |
 | 🟩 🟨 | Review | AI review by a GitHub workflow when the pull request is marked ready; `/code-review <pr>` as local fallback. Human review as the risk tier requires |
@@ -161,7 +161,7 @@ The documentation is layered: start here and follow the links down. The
 
 | Document | What it covers |
 |---|---|
-| [`scripts/README.md`](scripts/README.md) | `stage.sh`, `risk.sh`, `guard.sh`, `route.sh`, `protect-main.sh`, the shared `lib.sh` and the tests: usage, behaviour and exit codes. |
+| [`scripts/README.md`](scripts/README.md) | `stage.sh`, `risk.sh`, `guard.sh`, `route.sh`, `trace.sh`, `protect-main.sh`, the shared `lib.sh` and the tests: usage, behaviour and exit codes. |
 | [`.claude/skills/_shared/preamble.md`](.claude/skills/_shared/preamble.md) | The steps every stage skill starts with: argument parsing, interactive or not, stage check, and the duplicate guard. |
 | [`.claude/skills/refine/SKILL.md`](.claude/skills/refine/SKILL.md) | The `/refine` skill. |
 | [`.claude/skills/plan/SKILL.md`](.claude/skills/plan/SKILL.md) | The `/plan` skill. |
@@ -171,6 +171,7 @@ The documentation is layered: start here and follow the links down. The
 | [`.claude/agents/gimli-implement.md`](.claude/agents/gimli-implement.md) | The agent for `implement` tasks. |
 | [`.claude/agents/gimli-test-unit.md`](.claude/agents/gimli-test-unit.md) | The agent for `test-unit` tasks. |
 | [`.claude/agents/gimli-test-e2e.md`](.claude/agents/gimli-test-e2e.md) | The agent for `test-e2e` tasks. |
+| [`.claude/agents/gimli-test-design.md`](.claude/agents/gimli-test-design.md) | The agent for `test-design` tasks. |
 | [`.claude/agents/gimli-docs.md`](.claude/agents/gimli-docs.md) | The agent for `docs` tasks. |
 | [`.claude/agents/gimli-review.md`](.claude/agents/gimli-review.md) | The agent for `review` tasks. |
 | [`.github/PULL_REQUEST_TEMPLATE.md`](.github/PULL_REQUEST_TEMPLATE.md) | The pull request body that carries the evidence and the final risk assessment. |
@@ -192,7 +193,7 @@ The documentation is layered: start here and follow the links down. The
 │   ├── architecture/             how Gimli is built
 │   ├── adr/                      architecture decision records: why
 │   └── changes/                  change folders: how each large change is planned
-├── scripts/                      stage, risk, guard and routing helpers, ruleset setup, tests
+├── scripts/                      stage, risk, guard, routing and traceability helpers, ruleset setup, tests
 ├── .claude/skills/               one skill per automated lifecycle stage
 ├── .claude/agents/               one agent per task kind, for /build
 ├── .github/ISSUE_TEMPLATE/       the work item template that starts the cycle
