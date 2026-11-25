@@ -107,9 +107,11 @@ order of `tasks.md`, and make the commit itself.
 
 - **GIVEN** an agent changed a file that is not in its task's Owns list
 - **WHEN** Build checks the changed files
-- **THEN** Build either returns the task to the agent once with the Owns
-  list, or keeps the change and records it as a deviation
-- **AND** it never commits the change without one of the two
+- **THEN** Build reverts the change and returns the task to the agent once
+  with the Owns list
+- **AND** if the agent changes such a file again, Build reverts it or keeps
+  it, and records either as a deviation
+- **AND** it never commits such a change without a deviation
 
 ### Requirement ROUTE-4: No routing without a change folder
 

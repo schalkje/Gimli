@@ -53,9 +53,12 @@ follow, the agent reads when it needs it.
    and waits: one task at a time until parallel Build (#46, Track A step 5).
 3. The agent changes files and reports back. It never commits, pushes,
    changes a label or posts a comment.
-4. Build compares the changed files with the task's Owns list. A file outside
-   it is returned to the agent once, with the list, or kept and recorded as a
-   `## Build: deviation`; it is never committed silently.
+4. Build compares the changed files with the task's Owns list. A change to a
+   file outside it is reverted and the task returned to the agent once, with
+   the list; if it happens again, Build reverts or keeps it and records a
+   `## Build: deviation` either way. It is never committed silently.
+   A task the agent cannot finish is fixed by Build as a deviation, or
+   deferred with the agent's changes reverted.
 5. Build sets the task's status and commits, with a line
    `Routed: <agent> <model> <effort>` in the message.
 

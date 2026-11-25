@@ -141,12 +141,14 @@ as `docs/specs/task-routing/spec.md` (ROUTE-3) and `docs/architecture/agents.md`
 describe. You stay the orchestrator: you choose the task, hand it over, check
 the result and commit. One task at a time:
 
-1. Start from a clean working tree; the previous task's commit leaves one.
+1. Check that the working tree is clean (`git status --porcelain` is
+   empty). Each task ends in a commit, so it is; if it is not, stop and say
+   what is uncommitted.
 2. Run `scripts/route.sh <kind> <complexity>` with the task's Kind and
    Complexity. It prints `<agent> <model> <effort>`. A task without a Kind
    or Complexity, a `route.sh` error, or an agent file missing from
-   `.claude/agents/` is a deviation: record it, leave the task `todo`, and
-   stop implementing; go to the gate.
+   `.claude/agents/` cannot be routed: defer it as in step 6, and continue
+   with the next task.
 3. Build the context packet: the task's section of `tasks.md`, its Owns list,
    the Decisions section of `design.md`, the spec or delta sections for the
    scenario IDs in its Covers field, and the Principles section of
@@ -156,14 +158,19 @@ the result and commit. One task at a time:
    the model, and `effort` set to the effort `route.sh` printed. This skill
    asks for that effort explicitly. Wait for the agent's report.
 5. List what changed with `git status --porcelain --untracked-files=all`.
-   Every path must be in the task's Owns list. If one is not, return the
-   task to the agent once, with the Owns list and the paths outside it. If
-   the second attempt still changes such a path, either revert that path or
-   keep it and record it as a deviation; never commit it without one of the
-   two.
+   Every path must be in the task's Owns list. If one is not, revert the
+   paths outside it yourself (`git restore --staged --worktree -- <path>`
+   for a tracked file, delete an untracked one), then return the task to the
+   agent once, with the Owns list and the paths you reverted. If the second
+   attempt changes such a path again, revert it, or keep it when the task
+   really needs it, and record either as a deviation; never commit it
+   without one of the two.
 6. Read the agent's report. If it says the task is not done, or the checks
-   it ran failed, decide as for any task you cannot complete: fix it
-   yourself as a recorded deviation, or set it `deferred`.
+   it ran failed, either fix it yourself, recorded as a deviation, and go on
+   to step 7; or defer it: revert every change the agent made, set the task
+   and every task that depends on it to `deferred` with a deviation entry
+   each, and commit only that status change, so the next task starts from a
+   clean tree.
 7. Set the task's status in `tasks.md` and commit the agent's changes with
    it, as one commit. The message body has a line
    `Routed: <agent> <model> <effort>` with what `route.sh` printed, before
