@@ -6,7 +6,8 @@ Part of the [Gimli specs](../README.md).
 - **Implemented by:** [`scripts/route.sh`](../../../scripts/route.sh), tested
   by [`scripts/tests/route_test.sh`](../../../scripts/tests/route_test.sh);
   [`.claude/skills/build/SKILL.md`](../../../.claude/skills/build/SKILL.md)
-  for delegation; the agents in [`.claude/agents/`](../../architecture/agents.md).
+  for delegation; the agents in `.claude/agents/`, described in
+  [Agents](../../architecture/agents.md).
 - **Decisions:** [ADR 0004](../../adr/0004-task-routing.md).
 
 Build hands each task of a [change folder](../../changes/README.md) to an
@@ -88,8 +89,9 @@ name the valid values when its input is invalid.
 ### Requirement ROUTE-3: Delegate the tasks of a change folder
 
 When Build works through a change folder's `tasks.md`, it SHALL hand each
-task to the agent and model `route.sh` gives, one task at a time in the
-order of `tasks.md`, and make the commit itself.
+task to the agent and model `route.sh` gives, one task at a time, taking
+the next `todo` task whose dependencies are done, lowest ID first, and make
+the commit itself.
 
 #### Scenario ROUTE-3.1: Task handed to its agent
 
@@ -110,7 +112,8 @@ order of `tasks.md`, and make the commit itself.
 - **THEN** Build sets the task's status to `done` and commits the change
 - **AND** the commit message has a line `Routed: <agent> <model> <effort>`
   with what `route.sh` gave
-- **AND** the agent made no commit, push, label change or comment
+- **AND** the branch, its last commit and its remote copy are as before
+  the agent ran; if not, Build stops and reports it
 
 #### Scenario ROUTE-3.3: File outside the task
 

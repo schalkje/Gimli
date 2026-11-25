@@ -41,7 +41,7 @@ context also lets a cheaper model do the task. `/build` gives each agent:
 | The files it may change | the task's Owns list |
 | The design decisions | the Decisions section of `design.md` |
 | What it implements or tests | the spec or delta sections for the scenario IDs in the task's Covers field |
-| What it is reviewed against | the Principles section of this overview |
+| What it is reviewed against | the Principles section of the [architecture overview](README.md#principles) |
 
 Anything else, such as a file the task names or an existing pattern to
 follow, the agent reads when it needs it.
@@ -57,8 +57,8 @@ follow, the agent reads when it needs it.
    file outside it is reverted and the task returned to the agent once, with
    the list; if it happens again, Build reverts or keeps it and records a
    `## Build: deviation` either way. It is never committed silently.
-   A commit the agent made is undone with `git reset --soft` before the
-   check, and recorded. A task the agent cannot finish is fixed by Build as a
+   If the agent switched branch, committed or pushed, Build stops and
+   reports it instead of repairing it. A task the agent cannot finish is fixed by Build as a
    deviation, with a `Fixed-by: build` line in its commit, or deferred with
    the agent's changes reverted.
 5. Build sets the task's status and commits, with a line

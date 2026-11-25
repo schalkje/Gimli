@@ -74,7 +74,8 @@ packet.
    prints one line per check. It calls no network and no `gh`. Running it in
    CI is later work.
 6. **Agents edit, Build commits.** An agent never commits, pushes, changes a
-   label or posts a comment; Build undoes an agent's commit before checking.
+   label or posts a comment; if its branch, commit or remote changed, Build
+   stops and reports it.
    A change outside the task's Owns list is reverted and the task returned
    to the agent once; a repeat is reverted or kept, and recorded as a
    deviation either way. Build never commits it silently. Changed in Review
