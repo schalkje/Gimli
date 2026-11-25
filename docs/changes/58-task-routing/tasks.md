@@ -41,7 +41,7 @@ in `docs/specs/README.md`.
 - **Complexity:** high
 - **Owns:** `docs/adr/0004-task-routing.md`, `docs/adr/README.md`
 - **Covers:** none
-- **Status:** todo
+- **Status:** done
 
 Decisions 2, 6, 9 and 10 of the design, with the roster options from Refine
 (one agent per kind, per kind and tier, or a few roles), the commit options
