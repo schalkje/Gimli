@@ -161,11 +161,18 @@ The documentation is layered: start here and follow the links down. The
 
 | Document | What it covers |
 |---|---|
-| [`scripts/README.md`](scripts/README.md) | `stage.sh`, `risk.sh`, `guard.sh`, `protect-main.sh` and the shared `lib.sh`: usage, behaviour and exit codes. |
+| [`scripts/README.md`](scripts/README.md) | `stage.sh`, `risk.sh`, `guard.sh`, `route.sh`, `protect-main.sh`, the shared `lib.sh` and the tests: usage, behaviour and exit codes. |
 | [`.claude/skills/_shared/preamble.md`](.claude/skills/_shared/preamble.md) | The steps every stage skill starts with: argument parsing, interactive or not, stage check, and the duplicate guard. |
 | [`.claude/skills/refine/SKILL.md`](.claude/skills/refine/SKILL.md) | The `/refine` skill. |
 | [`.claude/skills/plan/SKILL.md`](.claude/skills/plan/SKILL.md) | The `/plan` skill. |
 | [`.claude/skills/build/SKILL.md`](.claude/skills/build/SKILL.md) | The `/build` skill. |
+| [`.claude/agents/gimli-design.md`](.claude/agents/gimli-design.md) | The agent for `design` tasks. |
+| [`.claude/agents/gimli-spec.md`](.claude/agents/gimli-spec.md) | The agent for `spec` tasks. |
+| [`.claude/agents/gimli-implement.md`](.claude/agents/gimli-implement.md) | The agent for `implement` tasks. |
+| [`.claude/agents/gimli-test-unit.md`](.claude/agents/gimli-test-unit.md) | The agent for `test-unit` tasks. |
+| [`.claude/agents/gimli-test-e2e.md`](.claude/agents/gimli-test-e2e.md) | The agent for `test-e2e` tasks. |
+| [`.claude/agents/gimli-docs.md`](.claude/agents/gimli-docs.md) | The agent for `docs` tasks. |
+| [`.claude/agents/gimli-review.md`](.claude/agents/gimli-review.md) | The agent for `review` tasks. |
 | [`.github/PULL_REQUEST_TEMPLATE.md`](.github/PULL_REQUEST_TEMPLATE.md) | The pull request body that carries the evidence and the final risk assessment. |
 
 ### Agent instructions
@@ -185,8 +192,9 @@ The documentation is layered: start here and follow the links down. The
 │   ├── architecture/             how Gimli is built
 │   ├── adr/                      architecture decision records: why
 │   └── changes/                  change folders: how each large change is planned
-├── scripts/                      stage, risk and guard helpers, ruleset setup
+├── scripts/                      stage, risk, guard and routing helpers, ruleset setup, tests
 ├── .claude/skills/               one skill per automated lifecycle stage
+├── .claude/agents/               one agent per task kind, for /build
 ├── .github/ISSUE_TEMPLATE/       the work item template that starts the cycle
 ├── .github/PULL_REQUEST_TEMPLATE.md
 ├── .github/workflows/            AI review and @claude workflows

@@ -77,14 +77,19 @@ folders, are later work (#46, Track A step 7).
 | Task ID | `T1`, `T2`, ... in the order written; never reused within the folder. |
 | Stream | A letter. Tasks in different streams can run in parallel once their dependencies are done. |
 | Depends on | Task IDs that must be `done` first. The dependencies form no cycle. |
-| Kind | One of `design`, `spec`, `implement`, `test-unit`, `test-e2e`, `docs`, `review`. |
-| Complexity | `low`, `medium` or `high`. |
+| Kind | One of `design`, `spec`, `implement`, `test-unit`, `test-e2e`, `docs`, `review`. With Complexity, chooses the agent that does the task. |
+| Complexity | `low`, `medium` or `high`. Chooses the agent's model and effort; what each level means for `docs` is in [ROUTE-1](../specs/task-routing/spec.md#requirement-route-1-route-a-task-by-kind-and-complexity). |
 | Owns | The files the task changes. Two tasks in different streams own different files, so parallel work does not conflict. |
 | Covers | The scenario IDs, in the form of [`specs/README.md`](../specs/README.md#scenario-ids), that the task implements or tests. |
 | Status | `todo` until done. Build sets `done` in the commit that completes the task, or `deferred` with a `## Build: deviation` comment saying why. A task that depends on a `deferred` task is deferred too. On re-entry, a deferred task that review or the return note asks for goes back to `todo`, with the tasks deferred because of it. |
 
-The kinds and complexity levels are a fixed list, so later steps can choose
-an agent and model from them. Adding a kind is a change to this document.
+The kinds and complexity levels are a fixed list, so Build can choose an
+agent, model and effort from them, as the
+[task routing spec](../specs/task-routing/spec.md) says. Adding a kind is a
+change to this document, and also needs an agent in `.claude/agents/`, a row
+in the routing table and a change to `scripts/route.sh`;
+`scripts/tests/route_test.sh` reads the kinds from the table and fails until
+the table and the script agree.
 
 A task that defines what other streams build on, such as an interface or a
 format, comes first, and the other streams depend on it.
@@ -111,3 +116,4 @@ ADDED, MODIFIED and REMOVED.
 | Change folder | Issue |
 |---|---|
 | [`52-change-folder`](52-change-folder/design.md) | #52: the change folder and tasks format |
+| [`58-task-routing`](58-task-routing/design.md) | #58: agent roster and model routing for tasks |

@@ -1,6 +1,6 @@
 ---
 name: build
-description: Run the Build stage of the Gimli lifecycle on a GitHub issue. Takes the confirmed plan on the issue (for a large change, the tasks in its change folder), implements it on a branch with step-sized commits, records deviations, and after confirmation pushes the branch, opens the draft pull request unless Plan already did, and moves the issue to Test. Runs unattended only for risk:low issues.
+description: Run the Build stage of the Gimli lifecycle on a GitHub issue. Takes the confirmed plan on the issue (for a large change, the tasks in its change folder, each handed to the agent the routing table gives), implements it on a branch with step-sized commits, records deviations, and after confirmation pushes the branch, opens the draft pull request unless Plan already did, and moves the issue to Test. Runs unattended only for risk:low issues.
 argument-hint: <issue-number>
 disable-model-invocation: true
 ---
@@ -25,7 +25,8 @@ follow it with:
   `risk:low`**. For a `risk:low` issue a non-interactive run may push the
   branch, post one comment headed `## Build: deviation`, open the draft pull
   request, run `scripts/stage.sh <n> test`, and, if publishing fails part
-  way, post one comment headed `## Build: incomplete`. Nothing else. The
+  way or a ref moves during an agent run (step 3, "Delegating a task"), post
+  one comment headed `## Build: incomplete`. Nothing else. The
   preamble's duplicate guard is for repeated runs that would say the same
   thing again; it does not apply to these two headings, which report what
   this run did.
@@ -121,8 +122,9 @@ non-digit or the end of the line (the search also matches, for example,
 Follow the plan's Steps in order. When the plan links to a change folder,
 its `tasks.md` holds the steps, in the format of `docs/changes/README.md`:
 take the next task with status `todo` whose dependencies are all `done`,
-lowest ID first; implement it; and set its status to `done` in the commit
-that completes it. A task you cannot complete gets status `deferred` and an
+lowest ID first; have its agent do it, as "Delegating a task of a change
+folder" below describes; and set its status to `done` in the commit that
+completes it. A task you cannot complete gets status `deferred` and an
 entry in the deviation list. A task that depends on a `deferred` task is
 deferred too, with its own deviation entry naming that dependency, so no task
 is left `todo` when Build reaches the gate. A `spec` task applies its delta to the living
@@ -132,6 +134,74 @@ return note or review asks for changes to them. A `deferred` task they ask
 for goes back to `todo`, and so does every task deferred only because it
 depends on that task; each is recorded as a reversed deferral in the
 deviation list.
+
+### Delegating a task of a change folder
+
+Each task of a change folder is done by the agent the routing table gives,
+as `docs/specs/task-routing/spec.md` (ROUTE-3) and `docs/architecture/agents.md`
+describe. You stay the orchestrator: you choose the task, hand it over, check
+the result and commit. One task at a time:
+
+1. Check that the working tree is clean (`git status --porcelain` is
+   empty). Each task ends in a commit, so it is; if it is not, stop and say
+   what is uncommitted.
+2. Run `scripts/route.sh <kind> <complexity>` with the task's Kind and
+   Complexity. It prints `<agent> <model> <effort>`. A task without a Kind
+   or Complexity, a `route.sh` error, or an agent file missing from
+   `.claude/agents/` cannot be routed: defer it as in step 6, and continue
+   with the next task. So can a task whose Agent call fails, for example
+   because the platform rejects the model or effort, or that returns no
+   report.
+3. Build the context packet: the task's section of `tasks.md`, its Owns list,
+   the Decisions section of `design.md`, the spec or delta sections for the
+   scenario IDs in its Covers field, and the Principles section of
+   `docs/architecture/README.md`. Paste them into the prompt; do not tell the
+   agent to read the whole folder.
+4. Run `git fetch origin`, then note the branch
+   (`git symbolic-ref --short HEAD`) and the refs an agent could move, with
+   their commits: `git for-each-ref --format='%(refname) %(objectname)'
+   refs/heads refs/tags refs/stash refs/remotes/origin/<branch>`. That is
+   every local branch and tag, the stash, and this branch's remote copy;
+   other branches on `origin` are left out, so another pull request merging
+   does not stop Build. Then call the Agent tool with `subagent_type` set to the agent, `model`
+   set to the model, and `effort` set to the effort `route.sh` printed. This
+   skill asks for that effort explicitly. Wait for the agent's report.
+5. Fetch and read both again. If either changed, the branch or a ref moved
+   while the agent ran: the agent committed, stashed, switched or pushed
+   despite its rules, or someone else pushed to this branch. Stop: change nothing, do not
+   publish, push or move the stage, in an interactive or a non-interactive
+   run, and post a `## Build: incomplete` comment saying which ref changed,
+   for the user to resolve. Otherwise list what changed with
+   `git status --porcelain --untracked-files=all`; this sees tracked and
+   untracked files in the repository, not gitignored files or files outside
+   it. An agent that reports the task done but changed nothing, on a task
+   other than `review` whose Owns list is not `none`, has failed the task
+   (step 6).
+   Every path must be in the task's Owns list. If one is not, revert the
+   paths outside it yourself (`git restore --staged --worktree -- <path>`
+   for a tracked file, delete an untracked one), then return the task to the
+   agent once, with the Owns list and the paths you reverted; the second
+   attempt repeats steps 4 and 5 in full. If it changes such a path again, revert it, or keep it when the task
+   really needs it, and record either as a deviation; never commit it
+   without one of the two.
+6. Read the agent's report, and run every check it names for Build to run.
+   A `review` task's findings are part of its result: fix each one yourself
+   in this task's commit, recorded as a deviation, or record it in the
+   deviation list as left open; none is dropped. If the report says the
+   task is not done, or a check failed, either fix it yourself, recorded as a deviation, and go on
+   to step 7 with a `Fixed-by: build` line under the `Routed:` line, so the
+   routing record does not count the task as the agent's success; or defer
+   it: revert every change the agent made, set the task
+   and every task that depends on it to `deferred` with a deviation entry
+   each, and commit only that status change, so the next task starts from a
+   clean tree.
+7. Set the task's status in `tasks.md` and commit the agent's changes with
+   it, as one commit. The message body has a line
+   `Routed: <agent> <model> <effort>` with what `route.sh` printed, before
+   `Refs #<n>`.
+
+A change planned as a comment, without a change folder, is not routed: you
+implement its Steps yourself, as before (ROUTE-4).
 
 Add or update the tests or checks the
 plan's Tests table names. Do not invent a test runner the repository lacks;
@@ -207,7 +277,8 @@ a pull request behind it:
 If any command fails, for example because a `claude -p` run lacks permission
 for `git push` or `gh pr create`, stop there and do not move the stage. Post
 one issue comment headed `## Build: incomplete` saying exactly which of the
-four steps completed, which failed, and the error, so the record is on the
+four steps completed, which failed, and the error (or, when a ref moved
+during an agent run, which ref and which task), so the record is on the
 issue and not only in a transcript; then report the same to the user. The
 next run of this skill resumes from the existing branch and does not repeat
 the completed steps.

@@ -14,6 +14,7 @@ principles changes are reviewed against. What Gimli does is in the
 flowchart LR
 	person[Owner] --> skills[Stage skills]
 	skills --> scripts[Scripts]
+	skills --> agents[Agents]
 	skills --> github[(GitHub: issues, PRs, labels, comments)]
 	scripts --> github
 	templates[Issue and PR templates] --> github
@@ -30,7 +31,8 @@ flowchart LR
 | Lifecycle documents | `docs/` | The specification every other part implements. |
 | Change folders | `docs/changes/` | The design, tasks and spec deltas of each large change, written at Plan and followed by Build. |
 | Stage skills | `.claude/skills/` | Run a lifecycle stage in Claude Code, invoked as `/<stage> <issue>`; each starts with the shared preamble. |
-| Scripts | `scripts/` | Deterministic helpers for stage and risk labels, the duplicate guard, and the ruleset. |
+| Agents | `.claude/agents/` | Do one task of a change folder each, for `/build`, on the model and effort the routing table gives; described in [Agents](agents.md). |
+| Scripts | `scripts/` | Deterministic helpers for stage and risk labels, the duplicate guard, task routing, and the ruleset. |
 | Templates | `.github/ISSUE_TEMPLATE/`, `.github/PULL_REQUEST_TEMPLATE.md` | Shape the work item that starts the cycle and the pull request that carries the evidence. |
 | Workflows | `.github/workflows/` | Run the AI review when a pull request is marked ready, and answer `@claude` mentions. |
 | Vendored plugin | `vendor/claude-plugins/`, `.claude-plugin/` | The `code-review` plugin the AI review runs, copied verbatim from upstream. |
@@ -54,6 +56,10 @@ Changes are reviewed against these. Each links to where it is defined.
   labels or state, `stage.sh` and `risk.sh`, post their comment first, so a
   failure part way leaves the change documented
   ([STAGE-4](../specs/stage-transitions/spec.md#requirement-stage-4-comment-before-label)).
+- **Agents change only their task's files; Build commits.** An agent edits
+  the files in its task's Owns list and never commits, pushes or labels;
+  Build checks the files and commits
+  ([ROUTE-3](../specs/task-routing/spec.md#requirement-route-3-delegate-the-tasks-of-a-change-folder)).
 - **Pinned and vendored dependencies.** Workflow actions are pinned and the
   review plugin is vendored, never edited by hand
   ([`workflow-dependencies.md`](../workflow-dependencies.md)).
