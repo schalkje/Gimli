@@ -25,7 +25,7 @@ T1 is the contract: every other stream depends on the spec it writes.
 - **Complexity:** medium
 - **Owns:** `docs/specs/traceability/spec.md`, `docs/specs/README.md`
 - **Covers:** TRACE-1.1, TRACE-1.2, TRACE-2.1, TRACE-2.2, TRACE-2.3, TRACE-3.1, TRACE-3.2, TRACE-4.1, TRACE-4.2, TRACE-5.1, TRACE-5.2
-- **Status:** todo
+- **Status:** done
 
 Create the living spec from [the delta](specs/traceability/delta.md), using
 the spec template, with `scripts/trace.sh` as what implements it and
