@@ -36,6 +36,7 @@ lowercase words joined with hyphens. It holds:
 | File | Holds | Template |
 |---|---|---|
 | `design.md` | How the change is built: approach, decisions, where they land, risks. | [`_template/design.md`](_template/design.md) |
+| `test-design.md` | The cases the tests must cover, per scenario. | [`_template/test-design.md`](_template/test-design.md) |
 | `tasks.md` | The work as tasks, in the format below. | [`_template/tasks.md`](_template/tasks.md) |
 | `specs/<capability>/delta.md` | One per capability spec the change touches, in the format below. | [`_template/specs/capability/delta.md`](_template/specs/capability/delta.md) |
 
@@ -77,7 +78,7 @@ folders, are later work (#46, Track A step 7).
 | Task ID | `T1`, `T2`, ... in the order written; never reused within the folder. |
 | Stream | A letter. Tasks in different streams can run in parallel once their dependencies are done. |
 | Depends on | Task IDs that must be `done` first. The dependencies form no cycle. |
-| Kind | One of `design`, `spec`, `implement`, `test-unit`, `test-e2e`, `docs`, `review`. With Complexity, chooses the agent that does the task. |
+| Kind | One of `design`, `spec`, `test-design` (decides the cases the tests cover and writes `test-design.md`), `implement`, `test-unit`, `test-e2e`, `docs`, `review`. With Complexity, chooses the agent that does the task. |
 | Complexity | `low`, `medium` or `high`. Chooses the agent's model and effort; what each level means for `docs` is in [ROUTE-1](../specs/task-routing/spec.md#requirement-route-1-route-a-task-by-kind-and-complexity). |
 | Owns | The files the task changes. Two tasks in different streams own different files, so parallel work does not conflict. |
 | Covers | The scenario IDs, in the form of [`specs/README.md`](../specs/README.md#scenario-ids), that the task implements or tests. |
@@ -93,6 +94,13 @@ the table and the script agree.
 
 A task that defines what other streams build on, such as an interface or a
 format, comes first, and the other streams depend on it.
+
+### Test design task
+
+When a change's spec delta adds or modifies scenarios, `tasks.md` has a
+`test-design` task covering them, and every `test-unit` and `test-e2e` task
+for those scenarios depends on it. The task writes `test-design.md`, so the
+tests and the code are decided from the same cases.
 
 ## Spec deltas
 

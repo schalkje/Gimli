@@ -28,6 +28,7 @@ independently.
 |---|---|---|---|
 | design | sonnet medium | sonnet high | opus high |
 | spec | sonnet medium | sonnet high | opus high |
+| test-design | sonnet medium | sonnet high | opus high |
 | implement | sonnet low | sonnet medium | opus high |
 | test-unit | haiku low | sonnet low | sonnet medium |
 | test-e2e | sonnet low | sonnet medium | opus high |
@@ -62,8 +63,8 @@ approval), not a stronger model.
 
 #### Scenario ROUTE-1.4: Every cell
 
-- **WHEN** `scripts/route.sh` runs for each of the 21 kind and complexity
-  pairs in the table
+- **WHEN** `scripts/route.sh` runs for each kind and complexity pair in the
+  table
 - **THEN** each prints the agent and the model and effort in that cell
 
 ### Requirement ROUTE-2: Reject invalid input

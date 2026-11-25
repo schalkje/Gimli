@@ -122,7 +122,7 @@ run on #60 (PR #62, summarised in PR #59), and ROUTE-4.1 to the run on #61
 - **Complexity:** medium
 - **Owns:** `.claude/agents/gimli-test-design.md`, `scripts/route.sh`, `docs/specs/task-routing/spec.md`, `docs/changes/README.md`
 - **Covers:** ROUTE-1.1, ROUTE-1.2, ROUTE-1.3, ROUTE-1.4, ROUTE-2.1
-- **Status:** todo
+- **Status:** done
 
 Apply [the routing delta](specs/task-routing/delta.md): the `test-design`
 row and ROUTE-1.4. Add the kind and its cells to `route.sh`. Write
