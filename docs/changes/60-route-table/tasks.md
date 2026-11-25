@@ -78,7 +78,7 @@ that it prints every cell as `<kind> <complexity> <agent> <model> <effort>`.
 - **Complexity:** medium
 - **Owns:** none
 - **Covers:** ROUTE-2.3, ROUTE-5.1
-- **Status:** todo
+- **Status:** done
 
 Run `sh scripts/tests/route_test.sh` and check that the links in the
 changed files resolve. Check that the spec, `route.sh` and `scripts/README.md`
