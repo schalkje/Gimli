@@ -42,9 +42,11 @@ T4 and T5 both follow these. Where the spec is silent, this is the decision.
   glob, runs nothing and is not an error.
 - A scenario is a line starting `#### Scenario <ID>:`. The ID is
   `[A-Z]+-[0-9]+.[0-9]+`. Requirement headings, other prose that names an ID,
-  and the Retired section produce no line. Any other line starting
-  `#### Scenario` and a space or the end, such as one without the colon or
-  with a digit in the prefix, is malformed: no line, a message
+  and the Retired section produce no line. Any other heading, of any
+  level and with spaces or a tab after the `#`s, whose text starts with the
+  word `Scenario` (not `Scenarios`), such as one without the colon, with a
+  digit in the prefix, two spaces, the wrong level or the colon first, is
+  malformed: no line, a message
   `trace.sh: <file>:<line>: not a scenario heading: <line>` on standard
   error, and status 1. Lines inside a fenced code block are skipped: it
   opens on a line starting ```` ``` ```` or `~~~` and closes only on a line
@@ -88,8 +90,10 @@ T4 and T5 both follow these. Where the spec is silent, this is the decision.
   `not-yet` the reason, which is the text after `not yet` and an optional
   `:`, trimmed; `-` when that is empty, and for `uncovered`.
 - Exit status 1 when any line is `uncovered` or `failing`, any test file
-  exits non-zero even if it names nothing, or a scenario heading is
-  malformed or reuses an ID; else 0. All scenario lines are printed first in every case,
+  exits non-zero even if it names nothing, any test file prints a line
+  starting `FAIL` whatever follows, or a scenario heading is malformed or
+  reuses an ID; else 0. A file that exits 0 but prints a `FAIL` line is
+  named as `trace.sh: <file> printed a FAIL line but exited 0`. All scenario lines are printed first in every case,
   standard output holds only those lines. Each test file that exits
   non-zero is named on standard error as `trace.sh: <file> exited <status>`,
   followed by the last five lines of its standard error, indented two
@@ -103,7 +107,8 @@ T4 and T5 both follow these. Where the spec is silent, this is the decision.
   output, and no test file is run.
 - With no arguments the defaults `docs/specs` and `scripts/tests` are read
   relative to the repository (the script's own location), not the current
-  directory. The unit test cannot use them without running itself; T10 runs
+  directory. The unit test runs them only on a copy of `trace.sh` in a
+  fixture repository (TRACE-5.4 c), so it never runs itself; T10 runs
   `sh scripts/trace.sh` on the real specs.
 
 **How the test checks**
@@ -172,6 +177,7 @@ Implemented by: T5, extended in Review.
 | a | failure | `spec a: CAP-1.1 VB not yet: r`, then the line `#### Scenario CAP-1.2 S` (line 13) | `CAP-1.1 not-yet r`, status 1, standard error `a/spec.md:13: not a scenario heading: #### Scenario CAP-1.2 S` |
 | b | failure | as a with `#### Scenario C4P-1.2: S` | the same line, status 1, the heading named on standard error |
 | c | edge | as a with `#### Scenarios` | `CAP-1.1 not-yet r`, status 0: not a scenario heading at all |
+| d | failure | as a with `####  Scenario CAP-1.2: two spaces`, `### Scenario CAP-1.3: level`, `#### Scenario: CAP-1.4 colon first` and `####`, a tab, `Scenario CAP-1.5: tab` (lines 13 to 16) | `CAP-1.1 not-yet r`, status 1, each of lines 13 to 16 named as not a scenario heading |
 
 ### TRACE-1.4: Code blocks left out
 
@@ -318,6 +324,7 @@ Implemented by: T5, extended in Review.
 |---|---|---|---|
 | a | failure | `spec a: CAP-1.1 VB not yet: r`; `a_test.sh` that writes `setup broke` on standard error and exits 3; `b_test.sh: ok OTH-1.1; exit 0` | `CAP-1.1 not-yet r`, status 1, standard error holds `trace.sh: a_test.sh exited 3` and then `  setup broke` |
 | b | edge | as a | standard error does not name `b_test.sh` |
+| c | failure | `spec a: CAP-1.1 VB not yet: r`; `a_test.sh` prints `FAIL NOPE-1.1: x` and `FAIL CAP-1.1 : x`, exit 0 | `CAP-1.1 not-yet r`, status 1, standard error `trace.sh: a_test.sh printed a FAIL line but exited 0` |
 
 ### TRACE-5.1: Other folders
 
@@ -341,8 +348,8 @@ Implemented by: T5.
 | c | failure | four arguments | status 2, usage |
 | d | edge | any of a to c with a fixture `tests/a_test.sh` that writes a file `ran` | no `ran` file: nothing is run before the arguments are checked |
 
-Zero arguments is the default mode and has no unit case (see the
-conventions); the real specs and tests cover it when T10 runs `trace.sh`.
+Zero arguments is the default mode; TRACE-5.4 c tests it on a fixture
+repository, and the real specs and tests cover it when T10 runs `trace.sh`.
 
 ### TRACE-5.3: Missing folder
 
@@ -353,3 +360,15 @@ Implemented by: T5, extended in Review.
 | a | failure | a specs folder that does not exist; a tests folder whose `a_test.sh` writes a file `ran` | status 2, no standard output, standard error `trace.sh: not a folder: <path>`, no `ran` file |
 | b | failure | a tests folder that does not exist | status 2, the folder named on standard error |
 | c | failure | a plain file given as the specs folder | status 2 |
+
+### TRACE-5.4: No run from inside a test
+
+Implemented by: T5, extended in Review. The cases run a copy of `trace.sh`
+and `lib.sh` in a fixture repository, so that a broken guard runs the
+fixture's tests and never `trace_test.sh` itself.
+
+| Case | Kind | Given (fixture) | Expected |
+|---|---|---|---|
+| a | failure | `TRACE_RUNNING=1`, no arguments; the fixture's `a_test.sh` writes a file `ran` | status 2, no standard output, standard error `trace.sh: already running the tests`, no `ran` file |
+| b | edge | folders given; `a_test.sh` records `TRACE_RUNNING` | the usual line, status 0, and the test saw `TRACE_RUNNING=1` |
+| c | normal | `TRACE_RUNNING` unset, no arguments, the fixture repository's `docs/specs` and `scripts/tests` | `CAP-1.1 tested a_test.sh`, status 0: the default folders are the script's own repository |

@@ -3,7 +3,7 @@
 #
 #   sh scripts/tests/trace_test.sh
 #
-# Covers TRACE-1.1 to TRACE-5.3 in docs/specs/traceability/spec.md; the cases
+# Covers TRACE-1.1 to TRACE-5.4 in docs/specs/traceability/spec.md; the cases
 # are in docs/changes/65-traceability/test-design.md. Each case builds fixture
 # spec and test folders in a temporary directory and runs trace.sh on them,
 # never on scripts/tests, so this test does not run itself. Prints one line
@@ -230,6 +230,15 @@ fx 13c
 mkspec a "CAP-1.1|not yet: r"
 echo '#### Scenarios' >> "$S/a/spec.md"
 chk "TRACE-1.3: c, another heading is not malformed" 0 "CAP-1.1 not-yet r"
+
+fx 13d
+mkspec a "CAP-1.1|not yet: r"
+printf '%s\n' '####  Scenario CAP-1.2: two spaces' '### Scenario CAP-1.3: level' '#### Scenario: CAP-1.4 colon first' "####$(printf '\t')Scenario CAP-1.5: tab" >> "$S/a/spec.md"
+chk "TRACE-1.3: d, near misses at any level are malformed" 1 "CAP-1.1 not-yet r"
+check_err "TRACE-1.3: d, two spaces named" "a/spec.md:13: not a scenario heading"
+check_err "TRACE-1.3: d, wrong level named" "a/spec.md:14: not a scenario heading"
+check_err "TRACE-1.3: d, colon first named" "a/spec.md:15: not a scenario heading"
+check_err "TRACE-1.3: d, tab named" "a/spec.md:16: not a scenario heading"
 
 # ---- TRACE-1.4: Code blocks left out
 
@@ -574,6 +583,12 @@ else
   ok "TRACE-4.3: b, a passing file is not named"
 fi
 
+fx 43c
+mkspec a "CAP-1.1|not yet: r"
+mktest a_test.sh "echo 'FAIL NOPE-1.1: x'" "echo 'FAIL CAP-1.1 : x'" 'exit 0'
+chk "TRACE-4.3: c, a FAIL line no scenario takes still fails the run" 1 "CAP-1.1 not-yet r"
+check_err "TRACE-4.3: c, standard error names the file" "trace.sh: a_test.sh printed a FAIL line but exited 0"
+
 # ---- TRACE-5.1: Other folders
 
 fx 51a
@@ -633,6 +648,42 @@ check_run "TRACE-5.3: b, a missing tests folder exits 2" 2 "" "$S" "$D/nope"
 check_err "TRACE-5.3: b, standard error names it" "trace.sh: not a folder: $D/nope"
 : > "$D/file"
 check_run "TRACE-5.3: c, a file is not a folder" 2 "" "$D/file" "$T"
+
+# ---- TRACE-5.4: No run from inside a test
+
+# A copy of trace.sh in a fixture repository, so that a broken guard runs
+# the fixture's tests, not this one.
+fx 54a
+R=$D/repo
+mkdir -p "$R/scripts/tests" "$R/docs/specs/a"
+cp "$TRACE" "$HERE/../lib.sh" "$R/scripts/"
+printf '#### Scenario CAP-1.1: S\n' > "$R/docs/specs/a/spec.md"
+printf ': > "$0.ran"\necho "ok CAP-1.1: works"\n' > "$R/scripts/tests/a_test.sh"
+_out=$(TRACE_RUNNING=1 sh "$R/scripts/trace.sh" 2> "$TMP/err" < /dev/null)
+_st=$?
+if [ "$_st" -eq 2 ] && [ -z "$_out" ]; then
+  ok "TRACE-5.4: a, no arguments inside a test run exits 2"
+else
+  not_ok "TRACE-5.4: a, no arguments inside a test run exits 2: got status $_st"
+fi
+check_err "TRACE-5.4: a, standard error says why" "trace.sh: already running the tests"
+check_no_file "TRACE-5.4: a, no test file was run" "$R/scripts/tests/a_test.sh.ran"
+_out=$(env -u TRACE_RUNNING sh "$R/scripts/trace.sh" 2> "$TMP/err" < /dev/null)
+_st=$?
+if [ "$_st" -eq 0 ] && [ "$_out" = "CAP-1.1 tested a_test.sh" ]; then
+  ok "TRACE-5.4: c, outside a test run, no arguments read the repository's folders"
+else
+  not_ok "TRACE-5.4: c, outside a test run, no arguments read the repository's folders: got '$_out' status $_st"
+fi
+fx 54b
+mkspec a "CAP-1.1|not yet: r"
+mktest a_test.sh 'echo "TRACE_RUNNING=$TRACE_RUNNING" > "$0.env"' 'exit 0'
+chk "TRACE-5.4: b, folders given still run" 0 "CAP-1.1 not-yet r"
+if grep -q 'TRACE_RUNNING=1' "$T/a_test.sh.env" 2>/dev/null; then
+  ok "TRACE-5.4: b, the tests run with TRACE_RUNNING set"
+else
+  not_ok "TRACE-5.4: b, the tests run with TRACE_RUNNING set"
+fi
 
 # ---- Trial break: the helper must be able to fail
 

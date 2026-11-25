@@ -18,8 +18,8 @@ backtick run followed by another backtick on its line is inline code, not a
 fence. A code block still open at the end of its file SHALL be named on
 standard error with the line it opened on and make the run exit with
 status 1. A
-heading `#### Scenario` followed by a space or the end of the line that does
-not start `#### Scenario <ID>:` SHALL get no line, be named on standard
+heading of any level whose text starts with the word `Scenario` but that
+does not start exactly `#### Scenario <ID>:` SHALL get no line, be named on standard
 error with its file and line number, and make the run exit with status 1.
 So SHALL a scenario ID that heads more than one scenario, named with both
 places; each heading still gets its line, with its own Verified by line.
@@ -109,7 +109,8 @@ precedence over the line.
 - **GIVEN** a scenario with `**Verified by:** [fixture run](https://example.org/1)`
   and no test
 - **WHEN** `scripts/trace.sh` runs
-- **THEN** its line has status `evidence` and the link as its source
+- **THEN** its line has status `evidence` and the text of the Verified by
+  line as its source
 
 #### Scenario TRACE-3.2: Not yet
 
@@ -128,11 +129,12 @@ precedence over the line.
 ### Requirement TRACE-4: Exit status
 
 The system SHALL exit with status 1 when any scenario is `uncovered` or
-`failing`, a test file exits non-zero, or a scenario heading is malformed
-or reuses an ID (TRACE-1), and with status 0 otherwise. It SHALL name on standard error each
-test file that exits non-zero, with its status, followed by the last five
-lines of that file's standard error; standard output holds only the
-scenario lines.
+`failing`, a test file exits non-zero or prints any line starting `FAIL`,
+or a scenario heading is malformed or reuses an ID (TRACE-1), and with
+status 0 otherwise. It SHALL name on standard error each test file that
+exits non-zero, with its status, followed by the last five lines of that
+file's standard error, and each that exits 0 but prints a `FAIL` line;
+standard output holds only the scenario lines.
 
 #### Scenario TRACE-4.1: Uncovered scenario
 
@@ -160,7 +162,9 @@ The system SHALL read the specs and tests from `docs/specs` and
 `scripts/tests` by default, or from the two folders given as arguments, and
 exit with status 2 and its usage on any other number of arguments. It SHALL
 exit with status 2, naming the folder on standard error and running no
-test, when either folder is not a directory.
+test, when either folder is not a directory. It runs the tests with
+`TRACE_RUNNING` set, and SHALL refuse with status 2 a run without
+arguments while it is set, so a test cannot start the run that started it.
 
 #### Scenario TRACE-5.1: Other folders
 
@@ -178,6 +182,12 @@ test, when either folder is not a directory.
   exist
 - **THEN** standard error names it
 - **AND** it exits with status 2 without running a test
+
+#### Scenario TRACE-5.4: No run from inside a test
+
+- **GIVEN** `TRACE_RUNNING` is set, as it is for a test `trace.sh` runs
+- **WHEN** `scripts/trace.sh` runs without arguments
+- **THEN** it exits with status 2 without running a test
 
 ## MODIFIED
 

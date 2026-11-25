@@ -161,8 +161,8 @@ The Verified by format is in the [spec format](../docs/specs/README.md).
 | Exit | Meaning |
 |---|---|
 | 0 | No scenario is uncovered or failing, every test file exited 0, and every scenario heading is well formed with its own ID |
-| 1 | A scenario is uncovered or failing, a test file exited non-zero, or a scenario heading is malformed or reuses an ID |
-| 2 | Usage error: not zero or two arguments, or a path that is not a folder |
+| 1 | A scenario is uncovered or failing, a test file exited non-zero or printed a `FAIL` line, or a scenario heading is malformed or reuses an ID |
+| 2 | Usage error: not zero or two arguments, or a path that is not a folder; or no arguments inside a test it runs (`TRACE_RUNNING` is set) |
 
 The rules are the [traceability spec](../docs/specs/traceability/spec.md);
 why they are so is [ADR 0005](../docs/adr/0005-traceability.md).

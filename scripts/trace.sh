@@ -9,8 +9,9 @@
 # not-yet (a "**Verified by:**" line under the scenario), failing, uncovered.
 # The source is "-" when there is none. Exit 1 when a scenario is uncovered or
 # failing, a test file exits non-zero, a "#### Scenario" line is not a
-# well-formed heading, or two headings share an ID; exit 2 on a usage error
-# or a path that is not a folder. The rules are in
+# well-formed heading, or two headings share an ID, or a test prints a FAIL
+# line; exit 2 on a usage error, a path that is not a folder, or a run with
+# no arguments from inside a test trace.sh started. The rules are in
 # docs/specs/traceability/spec.md; scripts/tests/trace_test.sh checks them.
 
 set -eu
@@ -18,7 +19,11 @@ set -eu
 . "$(dirname "$0")/lib.sh"
 
 case $# in
-  0) ROOT=$(dirname "$0")/..
+  0) if [ -n "${TRACE_RUNNING:-}" ]; then
+       echo "trace.sh: already running the tests; a test must pass folders" >&2
+       exit 2
+     fi
+     ROOT=$(dirname "$0")/..
      SPECS=$ROOT/docs/specs
      TESTS=$ROOT/scripts/tests ;;
   2) SPECS=$1
@@ -69,12 +74,14 @@ for f in "$SPECS"/*/spec.md; do
       next
     }
     fence { next }
-    l ~ /^#+( |$)/ {
+    l ~ /^#+([ \t]|$)/ {
       cur = ""
+      h = l
+      sub(/^#+[ \t]*/, "", h)
       if (match(l, /^#### Scenario [A-Z]+-[0-9]+\.[0-9]+:/)) {
         cur = FILENAME ":" FNR
         print "S\t" substr(l, 15, RLENGTH - 15) "\t" cur
-      } else if (l ~ /^#### Scenario( |$)/) {
+      } else if (h ~ /^Scenario([^a-z]|$)/) {
         print "M\t" FILENAME ":" FNR "\t" l
       }
       next
@@ -93,11 +100,14 @@ done
 for f in "$TESTS"/*_test.sh; do
   [ -e "$f" ] || continue
   st=0
-  sh "$f" > "$WORK/out" 2> "$WORK/err" < /dev/null || st=$?
+  TRACE_RUNNING=1 sh "$f" > "$WORK/out" 2> "$WORK/err" < /dev/null || st=$?
   if [ "$st" -ne 0 ]; then
     BAD=1
     echo "trace.sh: $(basename "$f") exited $st" >&2
     tail -n 5 "$WORK/err" | sed 's/^/  /' >&2
+  elif grep -q '^FAIL' "$WORK/out"; then
+    BAD=1
+    echo "trace.sh: $(basename "$f") printed a FAIL line but exited 0" >&2
   fi
   awk -v base="$(basename "$f")" -v st="$st" '
     { sub(/\r$/, "") }

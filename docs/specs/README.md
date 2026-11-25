@@ -33,6 +33,9 @@ are already right for that location.
   A scenario with a passing check, an `ok <ID>:` line printed by a test in
   `scripts/tests/` that exits 0, needs no Verified by line.
   `scripts/trace.sh` reads these lines; see [Traceability](traceability/spec.md).
+- Headings use `#`, not `---` or `===` underlines, and a code block's
+  fences start a line, not a list item: `scripts/trace.sh` reads only
+  these forms.
 - A spec ends with a **Retired scenario IDs** section.
 
 This is the requirement-and-scenario style OpenSpec uses, so the format stays
