@@ -57,7 +57,7 @@ file, or grepping test files. Status `Accepted`, the next number unused on
 - **Complexity:** medium
 - **Owns:** `docs/changes/_template/test-design.md`, `docs/changes/65-traceability/test-design.md`
 - **Covers:** TRACE-1.1, TRACE-1.2, TRACE-2.1, TRACE-2.2, TRACE-2.3, TRACE-3.1, TRACE-3.2, TRACE-4.1, TRACE-4.2, TRACE-5.1, TRACE-5.2
-- **Status:** todo
+- **Status:** done
 
 Write the template: per scenario, its ID, the cases to test (normal, edge,
 failure) with the expected result, and the task that implements them. Then
