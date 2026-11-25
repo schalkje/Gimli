@@ -42,7 +42,7 @@ reason and, where one exists, the issue that will close it.
 - **Complexity:** high
 - **Owns:** `docs/adr/0005-traceability.md`, `docs/adr/README.md`
 - **Covers:** none
-- **Status:** todo
+- **Status:** done
 
 Decisions 1 to 3 of the design, with the options from Refine: fail, report
 only, or fail without exceptions; coverage from test output, a coverage
