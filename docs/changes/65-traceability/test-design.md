@@ -6,8 +6,10 @@ The cases `scripts/tests/trace_test.sh` (T5) must cover for
 `scripts/trace.sh` (T4), one section per scenario of the
 [traceability spec](../../specs/traceability/spec.md). T3 is a `design` task
 because the `test-design` kind does not exist yet (design decision 9); this
-file follows [the template](../_template/test-design.md). Every case is
-implemented by T5.
+file follows [the template](../_template/test-design.md). Every TRACE case
+is implemented by T5, with the cases marked "extended in Review" added by
+the review rounds on PR #67; the ROUTE-1.4 section, which the task routing
+delta modifies, is checked by `route_test.sh` from T7.
 
 ## Shared fixtures and conventions
 
@@ -47,7 +49,12 @@ T4 and T5 both follow these. Where the spec is silent, this is the decision.
   error, and status 1. Lines inside a fenced code block are skipped: it
   opens on a line starting ```` ``` ```` or `~~~` and closes only on a line
   of the same character, at least as many, and nothing after them but
-  spaces. An ID heading a second scenario, in the same or a later file,
+  spaces. Fences and headings may be indented up to three spaces; a
+  backtick run with another backtick after it on the line is inline code,
+  not a fence. A block still open at the end of a file adds
+  `trace.sh: <file>:<line>: code block not closed` on standard error and
+  gives status 1. Each heading has its own Verified by line, also when its
+  ID is a duplicate. An ID heading a second scenario, in the same or a later file,
   prints its line as usual, adds `trace.sh: <file>:<line>: duplicate
   scenario ID <ID>, first at <file>:<line>` on standard error, and gives
   status 1.
@@ -62,7 +69,7 @@ T4 and T5 both follow these. Where the spec is silent, this is the decision.
   are ignored.
 - A test file names an ID by a line of its standard output that starts in
   column 1 with `ok` and one or more spaces (`route_test.sh` prints `ok   `),
-  or `FAIL` and one space, then the ID exactly, then `:`. `CAP-1.1:` does not
+  or `FAIL` and one or more spaces, then the ID exactly, then `:`. `CAP-1.1:` does not
   name `CAP-1.10`. Comments, source text, prose and standard error name
   nothing. An ID that no spec has is ignored: no line, no error.
 - Status of a scenario, first match wins:
@@ -84,7 +91,9 @@ T4 and T5 both follow these. Where the spec is silent, this is the decision.
   exits non-zero even if it names nothing, or a scenario heading is
   malformed or reuses an ID; else 0. All scenario lines are printed first in every case,
   standard output holds only those lines. Each test file that exits
-  non-zero is named on standard error as `trace.sh: <file> exited <status>`.
+  non-zero is named on standard error as `trace.sh: <file> exited <status>`,
+  followed by the last five lines of its standard error, indented two
+  spaces.
 - A specs or tests folder that is not a directory exits 2 with
   `trace.sh: not a folder: <path>` on standard error, before any test runs.
 - CRLF: a spec file or test output with CRLF line endings gives the same
@@ -120,6 +129,17 @@ prints `ok trial-break: check_run fails on a wrong line`, which names no
 scenario, and `FAIL trial-break: ...` if the helper passed.
 
 ## Cases
+
+### ROUTE-1.4: Every cell
+
+Implemented by: T7. `route_test.sh` already reads the routing table from the
+task routing spec and checks `route.sh` against every cell, so the new
+`test-design` row needs no new case: T7 adds the row to the spec and to
+`route.sh`, and the test fails until they agree.
+
+| Case | Kind | Given (fixture) | Expected |
+|---|---|---|---|
+| a | normal | the routing table with the `test-design` row | `route.sh test-design low`, `medium` and `high` print `gimli-test-design sonnet medium`, `gimli-test-design sonnet high` and `gimli-test-design opus high` |
 
 ### TRACE-1.1: Every scenario
 
@@ -170,8 +190,20 @@ Implemented by: T5, extended in Review.
 
 | Case | Kind | Given (fixture) | Expected |
 |---|---|---|---|
-| a | failure | `spec a: CAP-1.1 VB not yet: r`, then `#### Scenario CAP-1.1: Copy` (line 13) | `CAP-1.1 not-yet r` twice, status 1, standard error `a/spec.md:13: duplicate scenario ID CAP-1.1, first at ...` |
+| a | failure | `spec a: CAP-1.1 VB not yet: r`, then `#### Scenario CAP-1.1: Copy` (line 13) | `CAP-1.1 not-yet r`, then `CAP-1.1 uncovered -`, status 1, standard error `a/spec.md:13: duplicate scenario ID CAP-1.1, first at ...` |
 | b | failure | `spec a: CAP-1.1 VB not yet: r`; `spec b: CAP-1.1 VB not yet: s` | IDs `CAP-1.1` twice, status 1, standard error names `b/spec.md:5` |
+| c | failure | `spec a: CAP-1.1`; `spec b: CAP-1.1 VB not yet: s` | `CAP-1.1 uncovered -`, `CAP-1.1 not-yet s`, status 1: each heading keeps its own Verified by line |
+
+### TRACE-1.6: Code block not closed
+
+Implemented by: T5, extended in Review.
+
+| Case | Kind | Given (fixture) | Expected |
+|---|---|---|---|
+| a | failure | `spec a: CAP-1.1 VB not yet: r`, then ```` ```sh ```` (line 13) and `#### Scenario CAP-1.2: Hidden`, never closed | `CAP-1.1 not-yet r`, status 1, standard error `a/spec.md:13: code block not closed` |
+| b | edge | as a, but the block holds `echo` and closes with ```` ``` ```` indented two spaces, then `#### Scenario CAP-1.2: After VB not yet: s` | both lines, status 0 |
+| c | edge | as a with the line ```` ```foo``` text ```` instead of a block, then CAP-1.2 as in b | both lines, status 0: inline code is not a fence |
+| d | edge | `#### Scenario CAP-1.2: Three VB not yet: s` indented three spaces, and `#### Scenario CAP-1.3: Four` indented four | `CAP-1.1 not-yet r`, `CAP-1.2 not-yet s`, status 0: four spaces is not a heading |
 
 ### TRACE-2.1: Passing check
 
@@ -202,6 +234,7 @@ Implemented by: T5.
 | f | edge | `spec a: CAP-1.1, CAP-1.2`; `a_test.sh: ok CAP-1.1; FAIL CAP-1.2; exit 1` | both lines `failing a_test.sh`, status 1 |
 | g | edge | `spec a: CAP-1.1 VB [run](https://example.org/1)`; `a_test.sh: FAIL CAP-1.1; exit 1` | `CAP-1.1 failing a_test.sh`: failing wins over a Verified by line |
 | h | failure | `a_test.sh` prints `FAIL CAP-1.1: broken` with CRLF endings, exit 1 | `CAP-1.1 failing a_test.sh`, status 1 |
+| i | failure | `a_test.sh` prints `FAIL  CAP-1.1: broken` (two spaces), exit 0; `b_test.sh: ok CAP-1.1; exit 0` | `CAP-1.1 failing a_test.sh`, status 1 |
 
 ### TRACE-2.3: ID named but not checked
 
@@ -283,7 +316,7 @@ Implemented by: T5, extended in Review.
 
 | Case | Kind | Given (fixture) | Expected |
 |---|---|---|---|
-| a | failure | `spec a: CAP-1.1 VB not yet: r`; `a_test.sh` that only runs `exit 3`; `b_test.sh: ok OTH-1.1; exit 0` | `CAP-1.1 not-yet r`, status 1, standard error holds `trace.sh: a_test.sh exited 3` |
+| a | failure | `spec a: CAP-1.1 VB not yet: r`; `a_test.sh` that writes `setup broke` on standard error and exits 3; `b_test.sh: ok OTH-1.1; exit 0` | `CAP-1.1 not-yet r`, status 1, standard error holds `trace.sh: a_test.sh exited 3` and then `  setup broke` |
 | b | edge | as a | standard error does not name `b_test.sh` |
 
 ### TRACE-5.1: Other folders

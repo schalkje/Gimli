@@ -4,7 +4,7 @@ Part of the [change folder for #<issue>](design.md).
 
 The cases the tests of a change must cover, written before the tests so that
 whoever writes them, and whoever writes the code, work from the same list.
-Every scenario the change's [spec deltas](specs/capability/delta.md) add or
+Every scenario the change's [spec deltas](../README.md#spec-deltas) add or
 modify has a section; a scenario the change leaves alone does not. Test tasks
 in [`tasks.md`](tasks.md) implement the cases and depend on the task that
 writes this file.

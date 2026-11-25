@@ -258,7 +258,7 @@ chk "TRACE-1.4: d, a shorter fence does not close a block" 0 "CAP-1.1 not-yet r"
 fx 15a
 mkspec a "CAP-1.1|not yet: r"
 printf '%s\n' '#### Scenario CAP-1.1: Copy' >> "$S/a/spec.md"
-chk "TRACE-1.5: a, an ID used twice in a file fails" 1 "$(lines 'CAP-1.1 not-yet r' 'CAP-1.1 not-yet r')"
+chk "TRACE-1.5: a, an ID used twice in a file fails" 1 "$(lines 'CAP-1.1 not-yet r' 'CAP-1.1 uncovered -')"
 check_err "TRACE-1.5: a, standard error names both places" "a/spec.md:13: duplicate scenario ID CAP-1.1, first at"
 
 fx 15b
@@ -266,6 +266,34 @@ mkspec a "CAP-1.1|not yet: r"
 mkspec b "CAP-1.1|not yet: s"
 chk_ids "TRACE-1.5: b, an ID used in two files fails" 1 "$(lines CAP-1.1 CAP-1.1)"
 check_err "TRACE-1.5: b, standard error names the second file" "b/spec.md:5: duplicate scenario ID CAP-1.1"
+
+fx 15c
+mkspec a CAP-1.1
+mkspec b "CAP-1.1|not yet: s"
+chk "TRACE-1.5: c, each heading keeps its own Verified by line" 1 "$(lines 'CAP-1.1 uncovered -' 'CAP-1.1 not-yet s')"
+
+# ---- TRACE-1.6: Code block not closed
+
+fx 16a
+mkspec a "CAP-1.1|not yet: r"
+printf '%s\n' '```sh' '#### Scenario CAP-1.2: Hidden' >> "$S/a/spec.md"
+chk "TRACE-1.6: a, an open code block at the end of a file fails" 1 "CAP-1.1 not-yet r"
+check_err "TRACE-1.6: a, standard error names where it opened" "a/spec.md:13: code block not closed"
+
+fx 16b
+mkspec a "CAP-1.1|not yet: r"
+printf '%s\n' '```sh' 'echo' '  ```' '#### Scenario CAP-1.2: After' '' '**Verified by:** not yet: s' >> "$S/a/spec.md"
+chk "TRACE-1.6: b, a closing fence indented up to three spaces closes" 0 "$(lines 'CAP-1.1 not-yet r' 'CAP-1.2 not-yet s')"
+
+fx 16c
+mkspec a "CAP-1.1|not yet: r"
+printf '%s\n' '```foo``` text' '#### Scenario CAP-1.2: After' '' '**Verified by:** not yet: s' >> "$S/a/spec.md"
+chk "TRACE-1.6: c, inline code at the start of a line is not a fence" 0 "$(lines 'CAP-1.1 not-yet r' 'CAP-1.2 not-yet s')"
+
+fx 16d
+mkspec a "CAP-1.1|not yet: r"
+printf '%s\n' '   #### Scenario CAP-1.2: Three' '' '**Verified by:** not yet: s' '    #### Scenario CAP-1.3: Four' >> "$S/a/spec.md"
+chk "TRACE-1.6: d, a heading indented up to three spaces counts, four does not" 0 "$(lines 'CAP-1.1 not-yet r' 'CAP-1.2 not-yet s')"
 
 # ---- TRACE-2.1: Passing check
 
@@ -355,6 +383,12 @@ fx 22h
 mkspec a CAP-1.1
 mktest a_test.sh "printf 'FAIL CAP-1.1: broken\\r\\n'" 'exit 1'
 chk "TRACE-2.2: h, CRLF FAIL line" 1 "CAP-1.1 failing a_test.sh"
+
+fx 22i
+mkspec a CAP-1.1
+mktest a_test.sh "echo 'FAIL  CAP-1.1: broken'" 'exit 0'
+mkcheck b_test.sh 0 "ok CAP-1.1"
+chk "TRACE-2.2: i, FAIL with several spaces is failing" 1 "CAP-1.1 failing a_test.sh"
 
 # ---- TRACE-2.3: ID named but not checked
 
@@ -529,10 +563,11 @@ chk "TRACE-4.2: e, a failing file naming an unknown ID fails the run" 1 "$(lines
 
 fx 43a
 mkspec a "CAP-1.1|not yet: r"
-mktest a_test.sh 'exit 3'
+mktest a_test.sh 'echo setup broke >&2' 'exit 3'
 mkcheck b_test.sh 0 "ok OTH-1.1"
 chk "TRACE-4.3: a, a test file that exits non-zero fails the run" 1 "CAP-1.1 not-yet r"
 check_err "TRACE-4.3: a, standard error names the file and status" "trace.sh: a_test.sh exited 3"
+check_err "TRACE-4.3: a, followed by the end of its standard error" "  setup broke"
 if grep -q b_test.sh "$TMP/err"; then
   not_ok "TRACE-4.3: b, a passing file is not named: $(cat "$TMP/err")"
 else

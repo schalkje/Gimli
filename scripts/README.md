@@ -150,7 +150,8 @@ Windows. The output is one line per scenario, `<ID> <status> <source>`:
 | `failing` | A test prints a `FAIL <ID>:` line, or its file exits non-zero | the file |
 | `uncovered` | None of the above, including Verified by text that is neither | `-` |
 
-Standard error names each test file that exits non-zero, each
+Standard error names each test file that exits non-zero, with the last
+five lines of its standard error, each code block left open, each
 `#### Scenario` line that is not a well-formed heading, and each scenario
 ID used by more than one heading, with file and line; headings inside
 fenced code blocks are skipped.
@@ -184,8 +185,8 @@ Running the tests in CI is later work.
 
 **Naming convention.** A test proves a scenario by printing
 `ok <ID>: <description>` for a passing check and `FAIL <ID>: ...` for a
-failing one, each starting in column 1; one or more spaces after `ok` are
-allowed. It exits non-zero when any check fails. `trace.sh` runs every
+failing one, each starting in column 1; one or more spaces after `ok` or
+`FAIL` are allowed. It exits non-zero when any check fails. `trace.sh` runs every
 `scripts/tests/*_test.sh`, so tests are POSIX shell, fast and offline.
 
 ## protect-main.sh

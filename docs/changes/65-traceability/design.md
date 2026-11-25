@@ -26,7 +26,8 @@ Test design becomes its own task kind. A `test-design` task writes
 `test-design.md` in the change folder: for each scenario it covers, the
 normal, edge and failure cases, and which test task implements them. Plan
 adds one whenever a change's delta adds or modifies scenarios, and the
-`test-unit` and `test-e2e` tasks depend on it.
+`implement`, `test-unit` and `test-e2e` tasks for those scenarios depend on
+it.
 
 ## Decisions
 

@@ -43,31 +43,39 @@ BAD=0
 set +f
 
 # Records, in file and heading order: "S<TAB>ID<TAB>file:line" per scenario
-# heading, "V<TAB>ID<TAB>text" for its first non-empty Verified by line, and
-# "M<TAB>file:line<TAB>text" per "#### Scenario" line that does not parse.
-# Lines in fenced code blocks are skipped; a fence closes only on the same
-# character, at least as many times. A heading is #s and a space.
+# heading; "V<TAB>file:line<TAB>text" for the first non-empty Verified by
+# line under the heading at file:line; "M<TAB>file:line<TAB>text" per
+# "#### Scenario" line that does not parse; "U<TAB>file:line" per code
+# block still open at the end of its file. Fences and headings may be
+# indented up to three spaces, as in Markdown. A fence closes only on the
+# same character, at least as many times; a backtick run with a backtick
+# after it is inline code, not a fence. A heading is #s and a space.
 for f in "$SPECS"/*/spec.md; do
   [ -e "$f" ] || continue
   case $f in */_template/spec.md) continue ;; esac
   awk '
-    { sub(/\r$/, "") }
-    /^(```|~~~)/ {
-      c = substr($0, 1, 1)
+    { sub(/\r$/, "")
+      match($0, /^ */)
+      l = (RLENGTH <= 3) ? substr($0, RLENGTH + 1) : "" }
+    l ~ /^(```|~~~)/ {
+      c = substr(l, 1, 1)
       n = 0
-      while (substr($0, n + 1, 1) == c) n++
-      if (!fence) { fence = 1; fc = c; fl = n }
-      else if (c == fc && n >= fl && substr($0, n + 1) ~ /^[ \t]*$/) fence = 0
+      while (substr(l, n + 1, 1) == c) n++
+      rest = substr(l, n + 1)
+      if (!fence) {
+        if (c == "`" && index(rest, "`") > 0) next
+        fence = 1; fc = c; fl = n; at = FILENAME ":" FNR
+      } else if (c == fc && n >= fl && rest ~ /^[ \t]*$/) fence = 0
       next
     }
     fence { next }
-    /^#+( |$)/ {
+    l ~ /^#+( |$)/ {
       cur = ""
-      if (match($0, /^#### Scenario [A-Z]+-[0-9]+\.[0-9]+:/)) {
-        cur = substr($0, 15, RLENGTH - 15)
-        print "S\t" cur "\t" FILENAME ":" FNR
-      } else if ($0 ~ /^#### Scenario( |$)/) {
-        print "M\t" FILENAME ":" FNR "\t" $0
+      if (match(l, /^#### Scenario [A-Z]+-[0-9]+\.[0-9]+:/)) {
+        cur = FILENAME ":" FNR
+        print "S\t" substr(l, 15, RLENGTH - 15) "\t" cur
+      } else if (l ~ /^#### Scenario( |$)/) {
+        print "M\t" FILENAME ":" FNR "\t" l
       }
       next
     }
@@ -77,6 +85,7 @@ for f in "$SPECS"/*/spec.md; do
       sub(/[ \t]+$/, "", t)
       if (t != "") { seen[cur] = 1; print "V\t" cur "\t" t }
     }
+    END { if (fence) print "U\t" at }
   ' "$f" >> "$WORK/records"
 done
 
@@ -84,10 +93,11 @@ done
 for f in "$TESTS"/*_test.sh; do
   [ -e "$f" ] || continue
   st=0
-  sh "$f" > "$WORK/out" 2>/dev/null < /dev/null || st=$?
+  sh "$f" > "$WORK/out" 2> "$WORK/err" < /dev/null || st=$?
   if [ "$st" -ne 0 ]; then
     BAD=1
     echo "trace.sh: $(basename "$f") exited $st" >&2
+    tail -n 5 "$WORK/err" | sed 's/^/  /' >&2
   fi
   awk -v base="$(basename "$f")" -v st="$st" '
     { sub(/\r$/, "") }
@@ -95,15 +105,16 @@ for f in "$TESTS"/*_test.sh; do
       match($0, /[A-Z]+-[0-9]+\.[0-9]+:/)
       print "R\t" base "\t" st "\tok\t" substr($0, RSTART, RLENGTH - 1)
     }
-    /^FAIL [A-Z]+-[0-9]+\.[0-9]+:/ {
-      print "R\t" base "\t" st "\tFAIL\t" substr($0, 6, index($0, ":") - 6)
+    /^FAIL +[A-Z]+-[0-9]+\.[0-9]+:/ {
+      match($0, /[A-Z]+-[0-9]+\.[0-9]+:/)
+      print "R\t" base "\t" st "\tFAIL\t" substr($0, RSTART, RLENGTH - 1)
     }
   ' "$WORK/out" >> "$WORK/records"
 done
 
 # Combine: order and text from the S and V records, checks from the R records.
 awk -F'\t' '
-  $1 == "S" { n++; ids[n] = $2; next }
+  $1 == "S" { n++; ids[n] = $2; locs[n] = $3; next }
   $1 == "V" { vb[$2] = substr($0, length($2) + 4); has[$2] = 1; next }
   $1 == "R" {
     bad = ($4 == "FAIL" || $3 != 0)
@@ -115,8 +126,8 @@ awk -F'\t' '
       id = ids[i]
       if (id in failing)     { s = "failing";  src = failing[id] }
       else if (id in tested) { s = "tested";   src = tested[id] }
-      else if (id in has) {
-        t = vb[id]
+      else if (locs[i] in has) {
+        t = vb[locs[i]]
         if (tolower(t) ~ /^not yet([ \t:]|$)/) {
           s = "not-yet"
           src = substr(t, 8)
@@ -135,8 +146,11 @@ awk -F'\t' '
 cat "$WORK/lines"
 TAB=$(printf '\t')
 while IFS=$TAB read -r kind loc text; do
-  [ "$kind" = M ] || continue
-  echo "trace.sh: $loc: not a scenario heading: $text" >&2
+  case $kind in
+    M) echo "trace.sh: $loc: not a scenario heading: $text" >&2 ;;
+    U) echo "trace.sh: $loc: code block not closed" >&2 ;;
+    *) continue ;;
+  esac
   BAD=1
 done < "$WORK/records"
 awk -F'\t' '

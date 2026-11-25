@@ -19,13 +19,18 @@ specs claim that nothing yet backs up.
 
 The system SHALL print one line per scenario heading in the capability specs,
 `<ID> <status> <source>`, in the order of the spec files and of the
-scenarios in them, leaving out the spec template and fenced code blocks; a
-fence closes only on a line of the same character, at least as long. A
+scenarios in them, leaving out the spec template and fenced code blocks. As
+in Markdown, fences and headings may be indented up to three spaces, a fence
+closes only on a line of the same character at least as long, and a
+backtick run followed by another backtick on its line is inline code, not a
+fence. A code block still open at the end of its file SHALL be named on
+standard error with the line it opened on and make the run exit with
+status 1. A
 heading `#### Scenario` followed by a space or the end of the line that does
 not start `#### Scenario <ID>:` SHALL get no line, be named on standard
 error with its file and line number, and make the run exit with status 1.
 So SHALL a scenario ID that heads more than one scenario, named with both
-places; each heading still gets its line.
+places; each heading still gets its line, with its own Verified by line.
 
 #### Scenario TRACE-1.1: Every scenario
 
@@ -63,12 +68,20 @@ places; each heading still gets its line.
   first one's
 - **AND** it exits with status 1
 
+#### Scenario TRACE-1.6: Code block not closed
+
+- **GIVEN** a spec with a line ```` ```sh ```` that no fence closes
+- **WHEN** `scripts/trace.sh` runs
+- **THEN** standard error names the file and the line the block opened on
+- **AND** it exits with status 1
+
 ### Requirement TRACE-2: Tested by a passing check
 
 A scenario SHALL be `tested` when a test file in the tests folder exits with
 status 0 and prints a line `ok <ID>: <description>` for it; the source is
-the test file's name. A test file that prints `FAIL <ID>: ...` or exits
-non-zero makes the scenarios it names `failing`.
+the test file's name; one or more spaces may follow `ok`. A test file that
+prints `FAIL <ID>: ...`, again with one or more spaces, or exits non-zero
+makes the scenarios it names `failing`.
 
 #### Scenario TRACE-2.1: Passing check
 
@@ -125,8 +138,9 @@ precedence over the line.
 The system SHALL exit with status 1 when any scenario is `uncovered` or
 `failing`, a test file exits non-zero, or a scenario heading is malformed
 or reuses an ID (TRACE-1), and with status 0 otherwise. It SHALL name on standard error each
-test file that exits non-zero, with its status; standard output holds only
-the scenario lines.
+test file that exits non-zero, with its status, followed by the last five
+lines of that file's standard error; standard output holds only the
+scenario lines.
 
 #### Scenario TRACE-4.1: Uncovered scenario
 
