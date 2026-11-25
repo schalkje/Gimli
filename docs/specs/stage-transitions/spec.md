@@ -31,11 +31,15 @@ and change nothing, unless STAGE-8 applies.
 - **THEN** it prints `plan`
 - **AND** posts no comment and changes no label
 
+**Verified by:** not yet: stage.sh calls gh, so its test needs a gh stub, #66.
+
 #### Scenario STAGE-1.2: Issue without a stage
 
 - **GIVEN** an issue with no `stage:*` label
 - **WHEN** `scripts/stage.sh <issue>` runs
 - **THEN** it prints `none`
+
+**Verified by:** not yet: stage.sh calls gh, so its test needs a gh stub, #66.
 
 The output for an issue carrying several stage labels is not specified yet:
 `stage.sh` prints all of them, for example `plan build`, which is not a stage.
@@ -51,16 +55,22 @@ invalid.
 - **WHEN** `scripts/stage.sh` runs without arguments
 - **THEN** it prints its usage and exits with status 2
 
+**Verified by:** not yet: stage.sh calls gh, so its test needs a gh stub, #66.
+
 #### Scenario STAGE-2.2: Issue is not a number
 
 - **WHEN** the first argument is not a plain number, for example `#5` or `abc`
 - **THEN** it reports that the issue must be a number and exits with status 2
+
+**Verified by:** not yet: stage.sh calls gh, so its test needs a gh stub, #66.
 
 #### Scenario STAGE-2.3: Unknown stage
 
 - **WHEN** the target is not one of the valid stages and not `close` or `parent`
 - **THEN** it names the valid targets and exits with status 2
 - **AND** posts no comment and changes no label
+
+**Verified by:** not yet: stage.sh calls gh, so its test needs a gh stub, #66.
 
 ### Requirement STAGE-3: Move to a stage
 
@@ -75,12 +85,16 @@ leave the issue with exactly that one stage label.
 - **AND** the issue carries `stage:plan` and no other `stage:*` label
 - **AND** it prints `#<issue>: refine → plan`
 
+**Verified by:** not yet: stage.sh calls gh, so its test needs a gh stub, #66.
+
 #### Scenario STAGE-3.2: Move with a note
 
 - **WHEN** `scripts/stage.sh <issue> build Plan posted.` runs
 - **THEN** the comment has `Stage: <old> → build` as its first line, then a
   blank line, then `Plan posted.`
 - **AND** all words after the stage are joined into the note, quoted or not
+
+**Verified by:** not yet: stage.sh calls gh, so its test needs a gh stub, #66.
 
 #### Scenario STAGE-3.3: Issue without a stage
 
@@ -89,12 +103,16 @@ leave the issue with exactly that one stage label.
 - **THEN** the comment reads `Stage: none → refine` and the issue carries
   `stage:refine`
 
+**Verified by:** not yet: stage.sh calls gh, so its test needs a gh stub, #66.
+
 #### Scenario STAGE-3.4: Issue with several stage labels
 
 - **GIVEN** an issue carrying more than one valid `stage:*` label, none of
   which is the target
 - **WHEN** it is moved to a stage
 - **THEN** every old stage label is removed and only the target label remains
+
+**Verified by:** not yet: stage.sh calls gh, so its test needs a gh stub, #66.
 
 The case where one of several stage labels is the target is not specified
 yet: `stage.sh` would remove and add the same label in one edit, and `gh`
@@ -115,6 +133,8 @@ transition documented.
   change fails
 - **THEN** the comment is on the issue and the old stage label is unchanged
 
+**Verified by:** not yet: stage.sh calls gh, so its test needs a gh stub, #66.
+
 #### Scenario STAGE-4.2: Later step fails on close or reopen
 
 - **WHEN** a close or a reopen fails after the comment is posted
@@ -123,6 +143,8 @@ transition documented.
   reopen, the issue is reopened before the labels change
 - **AND** the script stops with a non-zero status, so the partial state is
   visible to whoever ran it
+
+**Verified by:** not yet: stage.sh calls gh, so its test needs a gh stub, #66.
 
 ### Requirement STAGE-5: No-op at the same stage
 
@@ -136,12 +158,16 @@ stage.
 - **THEN** it prints `#<issue>: already at build`
 - **AND** posts no comment and changes no label
 
+**Verified by:** not yet: stage.sh calls gh, so its test needs a gh stub, #66.
+
 #### Scenario STAGE-5.2: Closed issue already at the target stage
 
 - **GIVEN** a closed issue that still carries `stage:build`
 - **WHEN** `scripts/stage.sh <issue> build` runs
 - **THEN** it prints `#<issue>: already at build`
 - **AND** posts no comment, and the issue stays closed
+
+**Verified by:** not yet: stage.sh calls gh, so its test needs a gh stub, #66.
 
 ### Requirement STAGE-6: Close
 
@@ -155,6 +181,8 @@ stage label, and leave the issue closed.
 - **THEN** a comment `Stage: merge → close` with the note is posted
 - **AND** the `stage:merge` label is removed and the issue is closed
 
+**Verified by:** not yet: stage.sh calls gh, so its test needs a gh stub, #66.
+
 #### Scenario STAGE-6.2: Close an issue GitHub already closed
 
 - **GIVEN** an issue closed by a closing keyword that still carries
@@ -162,6 +190,8 @@ stage label, and leave the issue closed.
 - **WHEN** `scripts/stage.sh <issue> close` runs
 - **THEN** the comment is still posted and the label removed
 - **AND** the issue stays closed
+
+**Verified by:** not yet: stage.sh calls gh, so its test needs a gh stub, #66.
 
 ### Requirement STAGE-7: Reopen a closed issue
 
@@ -174,6 +204,8 @@ At its current stage, STAGE-5.2 applies instead.
 - **WHEN** `scripts/stage.sh <issue> build "Regression found."` runs
 - **THEN** the comment is posted, the issue is reopened, and it carries
   `stage:build`
+
+**Verified by:** not yet: stage.sh calls gh, so its test needs a gh stub, #66.
 
 ### Requirement STAGE-8: Refuse a non-canonical stage label
 
@@ -189,6 +221,8 @@ carries a `stage:*` label that is not one of the valid stages.
   exits with status 1
 - **AND** posts no comment and changes no label
 
+**Verified by:** not yet: stage.sh calls gh, so its test needs a gh stub, #66.
+
 ### Requirement STAGE-9: Mark a parent issue
 
 Given the target `parent`, the system SHALL record the transition and remove
@@ -202,6 +236,8 @@ every stage label, without closing or reopening the issue.
 - **AND** the issue carries no `stage:*` label and stays open
 - **AND** it prints `#<issue>: refine → parent`
 
+**Verified by:** not yet: stage.sh calls gh, so its test needs a gh stub, #66.
+
 #### Scenario STAGE-9.2: Issue without a stage label
 
 - **GIVEN** an issue with no `stage:*` label
@@ -209,12 +245,16 @@ every stage label, without closing or reopening the issue.
 - **THEN** it prints `#<issue>: no stage label`
 - **AND** posts no comment and changes no label
 
+**Verified by:** not yet: stage.sh calls gh, so its test needs a gh stub, #66.
+
 #### Scenario STAGE-9.3: Closed issue stays closed
 
 - **GIVEN** a closed issue that carries a stage label
 - **WHEN** `scripts/stage.sh <issue> parent` runs
 - **THEN** the comment is posted and the label removed
 - **AND** the issue stays closed
+
+**Verified by:** not yet: stage.sh calls gh, so its test needs a gh stub, #66.
 
 ## Retired scenario IDs
 

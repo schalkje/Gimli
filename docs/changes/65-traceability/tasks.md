@@ -107,7 +107,7 @@ can fail.
 - **Complexity:** low
 - **Owns:** `docs/specs/stage-transitions/spec.md`, `docs/specs/task-routing/spec.md`
 - **Covers:** none
-- **Status:** todo
+- **Status:** done
 
 Every STAGE scenario gets `**Verified by:** not yet: stage.sh calls gh;
 needs a gh stub, #66.` ROUTE-3.1 to 3.3 get a link to the fixture
