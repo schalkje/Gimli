@@ -106,6 +106,41 @@ A failure exits 3, never 0 or 1, so a caller cannot mistake it for a decision.
 The number may be an issue or a pull request. The heading is trimmed of
 trailing whitespace like the comment's first line, and must be one line.
 
+## route.sh
+
+Print the agent, model and effort for a task of a change folder, from its
+Kind and Complexity in `tasks.md`. `/build` runs it for each task it hands to
+an agent. Reads nothing and calls no `gh`.
+
+```sh
+scripts/route.sh implement high   # gimli-implement opus high
+scripts/route.sh docs low         # gimli-docs haiku low
+```
+
+The output is one line, `<agent> <model> <effort>`. The table it implements,
+and what each `docs` complexity level means, are in the
+[task routing spec](../docs/specs/task-routing/spec.md#requirement-route-1-route-a-task-by-kind-and-complexity).
+An unknown kind or complexity, or a number of arguments other than two,
+exits with status 2 and prints nothing on standard output; the message goes
+to standard error.
+
+Changing the table means changing the spec and this script together; the
+test below fails until they agree.
+
+## Tests
+
+Tests live in `scripts/tests/`, one POSIX shell file per script, and run
+without network or `gh`:
+
+```sh
+sh scripts/tests/route_test.sh
+```
+
+Each prints one line per check and a summary, and exits non-zero if any
+check fails. `route_test.sh` reads the routing table from the task routing
+spec and checks `route.sh` against every cell, then the invalid-input
+scenarios. Running the tests in CI is later work.
+
 ## protect-main.sh
 
 Apply the repository settings and the `protect-main` ruleset that make `main`
@@ -140,7 +175,7 @@ Behaviour worth knowing:
 ## lib.sh
 
 Not a command. A library of helpers sourced by `stage.sh`, `risk.sh`,
-`guard.sh`, and `protect-main.sh` with `. "$(dirname "$0")/lib.sh"`, so it is
+`guard.sh`, `protect-main.sh` and `route.sh` with `. "$(dirname "$0")/lib.sh"`, so it is
 found next to the calling script whatever the working directory. It holds only what at least two
 of them use: usage printing from the caller's header comment, the issue-number
 check, argument and note parsing, the membership and canonical-label checks,

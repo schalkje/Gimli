@@ -57,7 +57,7 @@ on `main`, and the index row.
 - **Complexity:** low
 - **Owns:** `scripts/route.sh`, `scripts/README.md`
 - **Covers:** ROUTE-1.1, ROUTE-1.2, ROUTE-1.3, ROUTE-1.4, ROUTE-2.1, ROUTE-2.2, ROUTE-2.3
-- **Status:** todo
+- **Status:** done
 
 POSIX shell, following `risk.sh`: a usage header, `lib.sh` for `usage` and
 `in_list` if they fit, the table as a `case` statement, status 2 on invalid
