@@ -50,7 +50,7 @@ lookup's output. Update the usage header. Every other argument rule stays.
 - **Complexity:** low
 - **Owns:** `scripts/tests/route_test.sh`
 - **Covers:** ROUTE-2.3, ROUTE-5.1
-- **Status:** todo
+- **Status:** done
 
 Add a ROUTE-5.1 check: `route.sh --table` prints 21 lines, each matching the
 spec's cell for its kind and complexity, in the table's order. Keep the

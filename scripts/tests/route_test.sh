@@ -3,7 +3,7 @@
 #
 #   sh scripts/tests/route_test.sh
 #
-# Covers ROUTE-1.1 to ROUTE-1.4 and ROUTE-2.1 to ROUTE-2.3 in
+# Covers ROUTE-1.1 to ROUTE-1.4, ROUTE-2.1 to ROUTE-2.3 and ROUTE-5.1 in
 # docs/specs/task-routing/spec.md. Prints one line per check and a summary;
 # exits 1 if any check fails. Uses no network and no gh.
 
@@ -91,6 +91,27 @@ check_invalid "ROUTE-2.2" implement extreme
 check_invalid "ROUTE-2.3"
 check_invalid "ROUTE-2.3" implement
 check_invalid "ROUTE-2.3" implement high extra
+check_invalid "ROUTE-2.3" --tables
+
+# ROUTE-5.1: --table prints every cell, in the table's order, one line each,
+# and exits 0. The expected lines come from the same $ROWS as ROUTE-1.4.
+EXPECTED=$(while read -r kind lm le mm me hm he; do
+  [ -n "$kind" ] || continue
+  echo "$kind low gimli-$kind $lm $le"
+  echo "$kind medium gimli-$kind $mm $me"
+  echo "$kind high gimli-$kind $hm $he"
+done <<EOF
+$ROWS
+EOF
+)
+TABLE=$(sh "$ROUTE" --table 2>/dev/null)
+TABLE_STATUS=$?
+if [ "$TABLE_STATUS" -eq 0 ] && [ "$TABLE" = "$EXPECTED" ]; then
+  ok "ROUTE-5.1: route.sh --table prints the 21 cells in table order, status 0"
+else
+  not_ok "ROUTE-5.1: route.sh --table -> status $TABLE_STATUS, output differs from the spec's table"
+  echo "$TABLE" | sed 's/^/     got: /'
+fi
 
 echo "$PASS passed, $FAIL failed"
 [ "$FAIL" -eq 0 ]
