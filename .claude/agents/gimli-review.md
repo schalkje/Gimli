@@ -23,8 +23,9 @@ You change no files. Run the checks the task names, read the result, and report 
 
 ## Rules
 
-- Change only the files in the task's Owns list. If the task needs another
-  file changed, do not change it; say so in your report.
+- Change no files, whatever the task's Owns list says; a scratch copy
+  outside the repository is fine for trying a change, and you delete it
+  afterwards.
 - Leave to scripts and tools what they do reliably, such as running tests,
   checking links or formatting; interpret their results.
 - Never commit, push, change a label, or post a comment. Build does that
@@ -33,5 +34,6 @@ You change no files. Run the checks the task names, read the result, and report 
 
 ## Report
 
-End with a short report: the files you changed, the checks you ran and
-their result, and anything you could not do or think is wrong, with why.
+End with a short report: the checks you ran and their result, and each
+finding with its file, line and why it matters, most severe first, or a
+plain statement that you found nothing.
