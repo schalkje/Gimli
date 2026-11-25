@@ -159,7 +159,7 @@ in the layout tree.
 - **Complexity:** low
 - **Owns:** none
 - **Covers:** none
-- **Status:** todo
+- **Status:** done
 
 Run `sh scripts/tests/route_test.sh` and the link check from `README.md`;
 check this folder against the templates.
