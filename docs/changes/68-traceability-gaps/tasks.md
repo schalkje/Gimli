@@ -24,7 +24,7 @@ T1 is the contract: every other stream depends on the spec it writes.
 - **Complexity:** low
 - **Owns:** `docs/specs/traceability/spec.md`, `docs/specs/stage-transitions/spec.md`, `docs/specs/README.md`
 - **Covers:** TRACE-1.7, TRACE-1.8, TRACE-3.1, TRACE-3.4, TRACE-5.5
-- **Status:** todo
+- **Status:** done
 
 Apply [the delta](specs/traceability/delta.md) to the living spec: replace
 the TRACE-1, TRACE-3 and TRACE-5 requirement text and TRACE-3.1, and add
