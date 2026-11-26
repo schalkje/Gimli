@@ -42,7 +42,7 @@ say that a Verified by paragraph may wrap and its lines are read joined.
 - **Complexity:** medium
 - **Owns:** `docs/changes/68-traceability-gaps/test-design.md`
 - **Covers:** TRACE-1.7, TRACE-1.8, TRACE-3.1, TRACE-3.4, TRACE-5.5
-- **Status:** todo
+- **Status:** done
 
 Write the cases for each scenario the delta adds or modifies, in the
 [template](../_template/test-design.md)'s form, reusing the fixture
