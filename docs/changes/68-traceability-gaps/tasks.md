@@ -95,7 +95,7 @@ Covers line. Run each new check against `main`'s `trace.sh`
 - **Complexity:** medium
 - **Owns:** `scripts/README.md`
 - **Covers:** none
-- **Status:** todo
+- **Status:** done
 
 In the `trace.sh` section: lines in byte order of the spec paths; the
 heading check in any case; Verified by text read as a joined paragraph;
