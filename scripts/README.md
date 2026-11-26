@@ -139,7 +139,7 @@ scripts/trace.sh <specs> <tests>        # other directories
 ```
 
 It reads `<specs>/*/spec.md`, except `_template`, and runs every
-`<tests>/*_test.sh` with `sh`, so a full run takes a minute or two on
+`<tests>/*_test.sh` with `sh`, so a full run takes several minutes on
 Windows. The output is one line per scenario, `<ID> <status> <source>`, in
 the byte order of the spec paths whatever the locale; test files run in byte
 order too:

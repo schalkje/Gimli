@@ -44,7 +44,7 @@ for d in "$SPECS" "$TESTS"; do
   fi
 done
 
-TESTS_PHYS=$(cd "$TESTS" && pwd -P)
+TESTS_PHYS=$(CDPATH= cd -P -- "$TESTS" && pwd -P)
 if printf '%s\n' "${TRACE_RUNNING:-}" | grep -q -x -F -e "$TESTS_PHYS"; then
   echo "trace.sh: already running the tests in $TESTS_PHYS" >&2
   exit 2
@@ -75,10 +75,9 @@ set +f
 for f in "$SPECS"/*/spec.md; do
   [ -e "$f" ] || continue
   case $f in */_template/spec.md) continue ;; esac
-  printf '%s\n' "${f%/spec.md}"
+  printf '%s\n' "$f"
 done | LC_ALL=C sort > "$WORK/speclist"
-while IFS= read -r d; do
-  f=$d/spec.md
+while IFS= read -r f; do
   awk '
     function flush() {
       if (para && ptext != "" && !(pcur in seen)) {

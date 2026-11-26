@@ -110,7 +110,7 @@ exit 2 also for a tests folder a run above is already running, with what
 - **Complexity:** medium
 - **Owns:** none
 - **Covers:** none
-- **Status:** todo
+- **Status:** done
 
 Run `sh scripts/trace.sh` (it must exit 0, with TRACE-1.7, 1.8, 3.4 and 5.5
 `tested` and STAGE-2.1 to 2.3 `not-yet` with the new reason),
