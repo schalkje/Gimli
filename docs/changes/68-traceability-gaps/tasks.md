@@ -80,7 +80,7 @@ usage header. POSIX shell and awk as now; no `gh`, no network.
 - **Complexity:** medium
 - **Owns:** `scripts/tests/trace_test.sh`
 - **Covers:** TRACE-1.7, TRACE-1.8, TRACE-3.1, TRACE-3.4, TRACE-5.5
-- **Status:** todo
+- **Status:** done
 
 Implement the cases in `test-design.md` in `trace_test.sh`'s existing
 style, printing `ok <ID>: ...` or `FAIL <ID>: ...`, and update its header's
