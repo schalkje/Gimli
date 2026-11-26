@@ -3,7 +3,7 @@
 #
 #   route.sh <kind> <complexity>   print "<agent> <model> <effort>"
 #
-# Kinds: design spec implement test-unit test-e2e docs review
+# Kinds: design spec test-design implement test-unit test-e2e docs review
 # Complexity: low medium high
 # The table is the routing table in docs/specs/task-routing/spec.md;
 # scripts/tests/route_test.sh checks this script against it.
@@ -12,7 +12,7 @@ set -eu
 
 . "$(dirname "$0")/lib.sh"
 
-KINDS="design spec implement test-unit test-e2e docs review"
+KINDS="design spec test-design implement test-unit test-e2e docs review"
 LEVELS="low medium high"
 
 [ $# -eq 2 ] || usage >&2
@@ -36,6 +36,9 @@ case "$KIND/$LEVEL" in
   spec/low)          CELL="sonnet medium" ;;
   spec/medium)       CELL="sonnet high" ;;
   spec/high)         CELL="opus high" ;;
+  test-design/low)    CELL="sonnet medium" ;;
+  test-design/medium) CELL="sonnet high" ;;
+  test-design/high)   CELL="opus high" ;;
   implement/low)     CELL="sonnet low" ;;
   implement/medium)  CELL="sonnet medium" ;;
   implement/high)    CELL="opus high" ;;

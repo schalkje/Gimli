@@ -20,6 +20,7 @@ every call.
 | [`gimli-design`](../../.claude/agents/gimli-design.md) | `design` | sonnet, high | Read, Grep, Glob, Edit, Write | Yes |
 | [`gimli-spec`](../../.claude/agents/gimli-spec.md) | `spec` | sonnet, high | Read, Grep, Glob, Edit, Write | Yes |
 | [`gimli-implement`](../../.claude/agents/gimli-implement.md) | `implement` | sonnet, medium | Read, Grep, Glob, Edit, Write, Bash | Yes |
+| [`gimli-test-design`](../../.claude/agents/gimli-test-design.md) | `test-design` | sonnet, high | Read, Grep, Glob, Edit, Write | Yes |
 | [`gimli-test-unit`](../../.claude/agents/gimli-test-unit.md) | `test-unit` | sonnet, low | Read, Grep, Glob, Edit, Write, Bash | Yes |
 | [`gimli-test-e2e`](../../.claude/agents/gimli-test-e2e.md) | `test-e2e` | sonnet, medium | Read, Grep, Glob, Edit, Write, Bash | Yes |
 | [`gimli-docs`](../../.claude/agents/gimli-docs.md) | `docs` | sonnet, medium | Read, Grep, Glob, Edit, Write | Yes |
@@ -41,6 +42,7 @@ context also lets a cheaper model do the task. `/build` gives each agent:
 | The files it may change | the task's Owns list |
 | The design decisions | the Decisions section of `design.md` |
 | What it implements or tests | the spec or delta sections for the scenario IDs in the task's Covers field |
+| The cases to test | the folder's `test-design.md`, when the task depends on a `test-design` task |
 | What it is reviewed against | the Principles section of the [architecture overview](README.md#principles) |
 
 Anything else, such as a file the task names or an existing pattern to

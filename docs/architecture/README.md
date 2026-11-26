@@ -32,7 +32,7 @@ flowchart LR
 | Change folders | `docs/changes/` | The design, tasks and spec deltas of each large change, written at Plan and followed by Build. |
 | Stage skills | `.claude/skills/` | Run a lifecycle stage in Claude Code, invoked as `/<stage> <issue>`; each starts with the shared preamble. |
 | Agents | `.claude/agents/` | Do one task of a change folder each, for `/build`, on the model and effort the routing table gives; described in [Agents](agents.md). |
-| Scripts | `scripts/` | Deterministic helpers for stage and risk labels, the duplicate guard, task routing, and the ruleset. |
+| Scripts | `scripts/` | Deterministic helpers for stage and risk labels, the duplicate guard, task routing, traceability (`trace.sh`), and the ruleset. |
 | Templates | `.github/ISSUE_TEMPLATE/`, `.github/PULL_REQUEST_TEMPLATE.md` | Shape the work item that starts the cycle and the pull request that carries the evidence. |
 | Workflows | `.github/workflows/` | Run the AI review when a pull request is marked ready, and answer `@claude` mentions. |
 | Vendored plugin | `vendor/claude-plugins/`, `.claude-plugin/` | The `code-review` plugin the AI review runs, copied verbatim from upstream. |
@@ -60,6 +60,10 @@ Changes are reviewed against these. Each links to where it is defined.
   the files in its task's Owns list and never commits, pushes or labels;
   Build checks the files and commits
   ([ROUTE-3](../specs/task-routing/spec.md#requirement-route-3-delegate-the-tasks-of-a-change-folder)).
+- **Every scenario is tested, evidenced or marked not yet.** `scripts/trace.sh`
+  fails on a scenario that is none of these
+  ([traceability spec](../specs/traceability/spec.md),
+  [ADR 0005](../adr/0005-traceability.md)).
 - **Pinned and vendored dependencies.** Workflow actions are pinned and the
   review plugin is vendored, never edited by hand
   ([`workflow-dependencies.md`](../workflow-dependencies.md)).

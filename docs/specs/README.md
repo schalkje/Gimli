@@ -23,6 +23,19 @@ are already right for that location.
 - Each requirement has one or more scenarios, each a heading
   `#### Scenario <CAP>-<req>.<n>: <name>` and a list of **GIVEN** (optional),
   **WHEN**, **THEN** and **AND** lines describing observable behaviour.
+- A scenario may end with a **Verified by** line, a paragraph under its list:
+  `**Verified by:** <link to the evidence>`, or
+  `**Verified by:** not yet: <reason>`, followed where one exists by the
+  issue that will close the gap, as in
+  `**Verified by:** not yet: needs a gh stub, #66`. Evidence must be a
+  Markdown link; any other text counts as no line. It records coverage, not
+  behaviour, so adding or editing one needs no [spec delta](../changes/README.md#spec-deltas).
+  A scenario with a passing check, an `ok <ID>:` line printed by a test in
+  `scripts/tests/` that exits 0, needs no Verified by line.
+  `scripts/trace.sh` reads these lines; see [Traceability](traceability/spec.md).
+- Headings use `#`, not `---` or `===` underlines, and a code block's
+  fences start a line, not a list item: `scripts/trace.sh` reads only
+  these forms.
 - A spec ends with a **Retired scenario IDs** section.
 
 This is the requirement-and-scenario style OpenSpec uses, so the format stays
@@ -57,3 +70,4 @@ A change with a change folder states what it does to a spec in a
 |---|---|---|
 | [Stage transitions](stage-transitions/spec.md) | `STAGE` | Reading and changing an issue's lifecycle stage with `scripts/stage.sh`. |
 | [Task routing](task-routing/spec.md) | `ROUTE` | Choosing the agent, model and effort for a task of a change folder, and Build delegating it. |
+| [Traceability](traceability/spec.md) | `TRACE` | Listing every scenario with whether a passing check, evidence or a stated gap backs it, with `scripts/trace.sh`. |

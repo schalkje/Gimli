@@ -2,8 +2,8 @@
 #
 #   . "$(dirname "$0")/lib.sh"
 #
-# Holds only what at least two of stage.sh, risk.sh, guard.sh,
-# protect-main.sh and route.sh use.
+# Holds only what at least two of stage.sh, risk.sh, guard.sh, protect-main.sh,
+# route.sh and trace.sh use.
 # Rules that belong to one script, such as the order of comment and label
 # changes, stay in that script. See scripts/README.md.
 

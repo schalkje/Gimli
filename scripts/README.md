@@ -127,6 +127,46 @@ to standard error.
 Changing the table means changing the spec and this script together; the
 test below fails until they agree.
 
+## trace.sh
+
+Report, for every scenario of every capability spec, whether it is tested,
+evidenced, marked not yet, failing or uncovered. It is run at the
+[Test stage](../docs/lifecycle.md#5-test). Calls no `gh`.
+
+```sh
+scripts/trace.sh                        # docs/specs and scripts/tests
+scripts/trace.sh <specs> <tests>        # other directories
+```
+
+It reads `<specs>/*/spec.md`, except `_template`, and runs every
+`<tests>/*_test.sh` with `sh`, so a full run takes a minute or two on
+Windows. The output is one line per scenario, `<ID> <status> <source>`:
+
+| Status | Meaning | Source |
+|---|---|---|
+| `tested` | A test file exits 0 and prints `ok <ID>:` | the test file name |
+| `evidence` | The scenario's `**Verified by:**` line holds a Markdown link | the text |
+| `not-yet` | Its Verified by line starts `not yet`, in any case | the reason |
+| `failing` | A test prints a `FAIL <ID>:` line, or its file exits non-zero | the file |
+| `uncovered` | None of the above, including Verified by text that is neither | `-` |
+
+Standard error names each test file that exits non-zero, with the last
+five lines of its standard error, each code block left open, each
+`#### Scenario` line that is not a well-formed heading, and each scenario
+ID used by more than one heading, with file and line; headings inside
+fenced code blocks are skipped.
+
+The Verified by format is in the [spec format](../docs/specs/README.md).
+
+| Exit | Meaning |
+|---|---|
+| 0 | No scenario is uncovered or failing, every test file exited 0, and every scenario heading is well formed with its own ID |
+| 1 | A scenario is uncovered or failing, a test file exited non-zero or printed a `FAIL` line, or a scenario heading is malformed or reuses an ID |
+| 2 | Usage error: not zero or two arguments, or a path that is not a folder; or no arguments inside a test it runs (`TRACE_RUNNING` is set) |
+
+The rules are the [traceability spec](../docs/specs/traceability/spec.md);
+why they are so is [ADR 0005](../docs/adr/0005-traceability.md).
+
 ## Tests
 
 Tests live in `scripts/tests/`, one POSIX shell file per script, and run
@@ -134,12 +174,20 @@ without network or `gh`:
 
 ```sh
 sh scripts/tests/route_test.sh
+sh scripts/tests/trace_test.sh
 ```
 
 Each prints one line per check and a summary, and exits non-zero if any
 check fails. `route_test.sh` reads the routing table from the task routing
 spec and checks `route.sh` against every cell, then the invalid-input
-scenarios. Running the tests in CI is later work.
+scenarios. `trace_test.sh` checks `trace.sh` against the traceability spec.
+Running the tests in CI is later work.
+
+**Naming convention.** A test proves a scenario by printing
+`ok <ID>: <description>` for a passing check and `FAIL <ID>: ...` for a
+failing one, each starting in column 1; one or more spaces after `ok` or
+`FAIL` are allowed. It exits non-zero when any check fails. `trace.sh` runs every
+`scripts/tests/*_test.sh`, so tests are POSIX shell, fast and offline.
 
 ## protect-main.sh
 
@@ -175,7 +223,7 @@ Behaviour worth knowing:
 ## lib.sh
 
 Not a command. A library of helpers sourced by `stage.sh`, `risk.sh`,
-`guard.sh`, `protect-main.sh` and `route.sh` with `. "$(dirname "$0")/lib.sh"`, so it is
+`guard.sh`, `protect-main.sh`, `route.sh` and `trace.sh` with `. "$(dirname "$0")/lib.sh"`, so it is
 found next to the calling script whatever the working directory. It holds only what at least two
 of them use: usage printing from the caller's header comment, the issue-number
 check, argument and note parsing, the membership and canonical-label checks,

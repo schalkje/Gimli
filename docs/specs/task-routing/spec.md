@@ -28,6 +28,7 @@ independently.
 |---|---|---|---|
 | design | sonnet medium | sonnet high | opus high |
 | spec | sonnet medium | sonnet high | opus high |
+| test-design | sonnet medium | sonnet high | opus high |
 | implement | sonnet low | sonnet medium | opus high |
 | test-unit | haiku low | sonnet low | sonnet medium |
 | test-e2e | sonnet low | sonnet medium | opus high |
@@ -62,8 +63,8 @@ approval), not a stronger model.
 
 #### Scenario ROUTE-1.4: Every cell
 
-- **WHEN** `scripts/route.sh` runs for each of the 21 kind and complexity
-  pairs in the table
+- **WHEN** `scripts/route.sh` runs for each kind and complexity pair in the
+  table
 - **THEN** each prints the agent and the model and effort in that cell
 
 ### Requirement ROUTE-2: Reject invalid input
@@ -104,6 +105,8 @@ the commit itself.
   Decisions of `design.md`, the spec sections for the scenarios it covers,
   and the architecture principles
 
+**Verified by:** [fixture run on #60](https://github.com/schalkje/Gimli/pull/62), summarised under AC5 in [PR #59](https://github.com/schalkje/Gimli/pull/59): Build handed five tasks to the agent, model and effort `route.sh` gave.
+
 #### Scenario ROUTE-3.2: Build commits
 
 - **GIVEN** an agent has finished a task and changed only files in its Owns
@@ -116,6 +119,8 @@ the commit itself.
   before the agent ran; if not, Build stops without publishing and reports
   it
 
+**Verified by:** [fixture run on #60](https://github.com/schalkje/Gimli/pull/62), summarised under AC5 in [PR #59](https://github.com/schalkje/Gimli/pull/59): each task committed with its `Routed:` line, no ref moved.
+
 #### Scenario ROUTE-3.3: File outside the task
 
 - **GIVEN** an agent changed a file that is not in its task's Owns list
@@ -125,6 +130,8 @@ the commit itself.
 - **AND** if the agent changes such a file again, Build reverts it or keeps
   it, and records either as a deviation
 - **AND** it never commits such a change without a deviation
+
+**Verified by:** not yet: no fixture run has had an agent change a file outside its Owns list; enforcing the rule instead is #64.
 
 ### Requirement ROUTE-4: No routing without a change folder
 
@@ -137,6 +144,8 @@ delegating.
 - **WHEN** `/build` runs
 - **THEN** it implements the plan's Steps in the main session and calls no
   `gimli-*` agent
+
+**Verified by:** [fixture run on #61](https://github.com/schalkje/Gimli/pull/63), summarised under AC6 in [PR #59](https://github.com/schalkje/Gimli/pull/59): a comment plan built in the main session, with no `gimli-*` agent.
 
 ## Retired scenario IDs
 

@@ -36,8 +36,9 @@ Closes #
 
 ## Test output
 
-<!-- Paste the relevant test run output or link to the CI run. Attach screenshots
-     for anything visual. -->
+<!-- Paste the relevant test run output or link to the CI run, and the
+     scripts/trace.sh lines for the scenarios this change touches. Attach
+     screenshots for anything visual. -->
 
 ## Known limitations
 
