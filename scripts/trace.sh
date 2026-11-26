@@ -5,14 +5,20 @@
 #
 # Reads <specs>/*/spec.md (not _template) and runs <tests>/*_test.sh with sh;
 # the defaults are docs/specs and scripts/tests of this repository.
-# Status: tested (a test file exits 0 and prints "ok <ID>:"), evidence or
-# not-yet (a "**Verified by:**" line under the scenario), failing, uncovered.
+# Spec and test files are read in byte order (LC_ALL=C sort), whatever the
+# locale. Status: tested (a test file exits 0 and prints "ok <ID>:"),
+# evidence or not-yet (a "**Verified by:**" paragraph under the scenario: that
+# line and the lines after it up to a blank line, heading or fence, joined
+# with one space), failing, uncovered.
 # The source is "-" when there is none. Exit 1 when a scenario is uncovered or
-# failing, a test file exits non-zero, a "#### Scenario" line is not a
-# well-formed heading, or two headings share an ID, or a test prints a FAIL
-# line; exit 2 on a usage error, a path that is not a folder, or a run with
-# no arguments from inside a test trace.sh started. The rules are in
-# docs/specs/traceability/spec.md; scripts/tests/trace_test.sh checks them.
+# failing, a test file exits non-zero, a heading that starts with the word
+# "scenario" in any case is not a well-formed "#### Scenario <ID>:" heading,
+# or two headings share an ID, or a test prints a FAIL line; exit 2 on a
+# usage error, a path that is not a folder, a run with no arguments from
+# inside a test trace.sh started, or a run of a tests folder that a run above
+# it is already running. TRACE_RUNNING holds those folders (physical paths),
+# one per line. The rules are in docs/specs/traceability/spec.md;
+# scripts/tests/trace_test.sh checks them.
 
 set -eu
 
@@ -38,6 +44,14 @@ for d in "$SPECS" "$TESTS"; do
   fi
 done
 
+TESTS_PHYS=$(cd "$TESTS" && pwd -P)
+if printf '%s\n' "${TRACE_RUNNING:-}" | grep -q -x -F -e "$TESTS_PHYS"; then
+  echo "trace.sh: already running the tests in $TESTS_PHYS" >&2
+  exit 2
+fi
+RUNNING=${TRACE_RUNNING:+$TRACE_RUNNING
+}$TESTS_PHYS
+
 WORK=$(mktemp -d)
 trap 'rm -rf "$WORK"' EXIT
 trap 'exit 130' INT TERM
@@ -49,58 +63,97 @@ set +f
 
 # Records, in file and heading order: "S<TAB>ID<TAB>file:line" per scenario
 # heading; "V<TAB>file:line<TAB>text" for the first non-empty Verified by
-# line under the heading at file:line; "M<TAB>file:line<TAB>text" per
-# "#### Scenario" line that does not parse; "U<TAB>file:line" per code
-# block still open at the end of its file. Fences and headings may be
+# paragraph under the heading at file:line (its lines joined with one space);
+# "M<TAB>file:line<TAB>text" per heading that starts with the word "scenario"
+# in any case and is not a "#### Scenario" heading that parses; "U<TAB>file:line"
+# per code block still open at the end of its file. Fences and headings may be
 # indented up to three spaces, as in Markdown. A fence closes only on the
 # same character, at least as many times; a backtick run with a backtick
-# after it is inline code, not a fence. A heading is #s and a space.
+# after it is inline code, not a fence. A heading is #s and a space. A
+# paragraph ends at a blank line, a heading, a fence or the end of the file.
+# The files are taken in byte order, not in the glob order of the locale.
 for f in "$SPECS"/*/spec.md; do
   [ -e "$f" ] || continue
   case $f in */_template/spec.md) continue ;; esac
+  printf '%s\n' "${f%/spec.md}"
+done | LC_ALL=C sort > "$WORK/speclist"
+while IFS= read -r d; do
+  f=$d/spec.md
   awk '
+    function flush() {
+      if (para && ptext != "" && !(pcur in seen)) {
+        seen[pcur] = 1
+        print "V\t" pcur "\t" ptext
+      }
+      para = 0
+      ptext = ""
+    }
+    function add(s) {
+      sub(/^[ \t]+/, "", s)
+      sub(/[ \t]+$/, "", s)
+      if (s == "") return
+      ptext = (ptext == "") ? s : ptext " " s
+    }
     { sub(/\r$/, "")
       match($0, /^ */)
       l = (RLENGTH <= 3) ? substr($0, RLENGTH + 1) : "" }
+    fence {
+      if (l ~ /^(```|~~~)/) {
+        c = substr(l, 1, 1)
+        n = 0
+        while (substr(l, n + 1, 1) == c) n++
+        rest = substr(l, n + 1)
+        if (c == fc && n >= fl && rest ~ /^[ \t]*$/) fence = 0
+      }
+      next
+    }
     l ~ /^(```|~~~)/ {
       c = substr(l, 1, 1)
       n = 0
       while (substr(l, n + 1, 1) == c) n++
       rest = substr(l, n + 1)
-      if (!fence) {
-        if (c == "`" && index(rest, "`") > 0) next
+      if (!(c == "`" && index(rest, "`") > 0)) {
+        flush()
         fence = 1; fc = c; fl = n; at = FILENAME ":" FNR
-      } else if (c == fc && n >= fl && rest ~ /^[ \t]*$/) fence = 0
-      next
+        next
+      }
     }
-    fence { next }
     l ~ /^#+([ \t]|$)/ {
+      flush()
       cur = ""
       h = l
       sub(/^#+[ \t]*/, "", h)
       if (match(l, /^#### Scenario [A-Z]+-[0-9]+\.[0-9]+:/)) {
         cur = FILENAME ":" FNR
         print "S\t" substr(l, 15, RLENGTH - 15) "\t" cur
-      } else if (h ~ /^Scenario([^a-z]|$)/) {
+      } else if (tolower(h) ~ /^scenario([^a-z]|$)/) {
         print "M\t" FILENAME ":" FNR "\t" l
       }
       next
     }
-    cur != "" && index($0, "**Verified by:**") == 1 && !(cur in seen) {
-      t = substr($0, 17)
-      sub(/^[ \t]+/, "", t)
-      sub(/[ \t]+$/, "", t)
-      if (t != "") { seen[cur] = 1; print "V\t" cur "\t" t }
+    para {
+      if ($0 ~ /^[ \t]*$/) flush()
+      else add($0)
+      next
     }
-    END { if (fence) print "U\t" at }
+    cur != "" && index($0, "**Verified by:**") == 1 {
+      para = 1; pcur = cur
+      add(substr($0, 17))
+    }
+    END { flush(); if (fence) print "U\t" at }
   ' "$f" >> "$WORK/records"
-done
+done < "$WORK/speclist"
 
 # Check records "R<TAB>file<TAB>exit<TAB>ok|FAIL<TAB>ID", one per check line.
+# Test files run in byte order; each sees the tests folders being run, its own
+# included, in TRACE_RUNNING.
 for f in "$TESTS"/*_test.sh; do
   [ -e "$f" ] || continue
+  printf '%s\n' "$f"
+done | LC_ALL=C sort > "$WORK/testlist"
+while IFS= read -r f; do
   st=0
-  TRACE_RUNNING=1 sh "$f" > "$WORK/out" 2> "$WORK/err" < /dev/null || st=$?
+  TRACE_RUNNING=$RUNNING sh "$f" > "$WORK/out" 2> "$WORK/err" < /dev/null || st=$?
   if [ "$st" -ne 0 ]; then
     BAD=1
     echo "trace.sh: $(basename "$f") exited $st" >&2
@@ -120,7 +173,7 @@ for f in "$TESTS"/*_test.sh; do
       print "R\t" base "\t" st "\tFAIL\t" substr($0, RSTART, RLENGTH - 1)
     }
   ' "$WORK/out" >> "$WORK/records"
-done
+done < "$WORK/testlist"
 
 # Combine: order and text from the S and V records, checks from the R records.
 awk -F'\t' '

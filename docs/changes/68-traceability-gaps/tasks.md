@@ -64,7 +64,7 @@ locale exists (design decision 5). Name the trial break.
 - **Complexity:** medium
 - **Owns:** `scripts/trace.sh`
 - **Covers:** TRACE-1.7, TRACE-1.8, TRACE-3.1, TRACE-3.4, TRACE-5.5
-- **Status:** todo
+- **Status:** done
 
 Design decisions 1 to 4: match the malformed check case-insensitively; read
 the Verified by paragraph joined; keep the physical tests folders in
