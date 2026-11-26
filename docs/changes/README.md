@@ -128,3 +128,4 @@ ADDED, MODIFIED and REMOVED.
 | [`52-change-folder`](52-change-folder/design.md) | #52: the change folder and tasks format |
 | [`58-task-routing`](58-task-routing/design.md) | #58: agent roster and model routing for tasks |
 | [`65-traceability`](65-traceability/design.md) | #65: spec-driven test design and a traceability check |
+| [`68-traceability-gaps`](68-traceability-gaps/design.md) | #68: close the remaining traceability gaps |
