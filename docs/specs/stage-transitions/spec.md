@@ -55,14 +55,14 @@ invalid.
 - **WHEN** `scripts/stage.sh` runs without arguments
 - **THEN** it prints its usage and exits with status 2
 
-**Verified by:** not yet: stage.sh calls gh, so its test needs a gh stub, #66.
+**Verified by:** not yet: stage.sh checks this before it calls gh, but has no test yet, #66.
 
 #### Scenario STAGE-2.2: Issue is not a number
 
 - **WHEN** the first argument is not a plain number, for example `#5` or `abc`
 - **THEN** it reports that the issue must be a number and exits with status 2
 
-**Verified by:** not yet: stage.sh calls gh, so its test needs a gh stub, #66.
+**Verified by:** not yet: stage.sh checks this before it calls gh, but has no test yet, #66.
 
 #### Scenario STAGE-2.3: Unknown stage
 
@@ -70,7 +70,7 @@ invalid.
 - **THEN** it names the valid targets and exits with status 2
 - **AND** posts no comment and changes no label
 
-**Verified by:** not yet: stage.sh calls gh, so its test needs a gh stub, #66.
+**Verified by:** not yet: stage.sh checks this before it calls gh, but has no test yet, #66.
 
 ### Requirement STAGE-3: Move to a stage
 

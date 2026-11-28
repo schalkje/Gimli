@@ -28,11 +28,13 @@ are already right for that location.
   `**Verified by:** not yet: <reason>`, followed where one exists by the
   issue that will close the gap, as in
   `**Verified by:** not yet: needs a gh stub, #66`. Evidence must be a
-  Markdown link; any other text counts as no line. It records coverage, not
+  Markdown link; any other text counts as no paragraph. It records coverage, not
   behaviour, so adding or editing one needs no [spec delta](../changes/README.md#spec-deltas).
   A scenario with a passing check, an `ok <ID>:` line printed by a test in
   `scripts/tests/` that exits 0, needs no Verified by line.
-  `scripts/trace.sh` reads these lines; see [Traceability](traceability/spec.md).
+  A Verified by paragraph may wrap over several lines: `scripts/trace.sh` reads
+  its lines joined, up to a blank line, a heading or a fence. See
+  [Traceability](traceability/spec.md).
 - Headings use `#`, not `---` or `===` underlines, and a code block's
   fences start a line, not a list item: `scripts/trace.sh` reads only
   these forms.

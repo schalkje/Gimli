@@ -139,30 +139,35 @@ scripts/trace.sh <specs> <tests>        # other directories
 ```
 
 It reads `<specs>/*/spec.md`, except `_template`, and runs every
-`<tests>/*_test.sh` with `sh`, so a full run takes a minute or two on
-Windows. The output is one line per scenario, `<ID> <status> <source>`:
+`<tests>/*_test.sh` with `sh`, so a full run takes several minutes on
+Windows. The output is one line per scenario, `<ID> <status> <source>`, in
+the byte order of the spec paths whatever the locale; test files run in byte
+order too:
 
 | Status | Meaning | Source |
 |---|---|---|
 | `tested` | A test file exits 0 and prints `ok <ID>:` | the test file name |
-| `evidence` | The scenario's `**Verified by:**` line holds a Markdown link | the text |
-| `not-yet` | Its Verified by line starts `not yet`, in any case | the reason |
+| `evidence` | The scenario's `**Verified by:**` paragraph holds a Markdown link | the text |
+| `not-yet` | Its Verified by paragraph starts `not yet`, in any case | the reason |
 | `failing` | A test prints a `FAIL <ID>:` line, or its file exits non-zero | the file |
 | `uncovered` | None of the above, including Verified by text that is neither | `-` |
 
 Standard error names each test file that exits non-zero, with the last
 five lines of its standard error, each code block left open, each
-`#### Scenario` line that is not a well-formed heading, and each scenario
-ID used by more than one heading, with file and line; headings inside
-fenced code blocks are skipped.
+heading that starts with the word scenario, in any case, and is not well
+formed, each scenario ID used by more than one heading, with file and
+line, and a tests folder that is already running; headings inside fenced
+code blocks are skipped.
 
-The Verified by format is in the [spec format](../docs/specs/README.md).
+The Verified by paragraph is the line and those after it up to a blank
+line, a heading or a fence, each trimmed and joined with one space. Its
+format is in the [spec format](../docs/specs/README.md).
 
 | Exit | Meaning |
 |---|---|
 | 0 | No scenario is uncovered or failing, every test file exited 0, and every scenario heading is well formed with its own ID |
 | 1 | A scenario is uncovered or failing, a test file exited non-zero or printed a `FAIL` line, or a scenario heading is malformed or reuses an ID |
-| 2 | Usage error: not zero or two arguments, or a path that is not a folder; or no arguments inside a test it runs (`TRACE_RUNNING` is set) |
+| 2 | Usage error: not zero or two arguments, or a path that is not a folder; or no arguments inside a test it runs (`TRACE_RUNNING` is set); or a tests folder that a run above it is already running. `TRACE_RUNNING` holds those folders as physical paths, one per line |
 
 The rules are the [traceability spec](../docs/specs/traceability/spec.md);
 why they are so is [ADR 0005](../docs/adr/0005-traceability.md).
